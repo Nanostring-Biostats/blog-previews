@@ -10,7 +10,7 @@
 <atom:link href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/index.xml" rel="self" type="application/rss+xml"/>
 <description>NanoString&#39;s CosMx Analysis Scratch Space</description>
 <generator>quarto-1.6.30</generator>
-<lastBuildDate>Sat, 20 Sep 2025 00:00:00 GMT</lastBuildDate>
+<lastBuildDate>Mon, 29 Sep 2025 00:00:00 GMT</lastBuildDate>
 <item>
   <title>Differential expression: best practices and advanced techniques</title>
   <dc:creator>Patrick Danaher</dc:creator>
@@ -23,7 +23,7 @@
 
 <section id="introduction" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
-<p>CosMx analyses often culminate in a differential expression (DE) analysis. Exploratory analyses uncover all manner of interesting trends, and then these trends suggest hypotheses that can be tested with DE. A surprising breadth of questions can be framed as DE problems. To give a few examples:</p>
+<p>CosMx (R) SMI analyses often culminate in a differential expression (DE) analysis. Exploratory analyses uncover all manner of interesting trends, and then these trends suggest hypotheses that can be tested with DE. A surprising breadth of questions can be framed as DE problems. To give a few examples:</p>
 <ul>
 <li>How do tumor cells respond to the presence of T-cells?</li>
 <li>How do microglia activate in regions of inflammation?</li>
@@ -34,7 +34,7 @@
 <li>How do beta cells in pancreatic islets respond to local inflammation?</li>
 </ul>
 <p>Or, in the general form:</p>
-<p>“How does <my favorite="" cell="" type=""> change in response to <some aspect="" of="" its="" environment="">?”</some></my></p>
+<p>“How does <em>my favorite cell type</em> change in response to <em>some aspect of its environment</em>?”</p>
 <p>The goal of this post is to review major topics in DE in spatial transcriptomics, and to provide code when necessary.</p>
 </section>
 <section id="setting-up-a-de-question" class="level2" data-number="2">
@@ -42,27 +42,137 @@
 <p>Our experience suggests that most studies demand a highly custom DE question whose framing depends on the investigator’s primary questions and working assumptions about the biological system. To assist with this framing, we present below a collection of examples which, with slight modifications and remixing, covers most DE investigations you are likely to find productive. In each case we’ll define a variable that can be used as a predictor in DE models.</p>
 <section id="important-note-treatment-of-continuous-variables" class="level3" data-number="2.1">
 <h3 data-number="2.1" class="anchored" data-anchor-id="important-note-treatment-of-continuous-variables"><span class="header-section-number">2.1</span> Important note: treatment of continuous variables</h3>
-<p>Say we want to run DE against a continuous variable like distance to a cell type, or the expression level of a cytokine in a cell’s neighbors. We can calculate that distance (or expression level) and use it as a predictor in our model. However, in doing so we implicitly assume a linear relationship between the variable and our outcome. Other models might be more appropriate: we could consider transforming the variable, or we could break it into bins for a non-parametric approach. In particular, we have often found that binning of continuous variables produces satisfactory results.</p>
+<p>Say we want to run DE against a continuous variable like distance to a cell type, or the expression level of a cytokine in a cell’s neighbors. We can calculate that distance (or neighborhood expression level) and use it as a predictor in our model. However, in doing so we implicitly assume a linear relationship between the variable and our outcome (either linear or log-scale gene expression, depending on the model). Other models might be more appropriate: we could consider transforming the variable, or we could break it into bins for a non-parametric approach. In particular, we have often found that binning of continuous variables produces satisfactory results.</p>
 <section id="transformations" class="level4" data-number="2.1.1">
 <h4 data-number="2.1.1" class="anchored" data-anchor-id="transformations"><span class="header-section-number">2.1.1</span> Transformations:</h4>
 <ul>
 <li>If you think distance to a feature matters because of some diffused signals, then concentration of those molecules will vary with <img src="https://latex.codecogs.com/png.latex?distance%5E%7B-1%7D">.</li>
 <li>If neighborhood expression of a molecule is strongly right-tailed, which is likely, then a log transformation could prevent the end of the tail from having undue influence.</li>
+<li>To make effect sizes more interpretable, scale the variable from 0-1.</li>
+<li>For variables with strong skew or long tails, a quantile transformation can prevent extreme values from exerting excess influence on DE results.</li>
 </ul>
 </section>
 <section id="binning-discretizing" class="level4" data-number="2.1.2">
 <h4 data-number="2.1.2" class="anchored" data-anchor-id="binning-discretizing"><span class="header-section-number">2.1.2</span> Binning / discretizing:</h4>
-<p>You can avoid assumptions about the shape of a variable by binning it, e.g.&nbsp;assigning cells to 20 bins of “distance to nearest T-cell”. Then, you can use a likelihood ratio test to test the compound null hypothesis that “this variable predicts expression.” Because we usually have so many cells to work with, the slight loss in statistical power that comes with this approach is usually a cheap tradeoff to make for its flexibility. Also nice: you can use plots like the below to show how each gene changes expression across bins:</p>
+<p>You can avoid assumptions about the shape of a variable by binning it, e.g.&nbsp;assigning cells to 20 bins of “distance to nearest T-cell”. Then, you can use a likelihood ratio test against a null model (intercept-only) to test the compound null hypothesis that “this variable predicts expression.” Because we usually have so many cells to work with, the slight loss in statistical power that comes with this approach is usually a cheap tradeoff to make for its flexibility. Also nice: you can use plots like the below to show how each gene changes expression across bins:</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/bins.png" class="img-fluid figure-img" width="230"></p>
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/bins.png" class="img-fluid figure-img" style="width:110.0%"></p>
 </figure>
 </div>
 </div>
 </div>
 <p>Note: When binning, examine the number of cells per bin. If some bins have too few cells to produce stable results, either consider discarding them, or take wider bins.</p>
+</section>
+<section id="splines-flexibility-without-bins" class="level4" data-number="2.1.3">
+<h4 data-number="2.1.3" class="anchored" data-anchor-id="splines-flexibility-without-bins"><span class="header-section-number">2.1.3</span> Splines: flexibility without bins</h4>
+<p>Discretizing / binning has one drawback: the fit to discretized variables can be highly discontinuous, e.g.&nbsp;with a single bin having a large estimated effect size. It often makes sense to assume your design variable’s impact on gene expression varies smoothly across its range. To achieve this, you can use splines:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># define a continuous variable:</span></span>
+<span id="cb1-2">x <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rnorm</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5000</span>)</span>
+<span id="cb1-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># fit splines to it, producing a matrix of 10 dimensions:</span></span>
+<span id="cb1-4">splinex <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.matrix</span>(splines<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ns</span>(x, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">df =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">20</span>))</span>
+<span id="cb1-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># the "splinex" matrix can now be input into DE models</span></span>
+<span id="cb1-6"></span>
+<span id="cb1-7"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># how splinex relates to x:</span></span>
+<span id="cb1-8">o <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">order</span>(x)</span>
+<span id="cb1-9"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(x, splinex[,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">col =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xlab =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"variable"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ylab =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"spline values"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">cex.lab =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.3</span>)</span>
+<span id="cb1-10"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># draw each spline as a line:</span></span>
+<span id="cb1-11"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> (i <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ncol</span>(splinex)) {</span>
+<span id="cb1-12">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lines</span>(x[o], splinex[o, i], <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">col =</span> scales<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">alpha</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"darkblue"</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.3</span>))</span>
+<span id="cb1-13">}</span></code></pre></div>
+</details>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/splines.png" class="img-fluid figure-img" style="width:170.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>As with DE models fitting to bins, use a likelihood ratio test against an intercept-only null model, just as you would with a binned variable. To explore your results, plot mean values across bins for your most significant genes.</p>
 </section>
 </section>
 <section id="example-data" class="level3" data-number="2.2">
@@ -71,31 +181,31 @@
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="co" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Define paths</span></span>
-<span id="cb1-2">raw_data_dir <span class="ot" style="color: #003B4F;
+<span id="cb2-2">raw_data_dir <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"/path/to/raw/data"</span></span>
-<span id="cb1-3">out_dir <span class="ot" style="color: #003B4F;
+<span id="cb2-3">out_dir <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"/path/to/out/dir"</span></span>
-<span id="cb1-4">slide_name <span class="ot" style="color: #003B4F;
+<span id="cb2-4">slide_name <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"slideName"</span> <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Set this to your slide name, i.e. the identifier at the front of each flat file</span></span>
-<span id="cb1-5"></span>
-<span id="cb1-6"><span class="co" style="color: #5E5E5E;
+<span id="cb2-5"></span>
+<span id="cb2-6"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Read flat file exports: </span></span>
-<span id="cb1-7">meta_data <span class="ot" style="color: #003B4F;
+<span id="cb2-7">meta_data <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -108,7 +218,7 @@ background-color: null;
 font-style: inherit;">"_metadata_file.csv.gz"</span>)) <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#Note this is a small file and we read it into a data frame for convenience</span></span>
-<span id="cb1-8">xy <span class="ot" style="color: #003B4F;
+<span id="cb2-8">xy <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> meta_data[, <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -117,7 +227,7 @@ background-color: null;
 font-style: inherit;">"x_slide_mm"</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"y_slide_mm"</span>)]  </span>
-<span id="cb1-9">counts <span class="ot" style="color: #003B4F;
+<span id="cb2-9">counts <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -126,20 +236,20 @@ background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">fread</span>(  </span>
-<span id="cb1-10">  <span class="fu" style="color: #4758AB;
+<span id="cb2-10">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">file.path</span>(raw_data_dir, <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">paste0</span>(slide_name, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"_exprMat_file.csv.gz"</span>))</span>
-<span id="cb1-11">))  <span class="co" style="color: #5E5E5E;
+<span id="cb2-11">))  <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># &lt;-------------------------------- PROBABLY WRONG ------------------------ #</span></span>
-<span id="cb1-12"><span class="co" style="color: #5E5E5E;
+<span id="cb2-12"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># normalize:</span></span>
-<span id="cb1-13">norm_factors <span class="ot" style="color: #003B4F;
+<span id="cb2-13">norm_factors <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -150,7 +260,7 @@ background-color: null;
 font-style: inherit;">/</span> meta_data<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>nCount_RNA </span>
-<span id="cb1-14">norm <span class="ot" style="color: #003B4F;
+<span id="cb2-14">norm <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> Matrix<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -167,16 +277,25 @@ font-style: inherit;">%*%</span> counts</span></code></pre></div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="fu" style="color: #4758AB;
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">head</span>(meta_data)</span></code></pre></div>
 </details>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/metadatatable.png" class="img-fluid figure-img" style="width:170.0%"></p>
+</figure>
+</div>
+</div>
 </div>
 <p>…and the sample itself:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1">clustcols  <span class="ot" style="color: #003B4F;
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">clustcols  <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -243,8 +362,8 @@ background-color: null;
 font-style: inherit;">Unknown=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"#666666"</span>)</span>
-<span id="cb3-2"></span>
-<span id="cb3-3"><span class="fu" style="color: #4758AB;
+<span id="cb4-2"></span>
+<span id="cb4-3"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">par</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -259,7 +378,7 @@ background-color: null;
 font-style: inherit;">0</span>,<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span>))</span>
-<span id="cb3-4"><span class="fu" style="color: #4758AB;
+<span id="cb4-4"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(xy, <span class="at" style="color: #657422;
 background-color: null;
@@ -274,7 +393,7 @@ background-color: null;
 font-style: inherit;">asp =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>,</span>
-<span id="cb3-5">     <span class="at" style="color: #657422;
+<span id="cb4-5">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">col =</span> clustcols[meta_data<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -287,7 +406,7 @@ background-color: null;
 font-style: inherit;">ylab =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">""</span>)</span>
-<span id="cb3-6"><span class="fu" style="color: #4758AB;
+<span id="cb4-6"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">legend</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -312,7 +431,7 @@ font-style: inherit;">0.7</span>)</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/celltypemap.png" class="img-fluid figure-img" width="394"></p>
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/celltypemap.png" class="img-fluid figure-img" style="width:170.0%"></p>
 </figure>
 </div>
 </div>
@@ -327,13 +446,13 @@ font-style: inherit;">0.7</span>)</span></code></pre></div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><span class="do" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## (use pre-calculated niche)</span></span>
-<span id="cb4-2"><span class="do" style="color: #5E5E5E;
+<span id="cb5-2"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## plot niche:</span></span>
-<span id="cb4-3">inds <span class="ot" style="color: #003B4F;
+<span id="cb5-3">inds <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> meta_data<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -342,7 +461,7 @@ background-color: null;
 font-style: inherit;">==</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Tumor"</span></span>
-<span id="cb4-4"><span class="fu" style="color: #4758AB;
+<span id="cb5-4"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">par</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -357,7 +476,7 @@ background-color: null;
 font-style: inherit;">2</span>,<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span>))</span>
-<span id="cb4-5"><span class="fu" style="color: #4758AB;
+<span id="cb5-5"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(xy[inds, ], <span class="at" style="color: #657422;
 background-color: null;
@@ -372,12 +491,12 @@ background-color: null;
 font-style: inherit;">asp =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>,</span>
-<span id="cb4-6">     <span class="at" style="color: #657422;
+<span id="cb5-6">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Tumor cells colored by niche"</span>,</span>
-<span id="cb4-7">     <span class="at" style="color: #657422;
+<span id="cb5-7">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">col =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -392,7 +511,7 @@ background-color: null;
 font-style: inherit;">as.factor</span>(meta_data<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>niche[inds]))],</span>
-<span id="cb4-8">     <span class="at" style="color: #657422;
+<span id="cb5-8">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">xlab =</span> <span class="st" style="color: #20794D;
 background-color: null;
@@ -401,7 +520,7 @@ background-color: null;
 font-style: inherit;">ylab =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">""</span>)</span>
-<span id="cb4-9"><span class="fu" style="color: #4758AB;
+<span id="cb5-9"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">points</span>(xy[<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -418,7 +537,7 @@ background-color: null;
 font-style: inherit;">col =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"grey80"</span>)</span>
-<span id="cb4-10"><span class="fu" style="color: #4758AB;
+<span id="cb5-10"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">legend</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -457,7 +576,7 @@ font-style: inherit;">0.7</span>)</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/niche.png" class="img-fluid figure-img" width="394"></p>
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/niche.png" class="img-fluid figure-img" style="width:170.0%"></p>
 </figure>
 </div>
 </div>
@@ -477,17 +596,17 @@ font-style: inherit;">0.7</span>)</span></code></pre></div>
 </ul>
 <p>This approach was driven by our knowledge of the tissue and by our biological questions.</p>
 </section>
-<section id="distance-to-nearest" class="level3" data-number="2.5">
-<h3 data-number="2.5" class="anchored" data-anchor-id="distance-to-nearest"><span class="header-section-number">2.5</span> Distance to nearest <cell type=""></cell></h3>
+<section id="distance-to-nearest-cell-from-a-given-cluster-group" class="level3" data-number="2.5">
+<h3 data-number="2.5" class="anchored" data-anchor-id="distance-to-nearest-cell-from-a-given-cluster-group"><span class="header-section-number">2.5</span> Distance to nearest cell from a given cluster / group</h3>
 <p>A common and productive DE question is: how does my favorite cell type change with proximity to another cell type?</p>
 <p>To demonstrate how to ask this kind of question, below we score tumor cells by their distance to the nearest T-cell:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="do" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## Calculate tumor cells' distance to nearest T-cell:</span></span>
-<span id="cb5-2">inds.tumor <span class="ot" style="color: #003B4F;
+<span id="cb6-2">inds.tumor <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> meta_data<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -496,7 +615,7 @@ background-color: null;
 font-style: inherit;">==</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Tumor"</span></span>
-<span id="cb5-3">inds.t     <span class="ot" style="color: #003B4F;
+<span id="cb6-3">inds.t     <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> meta_data<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -505,21 +624,21 @@ background-color: null;
 font-style: inherit;">==</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Tcell"</span></span>
-<span id="cb5-4"><span class="fu" style="color: #4758AB;
+<span id="cb6-4"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">stopifnot</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">any</span>(inds.tumor), <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">any</span>(inds.t))</span>
-<span id="cb5-5">dist2tcell <span class="ot" style="color: #003B4F;
+<span id="cb6-5">dist2tcell <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> FNN<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">get.knnx</span>(</span>
-<span id="cb5-6">  <span class="at" style="color: #657422;
+<span id="cb6-6">  <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">data  =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -528,32 +647,34 @@ background-color: null;
 font-style: inherit;">drop=</span><span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">FALSE</span>]),</span>
-<span id="cb5-7">  <span class="at" style="color: #657422;
+<span id="cb6-7">  <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">query =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">as.matrix</span>(xy[inds.tumor, , <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">drop=</span><span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">FALSE</span>]),</span>
-<span id="cb5-8">  <span class="at" style="color: #657422;
+font-style: inherit;">as.matrix</span>(xy),</span>
+<span id="cb6-8">  <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">k =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span></span>
-<span id="cb5-9">)<span class="sc" style="color: #5E5E5E;
+<span id="cb6-9">)<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>nn.dist[, <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>]</span>
-<span id="cb5-10"></span>
-<span id="cb5-11"></span>
-<span id="cb5-12"><span class="do" style="color: #5E5E5E;
+<span id="cb6-10"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># store in metadata:</span></span>
+<span id="cb6-11">meta_data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>dist2tcell <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> dist2tcell</span>
+<span id="cb6-12"></span>
+<span id="cb6-13"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## plot tumor cells, coloring by distance to T-cell:</span></span>
-<span id="cb5-13"></span>
-<span id="cb5-14"><span class="fu" style="color: #4758AB;
+<span id="cb6-14"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">par</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -568,7 +689,7 @@ background-color: null;
 font-style: inherit;">2</span>,<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span>))</span>
-<span id="cb5-15"><span class="fu" style="color: #4758AB;
+<span id="cb6-15"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(xy[inds.tumor, ], <span class="at" style="color: #657422;
 background-color: null;
@@ -583,12 +704,12 @@ background-color: null;
 font-style: inherit;">asp =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>,</span>
-<span id="cb5-16">     <span class="at" style="color: #657422;
+<span id="cb6-16">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Tumor cells colored by distance to T-cell"</span>,</span>
-<span id="cb5-17">     <span class="at" style="color: #657422;
+<span id="cb6-17">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">col =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -607,7 +728,7 @@ background-color: null;
 font-style: inherit;">"black"</span>)))(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">101</span>)[</span>
-<span id="cb5-18">       <span class="dv" style="color: #AD0000;
+<span id="cb6-18">       <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -622,8 +743,8 @@ background-color: null;
 font-style: inherit;">/</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">max</span>(dist2tcell))</span>
-<span id="cb5-19">     ],</span>
-<span id="cb5-20">     <span class="at" style="color: #657422;
+<span id="cb6-19">     ][inds.tumor],</span>
+<span id="cb6-20">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">xlab =</span> <span class="st" style="color: #20794D;
 background-color: null;
@@ -632,7 +753,7 @@ background-color: null;
 font-style: inherit;">ylab =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">""</span>)</span>
-<span id="cb5-21"><span class="fu" style="color: #4758AB;
+<span id="cb6-21"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">points</span>(xy[<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -649,7 +770,7 @@ background-color: null;
 font-style: inherit;">col =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"wheat"</span>)</span>
-<span id="cb5-22"><span class="fu" style="color: #4758AB;
+<span id="cb6-22"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">points</span>(xy[inds.t, ], <span class="at" style="color: #657422;
 background-color: null;
@@ -664,8 +785,8 @@ background-color: null;
 font-style: inherit;">col =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"red"</span>)</span>
-<span id="cb5-23"></span>
-<span id="cb5-24"><span class="fu" style="color: #4758AB;
+<span id="cb6-23"></span>
+<span id="cb6-24"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">legend</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -684,7 +805,7 @@ background-color: null;
 font-style: inherit;">"red"</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"wheat"</span>), </span>
-<span id="cb5-25">       <span class="at" style="color: #657422;
+<span id="cb6-25">       <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">legend =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -705,23 +826,23 @@ font-style: inherit;">0.7</span>)</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/dist2tcell.png" class="img-fluid figure-img" width="394"></p>
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/dist2tcell.png" class="img-fluid figure-img" style="width:170.0%"></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="distance-to-nearest-1" class="level3" data-number="2.6">
-<h3 data-number="2.6" class="anchored" data-anchor-id="distance-to-nearest-1"><span class="header-section-number">2.6</span> Distance to nearest <anatomical structure=""></anatomical></h3>
+<section id="distance-to-nearest-cell-from-an-anatomical-structure" class="level3" data-number="2.6">
+<h3 data-number="2.6" class="anchored" data-anchor-id="distance-to-nearest-cell-from-an-anatomical-structure"><span class="header-section-number">2.6</span> Distance to nearest cell from an anatomical structure</h3>
 <p>Many cell types fall in structures, e.g.&nbsp;blood vessels, tumor glands, or glomeruli. When calculating distance to a structure, it is tempting to simply record distance to the nearest relevant cell type, e.g.&nbsp;endothelial cells for blood vessels, or tumor cells for tumor glands, or podocytes and mesangial cells for glomeruli. However, this approach is easily distorted by sporadic cell typing errors. It is more robust to look at distance to the nearest <em>spatially contiguous group</em> of the target cell type.</p>
-<p>Below, we demonstrate how the DBSCAN algorithm can isolate cells in contiguous groups and remove singletons. DBSCAN is an incredibly fast algorithm that clusters together any points within a given radius of each other. We’ll keep only cells that fall in clusters of at least 3.</p>
+<p>Below, we’ll define an annotation for ‘vascular structure’, based on contiguous groups of endothelial cells. We use DBSCAN algorithm, an incredibly fast algorithm which can cluster together cells within a fixed radius of each other. We’ll keep only cells that fall in clusters of at least 3.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><span class="do" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## show the target cell type: endothelial cells:</span></span>
-<span id="cb6-2">inds <span class="ot" style="color: #003B4F;
+<span id="cb7-2">inds <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> meta_data<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -730,7 +851,7 @@ background-color: null;
 font-style: inherit;">==</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Vasculature"</span></span>
-<span id="cb6-3"><span class="fu" style="color: #4758AB;
+<span id="cb7-3"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">par</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -745,7 +866,7 @@ background-color: null;
 font-style: inherit;">2</span>,<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span>))</span>
-<span id="cb6-4"><span class="fu" style="color: #4758AB;
+<span id="cb7-4"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(xy[, ], <span class="at" style="color: #657422;
 background-color: null;
@@ -760,7 +881,7 @@ background-color: null;
 font-style: inherit;">asp =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>,</span>
-<span id="cb6-5">     <span class="at" style="color: #657422;
+<span id="cb7-5">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
 background-color: null;
@@ -769,7 +890,7 @@ background-color: null;
 font-style: inherit;">col =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"grey80"</span>,</span>
-<span id="cb6-6">     <span class="at" style="color: #657422;
+<span id="cb7-6">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">xlab =</span> <span class="st" style="color: #20794D;
 background-color: null;
@@ -778,7 +899,7 @@ background-color: null;
 font-style: inherit;">ylab =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">""</span>)</span>
-<span id="cb6-7"><span class="fu" style="color: #4758AB;
+<span id="cb7-7"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">points</span>(xy[inds, ], <span class="at" style="color: #657422;
 background-color: null;
@@ -799,7 +920,7 @@ font-style: inherit;">"darkred"</span>)</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/vessel.png" class="img-fluid figure-img" width="394"></p>
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/vessel.png" class="img-fluid figure-img" style="width:170.0%"></p>
 </figure>
 </div>
 </div>
@@ -807,50 +928,58 @@ font-style: inherit;">"darkred"</span>)</span></code></pre></div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="do" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## use dbscan to isolate clusters of Vasculature cells:</span></span>
-<span id="cb7-2">db <span class="ot" style="color: #003B4F;
+<span id="cb8-2">db <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> dbscan<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">dbscan</span>(xy[inds, ],</span>
-<span id="cb7-3">                     <span class="at" style="color: #657422;
+<span id="cb8-3">                     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">eps =</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.05</span>, <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># very small radius</span></span>
-<span id="cb7-4">                     <span class="at" style="color: #657422;
+<span id="cb8-4">                     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">minPts =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">3</span>)<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>cluster</span>
-<span id="cb7-5">inds.in.clusters <span class="ot" style="color: #003B4F;
+<span id="cb8-5">inds.in.clusters <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> db <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">!=</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span></span>
-<span id="cb7-6">is.vessel <span class="ot" style="color: #003B4F;
+<span id="cb8-6">is.vessel <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> inds</span>
-<span id="cb7-7">is.vessel[<span class="fu" style="color: #4758AB;
+<span id="cb8-7">is.vessel[<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">which</span>(inds)] <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> inds.in.clusters</span>
-<span id="cb7-8"></span>
-<span id="cb7-9"><span class="do" style="color: #5E5E5E;
+<span id="cb8-8"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># store in metadata:</span></span>
+<span id="cb8-9">meta_data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>is.vessel <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> is.vessel</span>
+<span id="cb8-10"></span>
+<span id="cb8-11"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## show the result:</span></span>
-<span id="cb7-10"><span class="fu" style="color: #4758AB;
+<span id="cb8-12"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">par</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -865,7 +994,7 @@ background-color: null;
 font-style: inherit;">2</span>,<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span>))</span>
-<span id="cb7-11"><span class="fu" style="color: #4758AB;
+<span id="cb8-13"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(xy[, ], <span class="at" style="color: #657422;
 background-color: null;
@@ -880,7 +1009,7 @@ background-color: null;
 font-style: inherit;">asp =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>,</span>
-<span id="cb7-12">     <span class="at" style="color: #657422;
+<span id="cb8-14">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
 background-color: null;
@@ -889,7 +1018,7 @@ background-color: null;
 font-style: inherit;">col =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"grey80"</span>,</span>
-<span id="cb7-13">     <span class="at" style="color: #657422;
+<span id="cb8-15">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">xlab =</span> <span class="st" style="color: #20794D;
 background-color: null;
@@ -898,7 +1027,7 @@ background-color: null;
 font-style: inherit;">ylab =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">""</span>)</span>
-<span id="cb7-14"><span class="fu" style="color: #4758AB;
+<span id="cb8-16"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">points</span>(xy[inds <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -917,7 +1046,7 @@ background-color: null;
 font-style: inherit;">col =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"blue"</span>)</span>
-<span id="cb7-15"><span class="fu" style="color: #4758AB;
+<span id="cb8-17"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">points</span>(xy[is.vessel, ], <span class="at" style="color: #657422;
 background-color: null;
@@ -932,7 +1061,7 @@ background-color: null;
 font-style: inherit;">col =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"red"</span>)</span>
-<span id="cb7-16"><span class="fu" style="color: #4758AB;
+<span id="cb8-18"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">legend</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -949,7 +1078,7 @@ background-color: null;
 font-style: inherit;">"red"</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"blue"</span>), </span>
-<span id="cb7-17">       <span class="at" style="color: #657422;
+<span id="cb8-19">       <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">legend =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -964,7 +1093,7 @@ font-style: inherit;">"Vasculature cells excluded by dbscan"</span>))</span></co
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/vesseldb.png" class="img-fluid figure-img" width="394"></p>
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/vesseldb.png" class="img-fluid figure-img" style="width:170.0%"></p>
 </figure>
 </div>
 </div>
@@ -972,16 +1101,16 @@ font-style: inherit;">"Vasculature cells excluded by dbscan"</span>))</span></co
 <p>After obtaining this cleaned up annotation, we could then take the distance to it using<br>
 code from the tumor distance to T-cell example earlier.</p>
 </section>
-<section id="number-of-in-a-neighborhood" class="level3" data-number="2.7">
-<h3 data-number="2.7" class="anchored" data-anchor-id="number-of-in-a-neighborhood"><span class="header-section-number">2.7</span> Number of <cell type=""> in a neighborhood</cell></h3>
+<section id="number-of-a-given-cell-type-in-a-neighborhood" class="level3" data-number="2.7">
+<h3 data-number="2.7" class="anchored" data-anchor-id="number-of-a-given-cell-type-in-a-neighborhood"><span class="header-section-number">2.7</span> Number of a given cell type in a neighborhood</h3>
 <p>Another common question: how does a cell type change in response to the abundance of another cell type in its neighborhood? Here we’ll log-transform our predictor to acknowledge the probability of diminishing effects of each new T-cell in a tumor cell’s neighborhood.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><span class="do" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## Calculate the number of T-cells in each tumor cell's neighborhood:</span></span>
-<span id="cb8-2">inds.tumor <span class="ot" style="color: #003B4F;
+<span id="cb9-2">inds.tumor <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> meta_data<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -990,7 +1119,7 @@ background-color: null;
 font-style: inherit;">==</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Tumor"</span></span>
-<span id="cb8-3">inds.t <span class="ot" style="color: #003B4F;
+<span id="cb9-3">inds.t <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> meta_data<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -999,11 +1128,11 @@ background-color: null;
 font-style: inherit;">==</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Tcell"</span></span>
-<span id="cb8-4"></span>
-<span id="cb8-5"><span class="co" style="color: #5E5E5E;
+<span id="cb9-4"></span>
+<span id="cb9-5"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># get the 50 nearest neighbors of each cell:</span></span>
-<span id="cb8-6">neighbors <span class="ot" style="color: #003B4F;
+<span id="cb9-6">neighbors <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> InSituCor<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -1022,10 +1151,10 @@ background-color: null;
 font-style: inherit;">N =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">50</span>)</span>
-<span id="cb8-7"><span class="co" style="color: #5E5E5E;
+<span id="cb9-7"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># (or alternatively, get neighbors within a radius of 0.1mm):</span></span>
-<span id="cb8-8">neighbors.radius <span class="ot" style="color: #003B4F;
+<span id="cb9-8">neighbors.radius <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> InSituCor<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -1044,11 +1173,11 @@ background-color: null;
 font-style: inherit;">R =</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.1</span>)</span>
-<span id="cb8-9"></span>
-<span id="cb8-10"><span class="co" style="color: #5E5E5E;
+<span id="cb9-9"></span>
+<span id="cb9-10"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># count the T-cells among cells' neighbors:</span></span>
-<span id="cb8-11">neighboring.tcells <span class="ot" style="color: #003B4F;
+<span id="cb9-11">neighboring.tcells <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> InSituCor<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -1067,10 +1196,10 @@ background-color: null;
 font-style: inherit;">==</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Tcell"</span>),</span>
-<span id="cb8-12">                                               <span class="at" style="color: #657422;
+<span id="cb9-12">                                               <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">neighbors =</span> neighbors)</span>
-<span id="cb8-13">log.neighboring.tcells <span class="ot" style="color: #003B4F;
+<span id="cb9-13">log.neighboring.tcells <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1079,10 +1208,19 @@ background-color: null;
 font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> neighboring.tcells)</span>
-<span id="cb8-14"><span class="co" style="color: #5E5E5E;
+<span id="cb9-14"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># store in metadata:</span></span>
+<span id="cb9-15">meta_data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>log.neighboring.tcells <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> log.neighboring.tcells</span>
+<span id="cb9-16"></span>
+<span id="cb9-17"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># color tumor cells by the number of T-cell neighbors:</span></span>
-<span id="cb8-15"><span class="fu" style="color: #4758AB;
+<span id="cb9-18"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">par</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -1097,7 +1235,7 @@ background-color: null;
 font-style: inherit;">2</span>,<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span>))</span>
-<span id="cb8-16"><span class="fu" style="color: #4758AB;
+<span id="cb9-19"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(xy[inds.tumor, ], <span class="at" style="color: #657422;
 background-color: null;
@@ -1112,296 +1250,12 @@ background-color: null;
 font-style: inherit;">asp =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>,</span>
-<span id="cb8-17">     <span class="at" style="color: #657422;
+<span id="cb9-20">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Tumor cells colored by log2(number of T-cell neighbors)"</span>,</span>
-<span id="cb8-18">     <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">col =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">colorRampPalette</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">c</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"#A6CEE3"</span>,<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"#1F78B4"</span>,<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"#081D58"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"black"</span>)))(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">101</span>)[</span>
-<span id="cb8-19">       <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">round</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">100</span> <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> log.neighboring.tcells[inds.tumor] <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">max</span>(log.neighboring.tcells[inds.tumor]))</span>
-<span id="cb8-20">     ],</span>
-<span id="cb8-21">     <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">xlab =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">""</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">ylab =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">""</span>)</span>
-<span id="cb8-22"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">points</span>(xy[<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">!</span>inds.tumor, ], <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">pch =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">16</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">cex =</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.1</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">col =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"wheat"</span>)</span>
-<span id="cb8-23"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">points</span>(xy[inds.t, ], <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">pch =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">16</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">cex =</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.3</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">col =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"red"</span>)</span>
-<span id="cb8-24"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">legend</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"topleft"</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">pch =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">16</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">col =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"#1F78B4"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"red"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"wheat"</span>), </span>
-<span id="cb8-25">       <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">legend =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Tumor cells colored by log2(number of neighboring T-cells)"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"T-cells"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"other cells"</span>), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">cex =</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.7</span>)</span></code></pre></div>
-</details>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/ntcells.png" class="img-fluid figure-img" width="394"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="gene-expression-in-cells-neighborhoods" class="level3" data-number="2.8">
-<h3 data-number="2.8" class="anchored" data-anchor-id="gene-expression-in-cells-neighborhoods"><span class="header-section-number">2.8</span> Gene expression in cells’ neighborhoods</h3>
-<p>To investigate how a gene impacts nearby cells, we can run differential expression against the gene’s total expression in each cell’s neighborhood. Below, we score macrophages for the total abundance of CXCL14 in their neighborhoods. This sets us up for DE studies of how macrophages respond to signaling from CXCL14. In the below example, we take the additional step of log-transforming neighborhood CXCL14.</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## get average CXCL14 expression in each cell's neighborhood:</span></span>
-<span id="cb9-2"></span>
-<span id="cb9-3"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># get the 50 nearest neighbors of each cell:</span></span>
-<span id="cb9-4">neighbors <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> InSituCor<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nearestNeighborGraph</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">x =</span> xy[, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span>], <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">y =</span> xy[, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span>], <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">N =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">50</span>)</span>
-<span id="cb9-5"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># (or alternatively, get neighbors within a radius of 0.1mm):</span></span>
-<span id="cb9-6">neighbors.radius <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> InSituCor<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">radiusBasedGraph</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">x =</span> xy[, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span>], <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">y =</span> xy[, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span>], <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">R =</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.1</span>)</span>
-<span id="cb9-7"></span>
-<span id="cb9-8"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># normalized CXCL14:</span></span>
-<span id="cb9-9">normvals <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> counts[, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"CXCL14"</span>] <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span> meta_data<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>nCount_RNA</span>
-<span id="cb9-10"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># get average CXCL14 expression in each cell's neighborhood:</span></span>
-<span id="cb9-11">neighboring.cxcl14 <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> InSituCor<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">neighbor_sum</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">x =</span> normvals,</span>
-<span id="cb9-12">                                               <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">neighbors =</span> neighbors)</span>
-<span id="cb9-13">log2.neighboring.cxcl14 <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">log2</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> neighboring.cxcl14)</span>
-<span id="cb9-14"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## plot macrophages, coloring by local CXCL14 expression:</span></span>
-<span id="cb9-15">inds.mac <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> meta_data<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>celltype <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">==</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Macrophage"</span></span>
-<span id="cb9-16"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">par</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">mar =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0</span>,<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0</span>,<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span>,<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0</span>))</span>
-<span id="cb9-17"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">plot</span>(xy, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">pch =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">16</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">cex =</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.1</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">asp =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">col =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"wheat"</span>,</span>
-<span id="cb9-18">     <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Macrophages colored by log2(neighborhood CXCL14 expression)"</span>,</span>
-<span id="cb9-19">     <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">xlab =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">""</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">ylab =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">""</span>)</span>
-<span id="cb9-20"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">points</span>(xy[inds.mac, ], <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">pch =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">16</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">cex =</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.4</span>, </span>
-<span id="cb9-21">            <span class="at" style="color: #657422;
+<span id="cb9-21">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">col =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1430,13 +1284,306 @@ font-style: inherit;">round</span>(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">100</span> <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">*</span> log2.neighboring.cxcl14[inds.mac] <span class="sc" style="color: #5E5E5E;
+font-style: inherit;">*</span> log.neighboring.tcells <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">/</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">max</span>(log2.neighboring.cxcl14[inds.mac]))</span>
-<span id="cb9-23">     ])</span>
-<span id="cb9-24"><span class="fu" style="color: #4758AB;
+font-style: inherit;">max</span>(log.neighboring.tcells))</span>
+<span id="cb9-23">     ][inds.tumor],</span>
+<span id="cb9-24">     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xlab =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">""</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ylab =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">""</span>)</span>
+<span id="cb9-25"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">points</span>(xy[<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!</span>inds.tumor, ], <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pch =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">16</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">cex =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">col =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"wheat"</span>)</span>
+<span id="cb9-26"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">points</span>(xy[inds.t, ], <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pch =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">16</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">cex =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.3</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">col =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>)</span>
+<span id="cb9-27"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">legend</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"topleft"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pch =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">16</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">col =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#1F78B4"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"wheat"</span>), </span>
+<span id="cb9-28">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">legend =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Tumor cells colored by log2(number of neighboring T-cells)"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"T-cells"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"other cells"</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">cex =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.7</span>)</span></code></pre></div>
+</details>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/ntcells.png" class="img-fluid figure-img" style="width:170.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="gene-expression-in-cells-neighborhoods" class="level3" data-number="2.8">
+<h3 data-number="2.8" class="anchored" data-anchor-id="gene-expression-in-cells-neighborhoods"><span class="header-section-number">2.8</span> Gene expression in cells’ neighborhoods</h3>
+<p>To investigate how a gene impacts nearby cells, we can run differential expression against the gene’s total expression in each cell’s neighborhood. Below, we score macrophages for the total abundance of CXCL14 in their neighborhoods. This sets us up for DE studies of how macrophages respond to signaling from CXCL14. In the below example, we take the additional step of log-transforming neighborhood CXCL14.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## get average CXCL14 expression in each cell's neighborhood:</span></span>
+<span id="cb10-2"></span>
+<span id="cb10-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># get the 50 nearest neighbors of each cell:</span></span>
+<span id="cb10-4">neighbors <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> InSituCor<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">nearestNeighborGraph</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> xy[, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> xy[, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>], <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">N =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>)</span>
+<span id="cb10-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># (or alternatively, get neighbors within a radius of 0.1mm):</span></span>
+<span id="cb10-6">neighbors.radius <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> InSituCor<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">radiusBasedGraph</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> xy[, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> xy[, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>], <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">R =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1</span>)</span>
+<span id="cb10-7"></span>
+<span id="cb10-8"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># normalized CXCL14:</span></span>
+<span id="cb10-9">normvals <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> counts[, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"CXCL14"</span>] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> meta_data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>nCount_RNA</span>
+<span id="cb10-10"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># get average CXCL14 expression in each cell's neighborhood:</span></span>
+<span id="cb10-11">neighboring.cxcl14 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> InSituCor<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">neighbor_sum</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> normvals,</span>
+<span id="cb10-12">                                               <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">neighbors =</span> neighbors)</span>
+<span id="cb10-13">log2.neighboring.cxcl14 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">log2</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> neighboring.cxcl14)</span>
+<span id="cb10-14"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># add to metadata:</span></span>
+<span id="cb10-15">meta_data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>log2.neighboring.cxcl14 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> log2.neighboring.cxcl14</span>
+<span id="cb10-16"></span>
+<span id="cb10-17"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## plot macrophages, coloring by local CXCL14 expression:</span></span>
+<span id="cb10-18">inds.mac <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> meta_data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>celltype <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Macrophage"</span></span>
+<span id="cb10-19"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">par</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mar =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>))</span>
+<span id="cb10-20"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(xy, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pch =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">16</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">cex =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">asp =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">col =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"wheat"</span>,</span>
+<span id="cb10-21">     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Macrophages colored by log2(neighborhood CXCL14 expression)"</span>,</span>
+<span id="cb10-22">     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xlab =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">""</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ylab =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">""</span>)</span>
+<span id="cb10-23"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">points</span>(xy[inds.mac, ], <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pch =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">16</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">cex =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.4</span>, </span>
+<span id="cb10-24">            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">col =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">colorRampPalette</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#A6CEE3"</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#1F78B4"</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#081D58"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>)))(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">101</span>)[</span>
+<span id="cb10-25">       <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">round</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> log2.neighboring.cxcl14 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">max</span>(log2.neighboring.cxcl14))</span>
+<span id="cb10-26">     ][inds.mac])</span>
+<span id="cb10-27"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">legend</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -1453,7 +1600,7 @@ background-color: null;
 font-style: inherit;">"#1F78B4"</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"wheat"</span>), </span>
-<span id="cb9-25">       <span class="at" style="color: #657422;
+<span id="cb10-28">       <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">legend =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1472,7 +1619,7 @@ font-style: inherit;">0.7</span>)</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/cxcl14.png" class="img-fluid figure-img" width="394"></p>
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/cxcl14.png" class="img-fluid figure-img" style="width:170.0%"></p>
 </figure>
 </div>
 </div>
@@ -1484,94 +1631,94 @@ font-style: inherit;">0.7</span>)</span></code></pre></div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><span class="co" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' Define roi's by Clicking on cells in a graphics window</span></span>
-<span id="cb10-2"><span class="co" style="color: #5E5E5E;
+<span id="cb11-2"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' </span></span>
-<span id="cb10-3"><span class="co" style="color: #5E5E5E;
+<span id="cb11-3"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' How to use:</span></span>
-<span id="cb10-4"><span class="co" style="color: #5E5E5E;
+<span id="cb11-4"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' \itemize{</span></span>
-<span id="cb10-5"><span class="co" style="color: #5E5E5E;
+<span id="cb11-5"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' \item Plot your cells in xy space. Use asp = 1. </span></span>
-<span id="cb10-6"><span class="co" style="color: #5E5E5E;
+<span id="cb11-6"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' \item Click cells around the boundary of your roi.</span></span>
-<span id="cb10-7"><span class="co" style="color: #5E5E5E;
+<span id="cb11-7"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' \item Hit enter or escape when done with your selection.</span></span>
-<span id="cb10-8"><span class="co" style="color: #5E5E5E;
+<span id="cb11-8"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' }</span></span>
-<span id="cb10-9"><span class="co" style="color: #5E5E5E;
+<span id="cb11-9"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' Other details:</span></span>
-<span id="cb10-10"><span class="co" style="color: #5E5E5E;
+<span id="cb11-10"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' \itemize{</span></span>
-<span id="cb10-11"><span class="co" style="color: #5E5E5E;
+<span id="cb11-11"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' \item Uses graphics::identify() to select points. </span></span>
-<span id="cb10-12"><span class="co" style="color: #5E5E5E;
+<span id="cb11-12"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' \item Only works for base graphics, not ggplots.</span></span>
-<span id="cb10-13"><span class="co" style="color: #5E5E5E;
+<span id="cb11-13"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' \item Can go wrong (draw rois in the wrong place) if the plot doesn't have asp = 1. </span></span>
-<span id="cb10-14"><span class="co" style="color: #5E5E5E;
+<span id="cb11-14"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' }</span></span>
-<span id="cb10-15"><span class="co" style="color: #5E5E5E;
+<span id="cb11-15"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' @param xy Matrix of xy positions used in the plot. </span></span>
-<span id="cb10-16"><span class="co" style="color: #5E5E5E;
+<span id="cb11-16"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' @param show Logical, for whether to show the selected roi when you're done. </span></span>
-<span id="cb10-17"><span class="co" style="color: #5E5E5E;
+<span id="cb11-17"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' @param type One of:</span></span>
-<span id="cb10-18"><span class="co" style="color: #5E5E5E;
+<span id="cb11-18"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' \itemize{</span></span>
-<span id="cb10-19"><span class="co" style="color: #5E5E5E;
+<span id="cb11-19"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' \item "direct" to define the boundary points in order, exactly as you click</span></span>
-<span id="cb10-20"><span class="co" style="color: #5E5E5E;
+<span id="cb11-20"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' \item "ahull" to draw an alpha hull around your selection</span></span>
-<span id="cb10-21"><span class="co" style="color: #5E5E5E;
+<span id="cb11-21"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' } </span></span>
-<span id="cb10-22"><span class="co" style="color: #5E5E5E;
+<span id="cb11-22"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' @return A list with 3 elements:</span></span>
-<span id="cb10-23"><span class="co" style="color: #5E5E5E;
+<span id="cb11-23"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' \itemize{</span></span>
-<span id="cb10-24"><span class="co" style="color: #5E5E5E;
+<span id="cb11-24"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' \item roi: The indices of the points in the roi</span></span>
-<span id="cb10-25"><span class="co" style="color: #5E5E5E;
+<span id="cb11-25"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' \item selected: The indices of the user-selected points</span></span>
-<span id="cb10-26"><span class="co" style="color: #5E5E5E;
+<span id="cb11-26"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' \item hull: The hull of the roi, either the user-selected polygon or the results of alphahull:ahull}</span></span>
-<span id="cb10-27"><span class="co" style="color: #5E5E5E;
+<span id="cb11-27"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' @importFrom graphics identify</span></span>
-<span id="cb10-28"><span class="co" style="color: #5E5E5E;
+<span id="cb11-28"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' @importFrom alphahull ahull</span></span>
-<span id="cb10-29"><span class="co" style="color: #5E5E5E;
+<span id="cb11-29"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#' @</span></span>
-<span id="cb10-30">defineROI <span class="ot" style="color: #003B4F;
+<span id="cb11-30">defineROI <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
 background-color: null;
@@ -1589,7 +1736,7 @@ background-color: null;
 font-style: inherit;">show =</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">TRUE</span>) {</span>
-<span id="cb10-31">  <span class="cf" style="color: #003B4F;
+<span id="cb11-31">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> (<span class="sc" style="color: #5E5E5E;
@@ -1597,20 +1744,20 @@ background-color: null;
 font-style: inherit;">!</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">is.null</span>(boundary_points)) {</span>
-<span id="cb10-32">    hull.x <span class="ot" style="color: #003B4F;
+<span id="cb11-32">    hull.x <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> boundary_points[, <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>]</span>
-<span id="cb10-33">    hull.y <span class="ot" style="color: #003B4F;
+<span id="cb11-33">    hull.y <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> boundary_points[, <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">2</span>]</span>
-<span id="cb10-34">    <span class="co" style="color: #5E5E5E;
+<span id="cb11-34">    <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># get points in the boundary:</span></span>
-<span id="cb10-35">    roi <span class="ot" style="color: #003B4F;
+<span id="cb11-35">    roi <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> sp<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -1625,7 +1772,7 @@ background-color: null;
 font-style: inherit;">point.y =</span> xy[, <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">2</span>], </span>
-<span id="cb10-36">                                <span class="at" style="color: #657422;
+<span id="cb11-36">                                <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">pol.x =</span> hull.x, <span class="at" style="color: #657422;
 background-color: null;
@@ -1634,25 +1781,25 @@ background-color: null;
 font-style: inherit;">&gt;</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span></span>
-<span id="cb10-37">    inds <span class="ot" style="color: #003B4F;
+<span id="cb11-37">    inds <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">NULL</span></span>
-<span id="cb10-38">    hull <span class="ot" style="color: #003B4F;
+<span id="cb11-38">    hull <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">NULL</span></span>
-<span id="cb10-39">  }</span>
-<span id="cb10-40">  <span class="cf" style="color: #003B4F;
+<span id="cb11-39">  }</span>
+<span id="cb11-40">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> (<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">is.null</span>(boundary_points)) {</span>
-<span id="cb10-41">    </span>
-<span id="cb10-42">    <span class="cf" style="color: #003B4F;
+<span id="cb11-41">    </span>
+<span id="cb11-42">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> (<span class="sc" style="color: #5E5E5E;
@@ -1666,7 +1813,7 @@ background-color: null;
 font-style: inherit;">"direct"</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"ahull"</span>))) {</span>
-<span id="cb10-43">      <span class="fu" style="color: #4758AB;
+<span id="cb11-43">      <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">stop</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -1687,11 +1834,11 @@ background-color: null;
 font-style: inherit;">\'</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"</span>)</span>
-<span id="cb10-44">    }</span>
-<span id="cb10-45">    <span class="co" style="color: #5E5E5E;
+<span id="cb11-44">    }</span>
+<span id="cb11-45">    <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># user identifies boundary:</span></span>
-<span id="cb10-46">    identifyres <span class="ot" style="color: #003B4F;
+<span id="cb11-46">    identifyres <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1704,7 +1851,7 @@ background-color: null;
 font-style: inherit;">order =</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">TRUE</span>)</span>
-<span id="cb10-47">    inds <span class="ot" style="color: #003B4F;
+<span id="cb11-47">    inds <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> identifyres<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -1713,8 +1860,8 @@ background-color: null;
 font-style: inherit;">order</span>(identifyres<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>order)]</span>
-<span id="cb10-48">    </span>
-<span id="cb10-49">    <span class="cf" style="color: #003B4F;
+<span id="cb11-48">    </span>
+<span id="cb11-49">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> (type <span class="sc" style="color: #5E5E5E;
@@ -1722,26 +1869,26 @@ background-color: null;
 font-style: inherit;">==</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"direct"</span>) {</span>
-<span id="cb10-50">      <span class="co" style="color: #5E5E5E;
+<span id="cb11-50">      <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># The hull is just the polygon you've selected:</span></span>
-<span id="cb10-51">      hull.x <span class="ot" style="color: #003B4F;
+<span id="cb11-51">      hull.x <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> xy[inds, <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>]</span>
-<span id="cb10-52">      hull.y <span class="ot" style="color: #003B4F;
+<span id="cb11-52">      hull.y <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> xy[inds, <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">2</span>]</span>
-<span id="cb10-53">      hull <span class="ot" style="color: #003B4F;
+<span id="cb11-53">      hull <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> inds</span>
-<span id="cb10-54">      <span class="co" style="color: #5E5E5E;
+<span id="cb11-54">      <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># get points in the boundary:</span></span>
-<span id="cb10-55">      roi <span class="ot" style="color: #003B4F;
+<span id="cb11-55">      roi <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> sp<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -1756,7 +1903,7 @@ background-color: null;
 font-style: inherit;">point.y =</span> xy[, <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">2</span>], </span>
-<span id="cb10-56">                                  <span class="at" style="color: #657422;
+<span id="cb11-56">                                  <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">pol.x =</span> hull.x, <span class="at" style="color: #657422;
 background-color: null;
@@ -1765,9 +1912,9 @@ background-color: null;
 font-style: inherit;">&gt;</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span></span>
-<span id="cb10-57">    }</span>
-<span id="cb10-58">    </span>
-<span id="cb10-59">    <span class="cf" style="color: #003B4F;
+<span id="cb11-57">    }</span>
+<span id="cb11-58">    </span>
+<span id="cb11-59">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> (type <span class="sc" style="color: #5E5E5E;
@@ -1775,10 +1922,10 @@ background-color: null;
 font-style: inherit;">==</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"ahull"</span>) {</span>
-<span id="cb10-60">      <span class="co" style="color: #5E5E5E;
+<span id="cb11-60">      <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># get alpha hull of boundary:</span></span>
-<span id="cb10-61">      hull <span class="ot" style="color: #003B4F;
+<span id="cb11-61">      hull <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> alphahull<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -1793,10 +1940,10 @@ background-color: null;
 font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.05</span>)</span>
-<span id="cb10-62">      <span class="co" style="color: #5E5E5E;
+<span id="cb11-62">      <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># get points in the boundary:</span></span>
-<span id="cb10-63">      roi <span class="ot" style="color: #003B4F;
+<span id="cb11-63">      roi <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> alphahull<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -1805,17 +1952,17 @@ background-color: null;
 font-style: inherit;">inahull</span>(<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">ahull.obj =</span> hull, xy)</span>
-<span id="cb10-64">    }</span>
-<span id="cb10-65">    </span>
-<span id="cb10-66">  }</span>
-<span id="cb10-67">  <span class="co" style="color: #5E5E5E;
+<span id="cb11-64">    }</span>
+<span id="cb11-65">    </span>
+<span id="cb11-66">  }</span>
+<span id="cb11-67">  <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># plot:</span></span>
-<span id="cb10-68">  <span class="cf" style="color: #003B4F;
+<span id="cb11-68">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> (show) {</span>
-<span id="cb10-69">    <span class="fu" style="color: #4758AB;
+<span id="cb11-69">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">points</span>(xy[inds, ], <span class="at" style="color: #657422;
 background-color: null;
@@ -1830,10 +1977,10 @@ background-color: null;
 font-style: inherit;">pch =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">16</span>)</span>
-<span id="cb10-70">    <span class="fu" style="color: #4758AB;
+<span id="cb11-70">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">polygon</span>(xy[hull, ])</span>
-<span id="cb10-71">    <span class="fu" style="color: #4758AB;
+<span id="cb11-71">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">points</span>(xy[roi, ], <span class="at" style="color: #657422;
 background-color: null;
@@ -1854,9 +2001,9 @@ background-color: null;
 font-style: inherit;">"gold"</span>, <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.3</span>))</span>
-<span id="cb10-72">  }</span>
-<span id="cb10-73">  </span>
-<span id="cb10-74">  out <span class="ot" style="color: #003B4F;
+<span id="cb11-72">  }</span>
+<span id="cb11-73">  </span>
+<span id="cb11-74">  out <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1867,16 +2014,16 @@ background-color: null;
 font-style: inherit;">selected =</span> inds, <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">hull =</span> hull)</span>
-<span id="cb10-75">  <span class="fu" style="color: #4758AB;
+<span id="cb11-75">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">return</span>(out)</span>
-<span id="cb10-76">}</span>
-<span id="cb10-77"></span>
-<span id="cb10-78"></span>
-<span id="cb10-79"><span class="do" style="color: #5E5E5E;
+<span id="cb11-76">}</span>
+<span id="cb11-77"></span>
+<span id="cb11-78"></span>
+<span id="cb11-79"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## example usage:</span></span>
-<span id="cb10-80">clustcols  <span class="ot" style="color: #003B4F;
+<span id="cb11-80">clustcols  <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1943,8 +2090,8 @@ background-color: null;
 font-style: inherit;">Unknown=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"#666666"</span>)</span>
-<span id="cb10-81"></span>
-<span id="cb10-82"><span class="fu" style="color: #4758AB;
+<span id="cb11-81"></span>
+<span id="cb11-82"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">par</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -1959,7 +2106,7 @@ background-color: null;
 font-style: inherit;">0</span>,<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span>))</span>
-<span id="cb10-83"><span class="fu" style="color: #4758AB;
+<span id="cb11-83"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(xy, <span class="at" style="color: #657422;
 background-color: null;
@@ -1974,7 +2121,7 @@ background-color: null;
 font-style: inherit;">asp =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>,</span>
-<span id="cb10-84">     <span class="at" style="color: #657422;
+<span id="cb11-84">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">col =</span> clustcols[meta_data<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -1987,8 +2134,8 @@ background-color: null;
 font-style: inherit;">ylab =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">""</span>)</span>
-<span id="cb10-85"></span>
-<span id="cb10-86">roi <span class="ot" style="color: #003B4F;
+<span id="cb11-85"></span>
+<span id="cb11-86">roi <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -2007,7 +2154,7 @@ font-style: inherit;">TRUE</span>) </span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/ROI.png" class="img-fluid figure-img" width="336"></p>
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/ROI.png" class="img-fluid figure-img" style="width:170.0%"></p>
 </figure>
 </div>
 </div>
@@ -2016,10 +2163,10 @@ font-style: inherit;">TRUE</span>) </span></code></pre></div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><span class="co" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># draw the tissue:</span></span>
-<span id="cb11-2">clustcols  <span class="ot" style="color: #003B4F;
+<span id="cb12-2">clustcols  <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -2086,7 +2233,7 @@ background-color: null;
 font-style: inherit;">Unknown=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"#666666"</span>)</span>
-<span id="cb11-3"><span class="fu" style="color: #4758AB;
+<span id="cb12-3"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">par</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -2101,7 +2248,7 @@ background-color: null;
 font-style: inherit;">0</span>,<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span>))</span>
-<span id="cb11-4"><span class="fu" style="color: #4758AB;
+<span id="cb12-4"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(xy, <span class="at" style="color: #657422;
 background-color: null;
@@ -2116,7 +2263,7 @@ background-color: null;
 font-style: inherit;">asp =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>,</span>
-<span id="cb11-5">     <span class="at" style="color: #657422;
+<span id="cb12-5">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">col =</span> clustcols[meta_data<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -2129,11 +2276,11 @@ background-color: null;
 font-style: inherit;">ylab =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">""</span>)</span>
-<span id="cb11-6"></span>
-<span id="cb11-7"><span class="co" style="color: #5E5E5E;
+<span id="cb12-6"></span>
+<span id="cb12-7"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># place a grid over it to determine where to pick boudnary points:</span></span>
-<span id="cb11-8"><span class="fu" style="color: #4758AB;
+<span id="cb12-8"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">abline</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -2168,11 +2315,11 @@ background-color: null;
 font-style: inherit;">col=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"grey20"</span>)</span>
-<span id="cb11-9"></span>
-<span id="cb11-10"><span class="co" style="color: #5E5E5E;
+<span id="cb12-9"></span>
+<span id="cb12-10"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># select points by hand:</span></span>
-<span id="cb11-11">boundary_points <span class="ot" style="color: #003B4F;
+<span id="cb12-11">boundary_points <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -2181,41 +2328,41 @@ background-color: null;
 font-style: inherit;">matrix</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">c</span>(</span>
-<span id="cb11-12">    <span class="fl" style="color: #AD0000;
+<span id="cb12-12">    <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1.85</span>,<span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">7.05</span>,</span>
-<span id="cb11-13">    <span class="dv" style="color: #AD0000;
+<span id="cb12-13">    <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">2</span>,<span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">7.1</span>,</span>
-<span id="cb11-14">    <span class="fl" style="color: #AD0000;
+<span id="cb12-14">    <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">2.05</span>,<span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">6.95</span>,</span>
-<span id="cb11-15">    <span class="fl" style="color: #AD0000;
+<span id="cb12-15">    <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1.95</span>,<span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">6.85</span>,</span>
-<span id="cb11-16">    <span class="fl" style="color: #AD0000;
+<span id="cb12-16">    <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1.87</span>,<span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">6.9</span></span>
-<span id="cb11-17">), <span class="at" style="color: #657422;
+<span id="cb12-17">), <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">nrow =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">2</span>))</span>
-<span id="cb11-18"></span>
-<span id="cb11-19"><span class="co" style="color: #5E5E5E;
+<span id="cb12-18"></span>
+<span id="cb12-19"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># define the ROI, i.e. the points in the boundary:</span></span>
-<span id="cb11-20">roi <span class="ot" style="color: #003B4F;
+<span id="cb12-20">roi <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -2236,7 +2383,7 @@ font-style: inherit;">TRUE</span>) </span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/gridROI.png" class="img-fluid figure-img" width="394"></p>
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/gridROI.png" class="img-fluid figure-img" style="width:170.0%"></p>
 </figure>
 </div>
 </div>
@@ -2245,10 +2392,10 @@ font-style: inherit;">TRUE</span>) </span></code></pre></div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><span class="do" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## Calculate macrophages' distance to nearest T-cell:</span></span>
-<span id="cb12-2">inds.mac <span class="ot" style="color: #003B4F;
+<span id="cb13-2">inds.mac <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> meta_data<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -2257,35 +2404,47 @@ background-color: null;
 font-style: inherit;">==</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Macrophage"</span></span>
-<span id="cb12-3">inds.roi <span class="ot" style="color: #003B4F;
+<span id="cb13-3">inds.roi <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> roi<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>roi</span>
-<span id="cb12-4">dist2roi <span class="ot" style="color: #003B4F;
+<span id="cb13-4">dist2roi <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> FNN<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">get.knnx</span>(</span>
-<span id="cb12-5">  <span class="at" style="color: #657422;
+<span id="cb13-5">  <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">data =</span> xy[inds.roi, ], <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># 2-column matrix of xy locations</span></span>
-<span id="cb12-6">  <span class="at" style="color: #657422;
+<span id="cb13-6">  <span class="at" style="color: #657422;
 background-color: null;
-font-style: inherit;">query =</span> xy[inds.mac, ], </span>
-<span id="cb12-7">  <span class="at" style="color: #657422;
+font-style: inherit;">query =</span> xy, </span>
+<span id="cb13-7">  <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">k =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>)<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>nn.dist</span>
-<span id="cb12-8"></span>
-<span id="cb12-9"><span class="fu" style="color: #4758AB;
+<span id="cb13-8"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># add to metadata:</span></span>
+<span id="cb13-9">meta_data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>dist2roi <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> dist2roi</span>
+<span id="cb13-10"></span>
+<span id="cb13-11"></span>
+<span id="cb13-12"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## plot:</span></span>
+<span id="cb13-13"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">par</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -2300,7 +2459,7 @@ background-color: null;
 font-style: inherit;">0</span>,<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span>))</span>
-<span id="cb12-10"><span class="fu" style="color: #4758AB;
+<span id="cb13-14"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(xy, <span class="at" style="color: #657422;
 background-color: null;
@@ -2315,7 +2474,7 @@ background-color: null;
 font-style: inherit;">asp =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>,</span>
-<span id="cb12-11">     <span class="at" style="color: #657422;
+<span id="cb13-15">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">col =</span> <span class="st" style="color: #20794D;
 background-color: null;
@@ -2328,7 +2487,7 @@ background-color: null;
 font-style: inherit;">ylab =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">""</span>)</span>
-<span id="cb12-12"><span class="fu" style="color: #4758AB;
+<span id="cb13-16"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">points</span>(xy[inds.roi, ], <span class="at" style="color: #657422;
 background-color: null;
@@ -2343,7 +2502,7 @@ background-color: null;
 font-style: inherit;">cex =</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.5</span>)</span>
-<span id="cb12-13"><span class="fu" style="color: #4758AB;
+<span id="cb13-17"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">points</span>(xy[inds.mac, ], <span class="at" style="color: #657422;
 background-color: null;
@@ -2354,7 +2513,7 @@ background-color: null;
 font-style: inherit;">cex =</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.5</span>,</span>
-<span id="cb12-14">       <span class="at" style="color: #657422;
+<span id="cb13-18">       <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">col =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -2371,7 +2530,7 @@ background-color: null;
 font-style: inherit;">"black"</span>))(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">101</span>)[</span>
-<span id="cb12-15">       <span class="dv" style="color: #AD0000;
+<span id="cb13-19">       <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -2385,8 +2544,8 @@ font-style: inherit;">*</span> dist2roi <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">/</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">max</span>(dist2roi))])</span>
-<span id="cb12-16"><span class="fu" style="color: #4758AB;
+font-style: inherit;">max</span>(dist2roi))][inds.mac])</span>
+<span id="cb13-20"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">legend</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -2395,7 +2554,7 @@ background-color: null;
 font-style: inherit;">pch =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">16</span>,</span>
-<span id="cb12-17">       <span class="at" style="color: #657422;
+<span id="cb13-21">       <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">col =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -2406,17 +2565,17 @@ background-color: null;
 font-style: inherit;">"orange"</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"wheat"</span>),</span>
-<span id="cb12-18">       <span class="at" style="color: #657422;
+<span id="cb13-22">       <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">legend =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Macrophages colored by distance to ROI"</span>,</span>
-<span id="cb12-19">                  <span class="st" style="color: #20794D;
+<span id="cb13-23">                  <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Cells in ROI"</span>,</span>
-<span id="cb12-20">                  <span class="st" style="color: #20794D;
+<span id="cb13-24">                  <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Other cells"</span>))</span></code></pre></div>
 </details>
@@ -2425,7 +2584,7 @@ font-style: inherit;">"Other cells"</span>))</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/dist2roi.png" class="img-fluid figure-img" width="394"></p>
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/dist2roi.png" class="img-fluid figure-img" style="width:170.0%"></p>
 </figure>
 </div>
 </div>
@@ -2434,7 +2593,12 @@ font-style: inherit;">"Other cells"</span>))</span></code></pre></div>
 </section>
 <section id="considerations-for-running-de" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="considerations-for-running-de"><span class="header-section-number">3</span> Considerations for running DE</h2>
-<p>Above we showed how to set up a variable to run DE against. Now we turn to the mechanics of actually running DE. We’ll discuss 2 important topics: - How to handle bias arising from cell segmentation errors - How to account for possible spatial correlation in your data Both of these topics are discussed in great depth in <a href="https://www.biorxiv.org/content/10.1101/2024.08.02.606405v2.abstract" target="_blank">this preprint</a>, which accompanies our differential expression package <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/smiDE/" target="_blank">smiDE</a>. Here we’ll merely summarize.</p>
+<p>Above we showed how to set up a variable to run DE against. Now we turn to the mechanics of actually running DE. We’ll discuss 2 important topics:</p>
+<ul>
+<li>How to handle bias arising from cell segmentation errors</li>
+<li>How to account for possible spatial correlation in your data</li>
+</ul>
+<p>Both of these topics are discussed in great depth in <a href="https://www.biorxiv.org/content/10.1101/2024.08.02.606405v2.abstract" target="_blank">this preprint</a>, which accompanies our differential expression package smiDE (<a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/smiDE/" target="_blank">blog post</a>) (<a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/smiDE" target="_blank">package</a>). Here we’ll merely summarize.</p>
 <section id="bias-from-segmentation-errors" class="level3" data-number="3.1">
 <h3 data-number="3.1" class="anchored" data-anchor-id="bias-from-segmentation-errors"><span class="header-section-number">3.1</span> Bias from segmentation errors:</h3>
 <p>Until the day that cell segmentation algorithms become perfectly accurate, cells’ expression profiles will occasionally be assigned transcripts from neighboring cells. Because the gene identity of these misassigned transcripts isn’t random across space, they can act as a powerful unmodeled confounding variable. For example: if we’re comparing T-cells in the stroma to T-cells in the tumor, the stroma T-cell profiles will contain transcripts from fibroblasts, and the tumor T-cell profiles will contain transcripts from tumor cells. DE will then discover many highly significant genes: fibroblast genes will appear up-regulated in stroma T-cells, and tumor genes will appear up in tumor-residing T-cells. These spurious hits waste analyst time and compromise analysis quality.</p>
@@ -2452,7 +2616,8 @@ font-style: inherit;">"Other cells"</span>))</span></code></pre></div>
 </section>
 <section id="other-model-choice-considerations" class="level3" data-number="3.3">
 <h3 data-number="3.3" class="anchored" data-anchor-id="other-model-choice-considerations"><span class="header-section-number">3.3</span> Other model choice considerations</h3>
-<p>We find that negative binomial models outperform Gaussian models, but at a cost in computational time. Poisson models offer a middle ground. The performance of Gaussian models is generally acceptable, making them a reasonable choice when computation time is a limitation. smiDE implements all these options under a variety of spatial correlation-aware methods.</p>
+<p>We find that negative binomial models outperform Gaussian models, but at a cost in computational time. Poisson models offer a middle ground in terms of computational time, but typically underestimate standard errors, leading to inflated Type I errors.</p>
+<p>The performance of Gaussian models is generally acceptable, making them a reasonable choice when computation time is a limitation. smiDE implements all these options under a variety of spatial correlation-aware methods.</p>
 </section>
 </section>
 <section id="approach-for-maximal-speed-simultaneous-fitting-of-all-genes-using-linear-algebra" class="level2" data-number="4">
@@ -2461,313 +2626,17 @@ font-style: inherit;">"Other cells"</span>))</span></code></pre></div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#' Very fast DE without best practices</span></span>
-<span id="cb13-2"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#' Runs simple OLS regression on all genes at once using matrix algebra</span></span>
-<span id="cb13-3"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#' @param y the normalized counts matrix (cells x genes)</span></span>
-<span id="cb13-4"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#' @param df a data frame of the variables to be modeled</span></span>
-<span id="cb13-5"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#' @return A list with:</span></span>
-<span id="cb13-6"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#'   - effect: matrix of effect sizes (genes x predictors)</span></span>
-<span id="cb13-7"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#'   - se:     matrix of standard errors</span></span>
-<span id="cb13-8"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#'   - p:      matrix of p-values</span></span>
-<span id="cb13-9"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#'   - df_resid: residual degrees of freedom</span></span>
-<span id="cb13-10">hastyDE <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">function</span>(y, df) {</span>
-<span id="cb13-11">  <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">if</span> (<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">!</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">is.matrix</span>(y) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&amp;&amp;</span> <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">!</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">inherits</span>(y, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Matrix"</span>)) {</span>
-<span id="cb13-12">    y <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">as.matrix</span>(y)</span>
-<span id="cb13-13">  }</span>
-<span id="cb13-14">  X <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">model.matrix</span>(<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> ., df)  <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># intercept + predictors</span></span>
-<span id="cb13-15">  <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">if</span> (<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nrow</span>(X) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">!=</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nrow</span>(y)) <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">stop</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"nrow(y) must equal nrow(df)."</span>)</span>
-<span id="cb13-16"></span>
-<span id="cb13-17">  n <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nrow</span>(X); p <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ncol</span>(X)</span>
-<span id="cb13-18">  coef_names <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">colnames</span>(X)[<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span>]  <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># drop intercept</span></span>
-<span id="cb13-19">  k <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">length</span>(coef_names)</span>
-<span id="cb13-20">  <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">if</span> (k <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">==</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0</span>) <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">stop</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"No predictors found."</span>)</span>
-<span id="cb13-21"></span>
-<span id="cb13-22">  <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Crossproducts</span></span>
-<span id="cb13-23">  XtX <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">crossprod</span>(X)</span>
-<span id="cb13-24">  XtY <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">crossprod</span>(X, y)</span>
-<span id="cb13-25"></span>
-<span id="cb13-26">  <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Inverse (with fallback)</span></span>
-<span id="cb13-27">  XtX_inv <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">tryCatch</span>(</span>
-<span id="cb13-28">    <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">chol2inv</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">chol</span>(XtX)),</span>
-<span id="cb13-29">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">error =</span> <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">function</span>(e) <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">solve</span>(XtX)</span>
-<span id="cb13-30">  )</span>
-<span id="cb13-31"></span>
-<span id="cb13-32">  <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Coefficients: p x G</span></span>
-<span id="cb13-33">  B <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> XtX_inv <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%*%</span> XtY</span>
-<span id="cb13-34">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">rownames</span>(B) <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">colnames</span>(X)</span>
-<span id="cb13-35"></span>
-<span id="cb13-36">  <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Residual variance</span></span>
-<span id="cb13-37">  yty   <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">colSums</span>(y <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> y)</span>
-<span id="cb13-38">  RSS   <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> yty <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">colSums</span>(B <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> XtY)</span>
-<span id="cb13-39">  dfres <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> n <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span> p</span>
-<span id="cb13-40">  sigma2 <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> RSS <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span> dfres  <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># length G</span></span>
-<span id="cb13-41"></span>
-<span id="cb13-42">  <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Standard errors: for each predictor j, sqrt(sigma2 * V_jj)</span></span>
-<span id="cb13-43">  Vdiag <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">diag</span>(XtX_inv)</span>
-<span id="cb13-44">  SE <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">vapply</span>((<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span><span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span>p), <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">function</span>(j) <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">sqrt</span>(sigma2 <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> Vdiag[j]), <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">numeric</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">length</span>(sigma2)))</span>
-<span id="cb13-45">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">colnames</span>(SE) <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> coef_names</span>
-<span id="cb13-46"></span>
-<span id="cb13-47">  <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Effects and p-values</span></span>
-<span id="cb13-48">  Effect <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">as.matrix</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">t</span>(B[<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span>, , <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">drop =</span> <span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">FALSE</span>]))   <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># G x k</span></span>
-<span id="cb13-49">  Tstat  <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">as.matrix</span>(Effect <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span> SE)</span>
-<span id="cb13-50">  Pval   <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span> <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">pt</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">abs</span>(Tstat), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">df =</span> dfres, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">lower.tail =</span> <span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">FALSE</span>)</span>
-<span id="cb13-51"></span>
-<span id="cb13-52">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">list</span>(</span>
-<span id="cb13-53">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">effect     =</span> Effect,</span>
-<span id="cb13-54">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">se         =</span> SE,</span>
-<span id="cb13-55">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">p          =</span> Pval,</span>
-<span id="cb13-56">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">df_resid   =</span> dfres</span>
-<span id="cb13-57">  )</span>
-<span id="cb13-58">}</span>
-<span id="cb13-59"></span>
-<span id="cb13-60"></span>
-<span id="cb13-61"><span class="do" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">source</span>()</span>
+<span id="cb14-2"></span>
+<span id="cb14-3"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">### Example usage:</span></span>
-<span id="cb13-62"><span class="co" style="color: #5E5E5E;
+<span id="cb14-4"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># run DE:</span></span>
-<span id="cb13-63">inds.tumor <span class="ot" style="color: #003B4F;
+<span id="cb14-5">inds.tumor <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> meta_data<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -2776,7 +2645,7 @@ background-color: null;
 font-style: inherit;">==</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Tumor"</span></span>
-<span id="cb13-64">inds.t <span class="ot" style="color: #003B4F;
+<span id="cb14-6">inds.t <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> meta_data<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -2785,37 +2654,37 @@ background-color: null;
 font-style: inherit;">==</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Tcell"</span></span>
-<span id="cb13-65">dist2tcell <span class="ot" style="color: #003B4F;
+<span id="cb14-7">dist2tcell <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> FNN<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">get.knnx</span>(</span>
-<span id="cb13-66">  <span class="at" style="color: #657422;
+<span id="cb14-8">  <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">data =</span> xy[inds.t, ], <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># 2-column matrix of xy locations</span></span>
-<span id="cb13-67">  <span class="at" style="color: #657422;
+<span id="cb14-9">  <span class="at" style="color: #657422;
 background-color: null;
-font-style: inherit;">query =</span> xy[inds.tumor, ], </span>
-<span id="cb13-68">  <span class="at" style="color: #657422;
+font-style: inherit;">query =</span> xy, </span>
+<span id="cb14-10">  <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">k =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>)<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>nn.dist</span>
-<span id="cb13-69"></span>
-<span id="cb13-70">out <span class="ot" style="color: #003B4F;
+<span id="cb14-11"></span>
+<span id="cb14-12">out <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">hastyDE</span>(<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">y =</span> norm[inds.tumor, ], </span>
-<span id="cb13-71">               <span class="at" style="color: #657422;
+<span id="cb14-13">               <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">df =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -2823,8 +2692,8 @@ font-style: inherit;">data.frame</span>(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"dist2tcell"</span> <span class="ot" style="color: #003B4F;
 background-color: null;
-font-style: inherit;">=</span> dist2tcell)) </span>
-<span id="cb13-72"><span class="fu" style="color: #4758AB;
+font-style: inherit;">=</span> dist2tcell[inds.tumor])) </span>
+<span id="cb14-14"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">str</span>(out)</span></code></pre></div>
 </details>
@@ -2838,7 +2707,7 @@ font-style: inherit;">str</span>(out)</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/deheatmap.png" class="img-fluid figure-img" width="220"></p>
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/per_tissue_heatmap.png" class="img-fluid figure-img" style="width:170.0%"></p>
 </figure>
 </div>
 </div>
@@ -2877,14 +2746,19 @@ font-style: inherit;">str</span>(out)</span></code></pre></div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><span class="do" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><span class="do" style="color: #5E5E5E;
 background-color: null;
-font-style: italic;">### use varrymander to partition the tissue into patches:</span></span>
-<span id="cb14-2"></span>
-<span id="cb14-3"><span class="co" style="color: #5E5E5E;
+font-style: italic;">### use Patch DE to partition the tissue into patches:</span></span>
+<span id="cb15-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">source</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/blob/Main/_code/PatchDE/DEutilsr.R"</span>)</span>
+<span id="cb15-3"></span>
+<span id="cb15-4"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># define your design variable:</span></span>
-<span id="cb14-4">inds.tumor <span class="ot" style="color: #003B4F;
+<span id="cb15-5">inds.tumor <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> meta_data<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -2893,7 +2767,7 @@ background-color: null;
 font-style: inherit;">==</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Tumor"</span></span>
-<span id="cb14-5">inds.t     <span class="ot" style="color: #003B4F;
+<span id="cb15-6">inds.t     <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> meta_data<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -2902,21 +2776,21 @@ background-color: null;
 font-style: inherit;">==</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Tcell"</span></span>
-<span id="cb14-6"><span class="fu" style="color: #4758AB;
+<span id="cb15-7"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">stopifnot</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">any</span>(inds.tumor), <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">any</span>(inds.t))</span>
-<span id="cb14-7">dist2tcell <span class="ot" style="color: #003B4F;
+<span id="cb15-8">dist2tcell <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> FNN<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">get.knnx</span>(</span>
-<span id="cb14-8">  <span class="at" style="color: #657422;
+<span id="cb15-9">  <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">data  =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -2925,36 +2799,33 @@ background-color: null;
 font-style: inherit;">drop=</span><span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">FALSE</span>]),</span>
-<span id="cb14-9">  <span class="at" style="color: #657422;
+<span id="cb15-10">  <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">query =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">as.matrix</span>(xy[inds.tumor, , <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">drop=</span><span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">FALSE</span>]),</span>
-<span id="cb14-10">  <span class="at" style="color: #657422;
+font-style: inherit;">as.matrix</span>(xy),</span>
+<span id="cb15-11">  <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">k =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span></span>
-<span id="cb14-11">)<span class="sc" style="color: #5E5E5E;
+<span id="cb15-12">)<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>nn.dist[, <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>]</span>
-<span id="cb14-12">res <span class="ot" style="color: #003B4F;
+<span id="cb15-13"></span>
+<span id="cb15-14">patches <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">varrymander</span>(<span class="at" style="color: #657422;
+font-style: inherit;">getPatches</span>(<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">xy =</span> xy[inds.tumor, ], </span>
-<span id="cb14-13">                   <span class="at" style="color: #657422;
+<span id="cb15-15">                      <span class="at" style="color: #657422;
 background-color: null;
-font-style: inherit;">X =</span> dist2tcell, </span>
-<span id="cb14-14">                   <span class="at" style="color: #657422;
+font-style: inherit;">X =</span> dist2tcell[inds.tumor], </span>
+<span id="cb15-16">                      <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">dbscan_eps =</span> <span class="fl" style="color: #AD0000;
 background-color: null;
@@ -2963,70 +2834,55 @@ background-color: null;
 font-style: inherit;">maxdbsize =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">50</span>, </span>
-<span id="cb14-15">                   <span class="at" style="color: #657422;
+<span id="cb15-17">                      <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">maxradius =</span> <span class="fl" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">0.25</span>,</span>
-<span id="cb14-16">                   <span class="at" style="color: #657422;
+font-style: inherit;">0.5</span>,</span>
+<span id="cb15-18">                      <span class="at" style="color: #657422;
 background-color: null;
-font-style: inherit;">totvarthresh =</span> .<span class="dv" style="color: #AD0000;
+font-style: inherit;">totvarthresh =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">25</span>  <span class="co" style="color: #5E5E5E;
+font-style: inherit;">100</span>  <span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;"># recommend default of 100 for most cases </span></span>
-<span id="cb14-17">)</span>
-<span id="cb14-18"><span class="fu" style="color: #4758AB;
+font-style: inherit;"># main driver of patch size</span></span>
+<span id="cb15-19">) <span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">str</span>(res)</span>
-<span id="cb14-19"></span>
-<span id="cb14-20"><span class="co" style="color: #5E5E5E;
+font-style: inherit;"># produces a vector of patch assigments, potentially including NA's for cells not given a patch</span></span>
+<span id="cb15-20"></span>
+<span id="cb15-21"></span>
+<span id="cb15-22"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># to view, draw polygon boundaries around each patch:</span></span>
-<span id="cb14-21">polys <span class="ot" style="color: #003B4F;
+<span id="cb15-23">polys <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">list</span>()</span>
-<span id="cb14-22"><span class="cf" style="color: #003B4F;
+font-style: inherit;">getPatchPolys</span>(<span class="at" style="color: #657422;
 background-color: null;
-font-weight: bold;
-font-style: inherit;">for</span> (patch <span class="cf" style="color: #003B4F;
+font-style: inherit;">xy =</span> xy[inds.tumor, ], <span class="at" style="color: #657422;
 background-color: null;
-font-weight: bold;
-font-style: inherit;">in</span> <span class="fu" style="color: #4758AB;
+font-style: inherit;">patch =</span> patches)</span>
+<span id="cb15-24"></span>
+<span id="cb15-25"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">setdiff</span>(<span class="fu" style="color: #4758AB;
+font-style: inherit;"># plot patches:</span></span>
+<span id="cb15-26"><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">unique</span>(res), <span class="cn" style="color: #8f5902;
+font-style: inherit;">par</span>(<span class="at" style="color: #657422;
 background-color: null;
-font-style: inherit;">NA</span>)) {</span>
-<span id="cb14-23">  inds <span class="ot" style="color: #003B4F;
+font-style: inherit;">mar =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">&lt;-</span> (res <span class="sc" style="color: #5E5E5E;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">==</span> patch) <span class="sc" style="color: #5E5E5E;
+font-style: inherit;">0</span>,<span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">&amp;</span> <span class="sc" style="color: #5E5E5E;
+font-style: inherit;">0</span>,<span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">!</span><span class="fu" style="color: #4758AB;
+font-style: inherit;">2</span>,<span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">is.na</span>(res)</span>
-<span id="cb14-24">  polys[[<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">as.character</span>(patch)]] <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> alphahull<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ahull</span>(xy[inds.tumor, ][inds, ], <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.5</span>)</span>
-<span id="cb14-25">}</span>
-<span id="cb14-26"><span class="fu" style="color: #4758AB;
+font-style: inherit;">0</span>))</span>
+<span id="cb15-27"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(xy[inds.tumor, ], <span class="at" style="color: #657422;
 background-color: null;
@@ -3041,12 +2897,12 @@ background-color: null;
 font-style: inherit;">asp =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>,</span>
-<span id="cb14-27">     <span class="at" style="color: #657422;
+<span id="cb15-28">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">"Tumor cells colored by distance to T-cell"</span>,</span>
-<span id="cb14-28">     <span class="at" style="color: #657422;
+font-style: inherit;">"Tumor cells colored by distance to T-cell, with patches for stratified DE"</span>,</span>
+<span id="cb15-29">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">col =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -3065,7 +2921,7 @@ background-color: null;
 font-style: inherit;">"black"</span>)))(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">101</span>)[</span>
-<span id="cb14-29">       <span class="dv" style="color: #AD0000;
+<span id="cb15-30">       <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -3079,9 +2935,9 @@ font-style: inherit;">*</span> dist2tcell <span class="sc" style="color: #5E5E5E
 background-color: null;
 font-style: inherit;">/</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">max</span>(dist2tcell))</span>
-<span id="cb14-30">     ],</span>
-<span id="cb14-31">     <span class="at" style="color: #657422;
+font-style: inherit;">max</span>(dist2tcell))[inds.tumor]</span>
+<span id="cb15-31">     ],</span>
+<span id="cb15-32">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">xlab =</span> <span class="st" style="color: #20794D;
 background-color: null;
@@ -3090,7 +2946,7 @@ background-color: null;
 font-style: inherit;">ylab =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">""</span>)</span>
-<span id="cb14-32"><span class="cf" style="color: #003B4F;
+<span id="cb15-33"><span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">for</span> (i <span class="cf" style="color: #003B4F;
@@ -3103,27 +2959,21 @@ background-color: null;
 font-style: inherit;">:</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">length</span>(polys)) {</span>
-<span id="cb14-33">  <span class="fu" style="color: #4758AB;
+<span id="cb15-34">  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">plot</span>(polys[[i]], <span class="at" style="color: #657422;
+font-style: inherit;">polygon</span>(polys[[i]], <span class="at" style="color: #657422;
 background-color: null;
-font-style: inherit;">add =</span> <span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">TRUE</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">wpoints =</span> F, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">col =</span> <span class="st" style="color: #20794D;
+font-style: inherit;">border =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"black"</span>)</span>
-<span id="cb14-34">}</span></code></pre></div>
+<span id="cb15-35">}</span></code></pre></div>
 </details>
 </div>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/varrymander.png" class="img-fluid figure-img" width="362"></p>
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/patches.png" class="img-fluid figure-img" style="width:170.0%"></p>
 </figure>
 </div>
 </div>
@@ -3132,47 +2982,17 @@ font-style: inherit;">"black"</span>)</span>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><span class="do" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">### run DE in each patch, using hastyDE, which computationally-efficient but ignores spatial correlation:</span></span>
-<span id="cb15-2">deresults <span class="ot" style="color: #003B4F;
+<span id="cb16-2">deresults <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">list</span>()</span>
-<span id="cb15-3"><span class="cf" style="color: #003B4F;
+font-style: inherit;">patchDE</span>(<span class="at" style="color: #657422;
 background-color: null;
-font-weight: bold;
-font-style: inherit;">for</span> (bin <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">in</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">setdiff</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">unique</span>(res), <span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">NA</span>)) {</span>
-<span id="cb15-4">  thisbininds <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> (res <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">==</span> bin) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&amp;</span> <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">!</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">is.na</span>(res)</span>
-<span id="cb15-5">  deresults[[bin]] <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">hastyDE</span>(</span>
-<span id="cb15-6">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">y =</span> norm[inds.tumor, ][thisbininds, ],</span>
-<span id="cb15-7">    <span class="at" style="color: #657422;
+font-style: inherit;">y =</span> norm[inds.tumor, ],</span>
+<span id="cb16-3">                     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">df =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -3180,70 +3000,31 @@ font-style: inherit;">data.frame</span>(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"dist2tcell"</span> <span class="ot" style="color: #003B4F;
 background-color: null;
-font-style: inherit;">=</span> dist2tcell[thisbininds])</span>
-<span id="cb15-8">  )</span>
-<span id="cb15-9">}</span>
-<span id="cb15-10"></span>
-<span id="cb15-11"><span class="do" style="color: #5E5E5E;
+font-style: inherit;">=</span> dist2tcell[inds.tumor]),</span>
+<span id="cb16-4">                     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">patch =</span> patches)</span>
+<span id="cb16-5"></span>
+<span id="cb16-6">  </span>
+<span id="cb16-7"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">### explore the results:</span></span>
-<span id="cb15-12">pvals <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">sapply</span>(deresults, <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">function</span>(tmp){tmp<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>p})</span>
-<span id="cb15-13">ests <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">sapply</span>(deresults, <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">function</span>(tmp){tmp<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>effect})</span>
-<span id="cb15-14">ses <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">sapply</span>(deresults, <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">function</span>(tmp){tmp<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>se})</span>
-<span id="cb15-15"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">rownames</span>(pvals) <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">rownames</span>(ests) <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">rownames</span>(ses) <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">colnames</span>(norm)</span>
-<span id="cb15-16"></span>
-<span id="cb15-17"><span class="co" style="color: #5E5E5E;
+<span id="cb16-8"></span>
+<span id="cb16-9"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># find genes with strong results in any region</span></span>
-<span id="cb15-18">lowestp <span class="ot" style="color: #003B4F;
+<span id="cb16-10">lowestp <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">apply</span>(pvals, <span class="dv" style="color: #AD0000;
+font-style: inherit;">apply</span>(deresults<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>dist2tcell<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>pvals, <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>, min)</span>
-<span id="cb15-19">topgenes1 <span class="ot" style="color: #003B4F;
+<span id="cb16-11">topgenes1 <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -3260,21 +3041,25 @@ background-color: null;
 font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">50</span>]]</span>
-<span id="cb15-20"></span>
-<span id="cb15-21"><span class="co" style="color: #5E5E5E;
+<span id="cb16-12"></span>
+<span id="cb16-13"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># use meta-analysis to summarize genes' trends across patches</span></span>
-<span id="cb15-22">metapvals <span class="ot" style="color: #003B4F;
+<span id="cb16-14">metapvals <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">sapply</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">rownames</span>(pvals), <span class="cf" style="color: #003B4F;
+font-style: inherit;">rownames</span>(deresults<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>dist2tcell<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>pvals), <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">function</span>(gene) {</span>
-<span id="cb15-23">  fit <span class="ot" style="color: #003B4F;
+<span id="cb16-15">  fit <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> metafor<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -3282,20 +3067,30 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rma.uni</span>(<span class="at" style="color: #657422;
 background-color: null;
-font-style: inherit;">yi =</span> ests[gene, ], <span class="at" style="color: #657422;
+font-style: inherit;">yi =</span> deresults<span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">sei =</span> ses[gene, ], <span class="at" style="color: #657422;
+font-style: inherit;">$</span>dist2tcell<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>ests[gene, ], </span>
+<span id="cb16-16">                          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">sei =</span> deresults<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>dist2tcell<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>ses[gene, ], </span>
+<span id="cb16-17">                          <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">method =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"REML"</span>)</span>
-<span id="cb15-24">  <span class="fu" style="color: #4758AB;
+<span id="cb16-18">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">return</span>(fit<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>pval)</span>
-<span id="cb15-25">})</span>
-<span id="cb15-26">topgenes2 <span class="ot" style="color: #003B4F;
+<span id="cb16-19">})</span>
+<span id="cb16-20">topgenes2 <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -3312,11 +3107,11 @@ background-color: null;
 font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">50</span>]]</span>
-<span id="cb15-27"></span>
-<span id="cb15-28"><span class="do" style="color: #5E5E5E;
+<span id="cb16-21"></span>
+<span id="cb16-22"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## now use a heatmap to plot results from either list of top genes:</span></span>
-<span id="cb15-29">pheatmap<span class="sc" style="color: #5E5E5E;
+<span id="cb16-23">pheatmap<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -3327,7 +3122,7 @@ background-color: null;
 font-style: inherit;">&lt;</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1e-3</span>))[topgenes1, ],</span>
-<span id="cb15-30">         <span class="at" style="color: #657422;
+<span id="cb16-24">         <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">col =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -3342,7 +3137,7 @@ background-color: null;
 font-style: inherit;">"darkred"</span>))(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">100</span>),</span>
-<span id="cb15-31">         <span class="at" style="color: #657422;
+<span id="cb16-25">         <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">breaks =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -3364,7 +3159,7 @@ font-style: inherit;">101</span>))</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/deheatmap.png" class="img-fluid figure-img" width="220"></p>
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/deheatmap.png" class="img-fluid figure-img" style="width:170.0%"></p>
 </figure>
 </div>
 </div>
@@ -3384,7 +3179,7 @@ font-style: inherit;">101</span>))</span></code></pre></div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1">inds.tumor <span class="ot" style="color: #003B4F;
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1">inds.tumor <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> meta_data<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -3393,7 +3188,7 @@ background-color: null;
 font-style: inherit;">==</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Tumor"</span></span>
-<span id="cb16-2">W <span class="ot" style="color: #003B4F;
+<span id="cb17-2">W <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> spdep<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -3418,7 +3213,7 @@ background-color: null;
 font-style: inherit;">1</span>], .<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">95</span>))</span>
-<span id="cb16-3">Wl <span class="ot" style="color: #003B4F;
+<span id="cb17-3">Wl <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> spdep<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -3433,15 +3228,15 @@ background-color: null;
 font-style: inherit;">zero.policy =</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">TRUE</span>)</span>
-<span id="cb16-4">outcome <span class="ot" style="color: #003B4F;
+<span id="cb17-4">outcome <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> norm[inds.tumor, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"VEGFA"</span>]</span>
-<span id="cb16-5">predictor <span class="ot" style="color: #003B4F;
+<span id="cb17-5">predictor <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> dist2tcell</span>
-<span id="cb16-6">spdep<span class="sc" style="color: #5E5E5E;
+<span id="cb17-6">spdep<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -3462,9 +3257,9 @@ font-style: inherit;">~</span> predictor)), Wl)</span></code></pre></div>
 </section>
 
  ]]></description>
-  <category>visualization</category>
+  <category>differential expression</category>
   <guid>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/</guid>
-  <pubDate>Sat, 20 Sep 2025 00:00:00 GMT</pubDate>
+  <pubDate>Mon, 29 Sep 2025 00:00:00 GMT</pubDate>
   <media:content url="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/thumbnail.png" medium="image" type="image/png" height="134" width="144"/>
 </item>
 <item>
@@ -13014,7 +12809,7 @@ Tip
   author = {Lidan Wu and Aster Wardhani and Joseph-Tin Phan},
   year = {2025},
   url = {https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/image-segmentation-models/},
-  note = {Accessed: 2025-09-18}
+  note = {Accessed: 2025-09-29}
 }</code></pre>
 </div>
 <div id="tabset-1-4" class="tab-pane" aria-labelledby="tabset-1-4-tab">
