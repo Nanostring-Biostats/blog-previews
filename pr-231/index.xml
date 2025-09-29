@@ -175,10 +175,16 @@ Figure&nbsp;6: (a) Alignment tool shifts and re-assigns RNA transcripts to prote
 </div>
 </div>
 <p>For every FOV, the assignment process takes as input the calculated shift and applies it to the transcript locations and then updates the cell id based on the associated protein cell label data. Once the re-assignment is complete, the final output is a folder with the updated transcripts data as shown in Figure&nbsp;6 (b).</p>
+</section>
+</section>
+<section id="conclusions" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Conclusions</h1>
+<p>After using the off-AtoMx alignment tool to apply protein cell segmentation boundaries and cell ID labels to the RNA data, you can use transcript-to-cell alignments found in the <code>*_FOV#####__complete_code_cell_target_call_coords.csv</code> per FOV files within the <code>AnalysisResults_shifted</code> folder to continue analysis with the aligned RNA dataset. These updated files can be used alongside the protein run flat files to create a new multiomic data object. It’s important to note that all transcripts in the aligned RNA data will now reference the segmentation results and metadata from the protein run.</p>
+<p>If you prefer to integrate the aligned RNA data into an existing data object, you can do so by starting with the protein run object and either replacing the protein expression matrix with an aligned RNA matrix or appending the RNA data as an additional assay.</p>
+<p><strong>Important Reminder</strong>: Once the raw protein and RNA data are exported from AtoMx and modified through alignment, the updated data cannot be re-imported into AtoMx. As of AtoMx v2.2 and earlier, the platform retains only the original, pre-aligned data.</p>
 <p>For technical support, please contact support.spatial@bruker.com.</p>
 
 
-</section>
 </section>
 
  ]]></description>
