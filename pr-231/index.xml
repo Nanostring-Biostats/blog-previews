@@ -10,7 +10,7 @@
 <atom:link href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/index.xml" rel="self" type="application/rss+xml"/>
 <description>NanoString&#39;s CosMx Analysis Scratch Space</description>
 <generator>quarto-1.6.30</generator>
-<lastBuildDate>Tue, 30 Sep 2025 00:00:00 GMT</lastBuildDate>
+<lastBuildDate>Thu, 02 Oct 2025 00:00:00 GMT</lastBuildDate>
 <item>
   <title>Aligning CosMx® Same-Cell Multiomics Data</title>
   <dc:creator>Mithra Korukonda</dc:creator>
@@ -86,7 +86,7 @@ Figure&nbsp;3: Data selection for (a) Protein and (b) RNA export from AtoMx SIP
 </section>
 <section id="download-and-use-alignment-tool" class="level1" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Download and Use Alignment Tool</h1>
-<p>Download and unzip the <code>MultiO_Alignment_Tool_SEP2025.zip</code> file available <a href="https://bruker-my.sharepoint.com/:u:/p/s_korukonda/EX2d6Itfh09Kp0OvqmIcOAcB_hgorv0IuxBA7siL0AFz_Q?e=5wI6bI" target="_blank">here</a>. Once the file has been unzipped, launch the tool by double-clicking the <code>MultiOAligmentUI.bat</code> file. The executable will launch an interactive graphical user interface (GUI) as shown in Figure&nbsp;4.</p>
+<p>Download and unzip the <code>MultiO_Alignment_Tool_SEP2025.zip</code> file available <a href="https://bruker-my.sharepoint.com/:u:/p/s_korukonda/EcSqJPZSai9GqLbGC14iTCsBvPaMhe5VVo7MOe2zQeK9rA?e=osmGIY" target="_blank">here</a>. Once the file has been unzipped, launch the tool by double-clicking the <code>MultiOAligmentUI.bat</code> file. The executable will launch an interactive graphical user interface (GUI) as shown in Figure&nbsp;4.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -97,7 +97,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>This multiomics alignment tool is actively and continuously under development in the RnD groups at Bruker Spatial Biology. Please be aware that there may be bugs and that it has not gone through the regular level of quality and testing. Our goal here is to bring the capabilities of multiomics to CosMx SMI users as fast as possible.</p>
+<p>This multiomics alignment tool is actively and continuously under development in the RnD groups at Bruker Spatial Biology. Please be aware that there may be bugs and that it has not gone through the regular level of quality and testing. Our goal here is to bring the capabilities of multiomics to CosMx SMI users as fast as possible. For technical support, please contact support.spatial@bruker.com.</p>
 </div>
 </div>
 <div class="cell">
@@ -218,7 +218,6 @@ Important
 <p>Once the protein and RNA data are exported from AtoMx and modified through alignment, the updated data cannot be re-imported into AtoMx. As of AtoMx v2.2 and earlier, the platform retains only the original, pre-aligned data.</p>
 </div>
 </div>
-<p>For technical support, please contact support.spatial@bruker.com.</p>
 
 
 </section>
@@ -230,7 +229,7 @@ Important
   <category>RNA</category>
   <category>alignment</category>
   <guid>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-alignment/</guid>
-  <pubDate>Tue, 30 Sep 2025 00:00:00 GMT</pubDate>
+  <pubDate>Thu, 02 Oct 2025 00:00:00 GMT</pubDate>
   <media:content url="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-alignment/figures/CosMx_Protein_RNA_Image.png" medium="image" type="image/png" height="46" width="144"/>
 </item>
 <item>
@@ -9780,7 +9779,7 @@ Tip
   author = {Lidan Wu and Aster Wardhani and Joseph-Tin Phan},
   year = {2025},
   url = {https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/image-segmentation-models/},
-  note = {Accessed: 2025-09-30}
+  note = {Accessed: 2025-10-02}
 }</code></pre>
 </div>
 <div id="tabset-1-4" class="tab-pane" aria-labelledby="tabset-1-4-tab">
