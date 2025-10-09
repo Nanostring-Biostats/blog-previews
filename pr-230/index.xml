@@ -10,7 +10,228 @@
 <atom:link href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/index.xml" rel="self" type="application/rss+xml"/>
 <description>NanoString&#39;s CosMx Analysis Scratch Space</description>
 <generator>quarto-1.6.30</generator>
-<lastBuildDate>Mon, 29 Sep 2025 00:00:00 GMT</lastBuildDate>
+<lastBuildDate>Thu, 02 Oct 2025 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Aligning CosMx® Same-Cell Multiomics Data</title>
+  <dc:creator>Mithra Korukonda</dc:creator>
+  <dc:creator>Claire Williams</dc:creator>
+  <link>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-alignment/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<section id="cosmx-multiomics-data" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> CosMx Multiomics Data</h1>
+<p>CosMx<sup>®</sup> SMI allows users to acquire protein and RNA data from the same tissue as consecutive experiments. These data are acquired as independent runs and therefore need to be aligned, post-acquisition, to combine them into a multiomic study. This alignment process brings the decoded RNA transcripts into the coordinate system of protein data. To accomplish this, we have developed a standalone alignment tool that can be used to align CosMx data exported from AtoMx<sup>®</sup> SIP. The tool has a 2-step workflow represented in Figure&nbsp;1:</p>
+<p>Step 1: Align the RNA morphology fields of view (FOVs) to protein references.</p>
+<p>Step 2: Assign the RNA transcripts to the protein cell segmentation labels.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-align-workflow" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-align-workflow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-alignment/figures/Figure1.png" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-align-workflow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Multiomics alignment workflow
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="{callout-note}">
+<p>Like other items in our <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/about.html" target="_blank">CosMx Analysis Scratch Space</a>, the multiomics alignment tool presented here is experimental so the usual <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/about.html" target="_blank">caveats</a> and <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/license.html" target="_blank">license</a> applies.</p>
+</div>
+</section>
+<section id="export-cosmx-multiomics-data-from-atomx-sip" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Export CosMx Multiomics Data from AtoMx SIP</h1>
+<p>To export data from AtoMx SIP, you will need an sFTP application such as WinSCP. Launch the AtoMx Export function to obtain the AtoMx Hostname and Username (Figure&nbsp;2, left). Use those credentials, with the AtoMx SIP user’s password, to open a WinSCP portal (Figure&nbsp;2, right).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-data-export" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-data-export-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-alignment/figures/Figure2.png" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-data-export-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Establishing export access between AtoMx SIP and WinSCP
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Next, export data from the protein experiment according to Figure&nbsp;3 (a). Export data from the RNA experiment according to Figure&nbsp;3 (b).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-data-selection" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-data-selection-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-alignment/figures/Figure3.png" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-data-selection-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Data selection for (a) Protein and (b) RNA export from AtoMx SIP
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Check the exported data to confirm the following contents:</p>
+<ul>
+<li><p>Protein <code>CellStatsDir</code> folder and <code>Morphology2D</code> folder within</p></li>
+<li><p>RNA <code>CellStatsDir</code> folder and <code>Morphology2D</code> folder within</p></li>
+<li><p>RNA <code>AnalysisResults</code> folder</p></li>
+</ul>
+</section>
+<section id="download-and-use-alignment-tool" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Download and Use Alignment Tool</h1>
+<p>Download and unzip the <code>MultiO_Alignment_Tool_OCT2025.zip</code> file available <a href="https://bruker-my.sharepoint.com/:u:/p/s_korukonda/EcSqJPZSai9GqLbGC14iTCsBvPaMhe5VVo7MOe2zQeK9rA?e=osmGIY" target="_blank">here</a>. Once the file has been unzipped, launch the tool by double-clicking the <code>MultiOAligmentUI.bat</code> file. The executable will launch an interactive graphical user interface (GUI) as shown in Figure&nbsp;4.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This multiomics alignment tool is actively and continuously under development in the RnD groups at Bruker Spatial Biology. Please be aware that there may be bugs and that it has not gone through the regular level of quality and testing. Our goal here is to bring the capabilities of multiomics to CosMx SMI users as fast as possible. For technical support, please contact support.spatial@bruker.com.</p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-gui" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-gui-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-alignment/figures/Figure4.png" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-gui-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Standalone multiomics alignment tool GUI
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<section id="step-1-calculate-2d-shift" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="step-1-calculate-2d-shift"><span class="header-section-number">3.1</span> Step 1: Calculate 2D Shift</h2>
+<p>To launch image alignment, select the <code>Morphology2D</code> folders for both the protein and RNA runs and click <code>Perform Alignment</code>. The standard search area used for the alignment is by default 500 pixels or roughly 60 microns. This range is large enough to account for shifts introduced by slide replacement. This search area is editable and can be increased to 750 if the user suspects a larger shift (though adjustment is typically not needed – the software makes an assessment of search range need prior to alignment).</p>
+<p>During alignment a new folder called <code>AlignmentQC</code> is created within the RNA data folder structure and is populated with the outputs from the alignment. Occasionally, certain FOVs may be discarded from the multiomic analysis if they fail alignment. This can happen in cases of tissue peeling or significant cell loss. These FOVs, identified as outliers, are recorded in the <code>Alignment_Stats_Curated.csv</code> file and are excluded from the transcript re-assignment process. Refer to Table&nbsp;1 for a list of <code>AlignmentQC</code> folder outputs and descriptions of the individual files.</p>
+<div id="tbl-alignment-qc-outputs" class="quarto-float quarto-figure quarto-figure-center anchored" data-tbl-colwidths="[40,60]">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-alignment-qc-outputs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Folder outputs and descriptions
+</figcaption>
+<div aria-describedby="tbl-alignment-qc-outputs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 40%">
+<col style="width: 60%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>AlignmentQC Folder Outputs</th>
+<th style="text-align: left;">Description of individual files</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Alignment_Stats.csv</td>
+<td style="text-align: left;">List of the paired Protein and RNA FOVs along with the computed XY shift (in pixels) between them.</td>
+</tr>
+<tr class="even">
+<td>FOV_mask.TIF</td>
+<td style="text-align: left;">Binary Map of the FOV Locations.</td>
+</tr>
+<tr class="odd">
+<td>FOV_Cluster.TIF</td>
+<td style="text-align: left;">Visualization of FOV Clusters.</td>
+</tr>
+<tr class="even">
+<td>Displacement_Vectors.png</td>
+<td style="text-align: left;">Visualization of the FOV displacement with marker outliers.</td>
+</tr>
+<tr class="odd">
+<td>Alignment_Stats_Curated.csv</td>
+<td style="text-align: left;">Updated Stats file with associated cluster label and outlier flag.</td>
+</tr>
+<tr class="even">
+<td>Stats_Report.txt</td>
+<td style="text-align: left;">Reports the percentage of FOVs that were successfully aligned, along with a list of FOVs that failed alignment and were excluded from target re-assignment.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+</section>
+<section id="step-2-shift-and-assign-transcripts" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="step-2-shift-and-assign-transcripts"><span class="header-section-number">3.2</span> Step 2: Shift and Assign Transcripts</h2>
+<p>Once the alignment process has been completed for all the FOVs, the path of the final alignment will appear in the GUI Alignment box (Figure&nbsp;5 ). The user can review the computed alignment to verify accuracy of the results.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-alignment-folders" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-alignment-folders-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-alignment/figures/Figure5.png" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-alignment-folders-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Alignment tool generates XY registration between the protein and RNA images
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Once the image registration is complete, the next step is to apply the computed shifts to transcripts and re-assign them to protein segmentation labels. For this step, select the Protein <code>CellStatsDir</code> and the location of the RNA transcripts folder (Figure&nbsp;6 ). If the original folder structure of export is maintained, these folders will be automatically populated when the RNA and protein morphology folders are selected. Once the inputs have been chosen, click <code>Assign transcripts</code> as shown in Figure&nbsp;6 (a).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-final-output" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-final-output-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-alignment/figures/Figure6.png" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-final-output-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: (a) Alignment tool shifts and re-assigns RNA transcripts to protein segmentation labels. (b) Final output fo the alignment.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>For every FOV, the assignment process takes as input the calculated shift and applies it to the transcript locations and then updates the cell id based on the associated protein cell label data. Once the re-assignment is complete, the final output is a folder with the updated transcripts data as shown in Figure&nbsp;6 (b).</p>
+</section>
+</section>
+<section id="conclusions" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Conclusions</h1>
+<p>After using the off-AtoMx alignment tool to apply protein cell segmentation boundaries and cell ID labels to the RNA data, you can use transcript-to-cell alignments found in the <code>*_FOV#####__complete_code_cell_target_call_coords.csv</code> per FOV files within the <code>AnalysisResults_shifted</code> folder to continue analysis with the aligned RNA dataset. These updated files can be used alongside the protein run flat files to create a new multiomic data object. It’s important to note that all transcripts in the aligned RNA data will now reference the segmentation results and metadata from the protein run.</p>
+<p>If you prefer to integrate the aligned RNA data into an existing data object, you can do so by starting with the protein run object and either replacing the protein expression matrix with an aligned RNA matrix or appending the RNA data as an additional assay.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Once the protein and RNA data are exported from AtoMx and modified through alignment, the updated data cannot be re-imported into AtoMx. As of AtoMx v2.2 and earlier, the platform retains only the original, pre-aligned data.</p>
+</div>
+</div>
+
+
+</section>
+
+ ]]></description>
+  <category>multiomics</category>
+  <category>algorithms</category>
+  <category>protein</category>
+  <category>RNA</category>
+  <category>alignment</category>
+  <guid>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-alignment/</guid>
+  <pubDate>Thu, 02 Oct 2025 00:00:00 GMT</pubDate>
+  <media:content url="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-alignment/figures/CosMx_Protein_RNA_Image.png" medium="image" type="image/png" height="46" width="144"/>
+</item>
 <item>
   <title>Differential expression: best practices and advanced techniques</title>
   <dc:creator>Patrick Danaher</dc:creator>
@@ -2725,7 +2946,7 @@ font-style: inherit;">str</span>(out)</span></code></pre></div>
 </section>
 <section id="experimental-approach-stratifying-de-across-tissue-patches" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="experimental-approach-stratifying-de-across-tissue-patches"><span class="header-section-number">6</span> Experimental approach: stratifying DE across tissue patches</h2>
-<p>Here we describe an alternative, experimental approach to DE that we have found to be useful.</p>
+<p>Here we describe an alternative, experimental approach to DE that we have found to be useful. We emphasize that this approach is thus far <strong>very</strong> lightly tested, but we include it here before fully developing it in hopes that it proves useful and that community feedback strengthens a later release.</p>
 <p>Our motivation is twofold:</p>
 <ol type="1">
 <li>Biology: we’ll often expect a DE relationship to vary across space, or to only occur locally. For example, perhaps T-cells only respond to nearby tumor cells when they’re in the nutrient-rich stroma rather than the tumor interior. When we look across the whole tissue for this relationship, we have a harder time discovering it since we model both regions where it occurs and regions where it doesn’t. In statistical terminology: unobserved variables across the span of the tissue are acting as effect modifiers.</li>
@@ -2733,16 +2954,16 @@ font-style: inherit;">str</span>(out)</span></code></pre></div>
 </ol>
 <p>Our solution is to divide the tissue into small patches, then to run DE separately within each patch. This produces a matrix of DE results across genes X patches. Then looking at patch-specific results, we can discover strong relationships that only occur in a few places. And using metaanalysis techniques across all patches, we recover our ability to discover relationships that exist broadly. In short, we get a more nuanced picture of DE behavior within a diverse tissue.</p>
 <p>This approach has one other benefit: when we analyze small patches, spatial correlation becomes less important, as the spatial context within a given patch will be less variable than spatial context across a whole tissue. This lets us run the super-fast algorithm above within each patch. The speed benefit of this approach is so great that even in a large WTX dataset we obtain full DE results across all patches in minutes, while running just a single tissue-wide model for each gene might take a day.</p>
-<p>To support patch-based DE. We have created an algorithm to partition a tissue into patches. This algorithm, “varrymander”, attempts to build patches that achieve a balance between the following goals:</p>
+<p>To support patch-based DE. We have created an algorithm to partition a tissue into patches. This algorithm, “patchDE”, attempts to build patches that achieve a balance between the following goals:</p>
 <ul>
 <li>Ensure each patch has reasonable statistical power</li>
 <li>Prevent overly large patches</li>
 <li>Build as many patches as possible</li>
 </ul>
 <p>In other words, we seek to gerrymander the tissue into districts of similar size and with high variance of the predictor variable.</p>
-<p>The varrymander algorithm is available as a .R script <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/blob/Main/_code/varrymander/varrymander.R" target="_blank">here</a>.</p>
-<p>Below is a demonstration of varrymander’s use in DE.</p>
-<p>First we use varrymander to define patches:</p>
+<p>The patchDE algorithm is available as a .R script <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/blob/Main/_code/PatchDE/DEutils.R" target="_blank">here</a>.</p>
+<p>Below is a demonstration of patchDE’s use.</p>
+<p>First we use define patches:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2753,7 +2974,7 @@ font-style: italic;">### use Patch DE to partition the tissue into patches:</spa
 background-color: null;
 font-style: inherit;">source</span>(<span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">"https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/blob/Main/_code/PatchDE/DEutilsr.R"</span>)</span>
+font-style: inherit;">"https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/blob/Main/_code/PatchDE/DEutils.R"</span>)</span>
 <span id="cb15-3"></span>
 <span id="cb15-4"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -2827,47 +3048,56 @@ background-color: null;
 font-style: inherit;">X =</span> dist2tcell[inds.tumor], </span>
 <span id="cb15-16">                      <span class="at" style="color: #657422;
 background-color: null;
-font-style: inherit;">dbscan_eps =</span> <span class="fl" style="color: #AD0000;
+font-style: inherit;">npatches =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">0.05</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">maxdbsize =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">50</span>, </span>
+font-style: inherit;">12</span>,</span>
 <span id="cb15-17">                      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">bitesize =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1</span>,</span>
+<span id="cb15-18">                      <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">maxradius =</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.5</span>,</span>
-<span id="cb15-18">                      <span class="at" style="color: #657422;
+<span id="cb15-19">                      <span class="at" style="color: #657422;
 background-color: null;
-font-style: inherit;">totvarthresh =</span> <span class="dv" style="color: #AD0000;
+font-style: inherit;">roundness =</span> <span class="fl" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">100</span>  <span class="co" style="color: #5E5E5E;
+font-style: inherit;">0.5</span>,</span>
+<span id="cb15-20">                      <span class="at" style="color: #657422;
 background-color: null;
-font-style: inherit;"># main driver of patch size</span></span>
-<span id="cb15-19">) <span class="co" style="color: #5E5E5E;
+font-style: inherit;">initwithhotspots =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>,</span>
+<span id="cb15-21">                      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">n_iters =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">25</span></span>
+<span id="cb15-22">) <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># produces a vector of patch assigments, potentially including NA's for cells not given a patch</span></span>
-<span id="cb15-20"></span>
-<span id="cb15-21"></span>
-<span id="cb15-22"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># to view, draw polygon boundaries around each patch:</span></span>
-<span id="cb15-23">polys <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">getPatchPolys</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">xy =</span> xy[inds.tumor, ], <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">patch =</span> patches)</span>
+<span id="cb15-23"></span>
 <span id="cb15-24"></span>
 <span id="cb15-25"><span class="co" style="color: #5E5E5E;
 background-color: null;
+font-style: inherit;"># to view, draw polygon boundaries around each patch:</span></span>
+<span id="cb15-26">patchhulls <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">getPatchHulls</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xy =</span> xy[inds.tumor, ], <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">patch =</span> patches) </span>
+<span id="cb15-27"></span>
+<span id="cb15-28"><span class="co" style="color: #5E5E5E;
+background-color: null;
 font-style: inherit;"># plot patches:</span></span>
-<span id="cb15-26"><span class="fu" style="color: #4758AB;
+<span id="cb15-29"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">par</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -2882,7 +3112,7 @@ background-color: null;
 font-style: inherit;">2</span>,<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span>))</span>
-<span id="cb15-27"><span class="fu" style="color: #4758AB;
+<span id="cb15-30"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(xy[inds.tumor, ], <span class="at" style="color: #657422;
 background-color: null;
@@ -2897,12 +3127,12 @@ background-color: null;
 font-style: inherit;">asp =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>,</span>
-<span id="cb15-28">     <span class="at" style="color: #657422;
+<span id="cb15-31">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Tumor cells colored by distance to T-cell, with patches for stratified DE"</span>,</span>
-<span id="cb15-29">     <span class="at" style="color: #657422;
+<span id="cb15-32">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">col =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -2921,7 +3151,7 @@ background-color: null;
 font-style: inherit;">"black"</span>)))(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">101</span>)[</span>
-<span id="cb15-30">       <span class="dv" style="color: #AD0000;
+<span id="cb15-33">       <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -2936,8 +3166,8 @@ background-color: null;
 font-style: inherit;">/</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">max</span>(dist2tcell))[inds.tumor]</span>
-<span id="cb15-31">     ],</span>
-<span id="cb15-32">     <span class="at" style="color: #657422;
+<span id="cb15-34">     ],</span>
+<span id="cb15-35">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">xlab =</span> <span class="st" style="color: #20794D;
 background-color: null;
@@ -2946,7 +3176,7 @@ background-color: null;
 font-style: inherit;">ylab =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">""</span>)</span>
-<span id="cb15-33"><span class="cf" style="color: #003B4F;
+<span id="cb15-36"><span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">for</span> (i <span class="cf" style="color: #003B4F;
@@ -2958,15 +3188,23 @@ font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">length</span>(polys)) {</span>
-<span id="cb15-34">  <span class="fu" style="color: #4758AB;
+font-style: inherit;">length</span>(patchhulls)) {</span>
+<span id="cb15-37">  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">polygon</span>(polys[[i]], <span class="at" style="color: #657422;
+font-style: inherit;">plot</span>(patchhulls[[i]], <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">border =</span> <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">"black"</span>)</span>
-<span id="cb15-35">}</span></code></pre></div>
+font-style: inherit;">"black"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">wpoints =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">add =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)</span>
+<span id="cb15-38">}</span></code></pre></div>
 </details>
 </div>
 <div class="cell">
@@ -3028,6 +3266,8 @@ font-style: inherit;">1</span>, min)</span>
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
+font-style: inherit;">setdiff</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
 font-style: inherit;">names</span>(lowestp)[<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">order</span>(lowestp, <span class="at" style="color: #657422;
@@ -3040,7 +3280,9 @@ font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">50</span>]]</span>
+font-style: inherit;">50</span>]], <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NA</span>)</span>
 <span id="cb16-12"></span>
 <span id="cb16-13"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -3094,6 +3336,8 @@ font-style: inherit;">$</span>pval)</span>
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
+font-style: inherit;">setdiff</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
 font-style: inherit;">names</span>(metapvals)[<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">order</span>(metapvals, <span class="at" style="color: #657422;
@@ -3106,7 +3350,9 @@ font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">50</span>]]</span>
+font-style: inherit;">50</span>]], <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NA</span>)</span>
 <span id="cb16-21"></span>
 <span id="cb16-22"><span class="do" style="color: #5E5E5E;
 background-color: null;
@@ -3115,9 +3361,17 @@ font-style: italic;">## now use a heatmap to plot results from either list of to
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">pheatmap</span>((ests <span class="sc" style="color: #5E5E5E;
+font-style: inherit;">pheatmap</span>((deresults<span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">*</span> (pvals <span class="sc" style="color: #5E5E5E;
+font-style: inherit;">$</span>dist2tcell<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>ests <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> (deresults<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>dist2tcell<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>pvals <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">&lt;</span> <span class="fl" style="color: #AD0000;
 background-color: null;
@@ -3154,7 +3408,7 @@ background-color: null;
 font-style: inherit;">101</span>))</span></code></pre></div>
 </details>
 </div>
-<p>Below is an example snippet of a heatmap of DE results on varrymander patches from a larger study:</p>
+<p>Below is an example snippet of a heatmap of DE results on patches from a larger study:</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -3164,6 +3418,11 @@ font-style: inherit;">101</span>))</span></code></pre></div>
 </div>
 </div>
 </div>
+<p>A note on multiplicity: when we run DE across dozens of patches, the problem of multiple testing gets even worse. So, before getting excited about a single gene in a single patch, take one of these countermeasures to multiplicity:</p>
+<ul>
+<li>Confirm the gene x patch has a strong adjusted p-value <em>considering all the p-values from all the genes x patches</em>.</li>
+<li>Confirm the gene has a strong adjusted p-value from the metaanalysis, considering the p-values from all the genes’ metaanalysis results.</li>
+</ul>
 </section>
 <section id="comment-on-statistical-power-and-false-discoveries" class="level2" data-number="7">
 <h2 data-number="7" class="anchored" data-anchor-id="comment-on-statistical-power-and-false-discoveries"><span class="header-section-number">7</span> Comment on statistical power and false discoveries</h2>
@@ -12809,7 +13068,7 @@ Tip
   author = {Lidan Wu and Aster Wardhani and Joseph-Tin Phan},
   year = {2025},
   url = {https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/image-segmentation-models/},
-  note = {Accessed: 2025-09-29}
+  note = {Accessed: 2025-10-09}
 }</code></pre>
 </div>
 <div id="tabset-1-4" class="tab-pane" aria-labelledby="tabset-1-4-tab">
@@ -24359,968 +24618,6 @@ Maher, Kamal, Morgan Wu, Yiming Zhou, Jiahao Huang, Qiangge Zhang, and Xiao Wang
   <guid>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/cellular-neighborhoods/cellular-neighborhoods.html</guid>
   <pubDate>Wed, 30 Oct 2024 00:00:00 GMT</pubDate>
   <media:content url="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/cellular-neighborhoods/figures/neighborhood-tile.png" medium="image" type="image/png" height="144" width="144"/>
-</item>
-<item>
-  <title>Programmatic stitching with napari-cosmx</title>
-  <dc:creator>Evelyn Metzger</dc:creator>
-  <link>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-stitching/napari-cosmx-stitching.html</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<p>This is the third how-to post in our <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/#category=napari"><code>napari series</code></a> for CosMx<sup>®</sup> SMI data analysis. In the <a href="../../posts/napari-cosmx-intro/index.html">first post</a>, I introduced the napari-cosmx plugin, which allows you to view and analyze CosMx SMI data exported from AtoMx<sup>®</sup> SIP. This plugin features a user-friendly GUI widget for stitching raw data, making it ideal for those without scripting experience. The <a href="../../posts/napari-cosmx-basics/using-napari-cosmx.html">second post</a> highlighted some tips and tricks for using the plugin effectively. This post will explore programmatic stitching using Python, offering a more flexible and powerful approach for advanced users.</p>
-<p>Stitching CosMx SMI datasets can be challenging due to their large size and the high RAM requirements of the stitching process. This is often compounded by limited storage space on local computers. While remote servers (like cloud computers) can mitigate these issues, they are often headless, making GUI-based stitching difficult. Additionally, there are situations where programmatic stitching of multiple slides is desired, bypassing the need for a GUI entirely. Finally, the current GUI-based approach within the plugin requires starting with an existing slide, as the stitching widget is only accessible after a slide is loaded. This adds an unnecessary step to the workflow.</p>
-<p>While the GUI provides a user-friendly way to stitch CosMx SMI data, it’s also possible to perform stitching programmatically. This approach offers greater flexibility and control, particularly for those comfortable with Python programming. However, it requires additional installation steps and may have higher technical barriers compared to the GUI method, which has been more extensively tested.</p>
-<ul>
-<li>Section&nbsp;1 Install napari and <code>napari-cosmx</code> using a virtual environment</li>
-<li>Section&nbsp;2 How to stitch a single slide within python</li>
-<li>Section&nbsp;3 How to stitch multiple slides serially with python</li>
-</ul>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Note: throughout this post I use the term “stitching” for brevity to refer to <em>both</em> the stitching (<code>stitch-images</code>) and the reading of targets (<code>read-targets</code>). These are two separate package scripts but are typically executed back-to-back.</p>
-</div>
-</div>
-<section id="sec-installation" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Installation</h1>
-<p>Before we begin stitching, we need to install both napari and the <code>napari-cosmx</code> plugin. I recommend using a version and virtual environment management like <a href="https://github.com/pyenv/pyenv">pyenv</a> to keep specific versions of packages but python’s built in <a href="https://docs.python.org/3/library/venv.html">venv</a> works well too.</p>
-<p>I’ve tested the instructions below on MacOS (v12.5.1) and an EC2 instance running Amazon Linux 2.</p>
-<section id="create-and-activate-a-virtual-environment" class="level2" data-number="1.1">
-<h2 data-number="1.1" class="anchored" data-anchor-id="create-and-activate-a-virtual-environment"><span class="header-section-number">1.1</span> Create and activate a virtual environment</h2>
-<p>The exact steps needed to create a virtual environment depends on several factors and a step-by-step guide beyond the scope of this post. That said, I recommend reading this fantastic <a href="https://realpython.com/intro-to-pyenv/">Real Python</a> post. I’m working with Python 3.9.20 as there have been reports of breaking changes with newer Python 3.10+.</p>
-<p>Once activated, install napari.</p>
-<div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">pip</span> install <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"napari[all]"</span></span>
-<span id="cb1-2"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">pip</span> install ipython <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># optional</span></span>
-<span id="cb1-3"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">pip</span> install imageio <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># optional</span></span></code></pre></div>
-</section>
-<section id="install-napari-cosmx-plugin" class="level2" data-number="1.2">
-<h2 data-number="1.2" class="anchored" data-anchor-id="install-napari-cosmx-plugin"><span class="header-section-number">1.2</span> Install <code>napari-cosmx</code> plugin</h2>
-<p>Download the <code>whl</code> file from the Scratch Space repository directly to your working directory via <code>wget</code> and then install it with <code>pip</code></p>
-<div class="sourceCode" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">wget</span> https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/raw/refs/heads/Main/assets/napari-cosmx%20releases/napari_CosMx-0.4.17.1-py3-none-any.whl</span>
-<span id="cb2-2"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">pip</span> install napari_CosMx-0.4.17.1-py3-none-any.whl</span></code></pre></div>
-<p>And you can confirm that it installed when <code>pip freeze</code> shows the installation path.</p>
-<div class="sourceCode" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">pip</span> freeze <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">|</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">grep</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"napari_CosMx"</span></span></code></pre></div>
-<blockquote class="blockquote">
-<p>napari-CosMx @ file:///home/ec2-user/napari_CosMx-0.4.17.0-py3-none-any.whl</p>
-</blockquote>
-</section>
-<section id="package-scripts" class="level2" data-number="1.3">
-<h2 data-number="1.3" class="anchored" data-anchor-id="package-scripts"><span class="header-section-number">1.3</span> Package scripts</h2>
-<p>When <code>napari-cosmx</code> is installed, we get a few package scripts that can be called directly. These are:</p>
-<ul>
-<li><code>stitch-images</code>, which builds the zarr structure</li>
-<li><code>read-targets</code>, which creates the targets.hdf5 file</li>
-</ul>
-<p>Assuming these are in your path, you can see their help documentation by running <code>stitch-images --help</code> or <code>read-targets --help</code>.</p>
-<div class="sourceCode" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">stitch-images</span> <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">--help</span></span></code></pre></div>
-<pre><code>usage: stitch-images [-h] [-i INPUTDIR] [--imagesdir IMAGESDIR] [-o OUTPUTDIR] [-f OFFSETSDIR] [-l] [-u UMPERPX] [-z ZSLICE] [--dotzarr]
-
-Tile CellLabels and morphology TIFFs.
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -i INPUTDIR, --inputdir INPUTDIR
-                        Required: Path to CellLabels and morphology images.
-  --imagesdir IMAGESDIR
-                        Optional: Path to morphology images, if different than inputdir.
-  -o OUTPUTDIR, --outputdir OUTPUTDIR
-                        Required: Where to create zarr output.
-  -f OFFSETSDIR, --offsetsdir OFFSETSDIR
-                        Required: Path to latest.fovs.csv directory.
-  -l, --labels          
-                        Optional: Only stitch labels.
-  -u UMPERPX, --umperpx UMPERPX
-                        Optional: Override image scale in um per pixel.
-                        Instrument-specific values to use:
-                        -&gt; beta04 = 0.1228
-  -z ZSLICE, --zslice ZSLICE
-                        Optional: Z slice to stitch.
-  --dotzarr             
-                        Optional: Add .zarr extension on multiscale pyramids.</code></pre>
-<div class="sourceCode" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">read-targets</span> <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">--help</span></span></code></pre></div>
-<pre><code>usage: read-targets [-h] [-o OUTPUTDIR] [--filename FILENAME] folder
-
-Read decoded targets and write to hdf5
-
-positional arguments:
-  folder                Voting folder
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -o OUTPUTDIR, --outputdir OUTPUTDIR
-                        Where to write hdf5 file
-  --filename FILENAME   Name for hdf5 file</code></pre>
-<p>So an example syntax might looks like this:</p>
-<div class="sourceCode" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">stitch-images</span> <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">-i</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&lt;</span>path to CellStats dir<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&gt;</span> -f <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&lt;</span>path to RunSummary dir<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&gt;</span> -o <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&lt;</span>path to output dir<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&gt;</span></span>
-<span id="cb8-2"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">read-targets</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&lt;</span>path to AnalysisResults/sub dir<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&gt;</span> - o <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&lt;</span>path to output dir<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&gt;</span></span></code></pre></div>
-</section>
-</section>
-<section id="sec-single-slide" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Stitching a single slide in Python</h1>
-<p>For many users, the terminal commands above should be sufficient to add into their workflows. The rest of this post will use Python to wrap these two scripts so that we can stitch a single slide or multiple slides in batch.</p>
-<p>In the code below, we point python to the location of our raw data slide folder. This folder will have subfolders <code>CellStatsDir</code>, <code>RunSummary</code>, and <code>AnalysisResults</code>.</p>
-<p>In the user-defined options section of this script, be sure to configure the paths as needed.</p>
-<div class="sourceCode" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># python code</span></span>
-<span id="cb9-2"></span>
-<span id="cb9-3"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> numpy</span>
-<span id="cb9-4"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> pandas <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">as</span> pd</span>
-<span id="cb9-5"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> os</span>
-<span id="cb9-6"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">from</span> os <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> listdir</span>
-<span id="cb9-7"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">from</span> glob <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> iglob</span>
-<span id="cb9-8"></span>
-<span id="cb9-9"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">### User-defined options</span></span>
-<span id="cb9-10"></span>
-<span id="cb9-11"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">## Path to your slide folder</span></span>
-<span id="cb9-12">SlideDir <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"path/to/your/slide/raw/data"</span> </span>
-<span id="cb9-13"></span>
-<span id="cb9-14"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">## Output path</span></span>
-<span id="cb9-15">SlideOutputDir <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"/path/to/new/directory/to/store/napari/files"</span> </span>
-<span id="cb9-16"></span>
-<span id="cb9-17"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">### Processing</span></span>
-<span id="cb9-18"></span>
-<span id="cb9-19"><span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">if</span> <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">not</span> os.path.exists(SlideOutputDir):</span>
-<span id="cb9-20">  <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Creating output folder"</span>)</span>
-<span id="cb9-21">  os.makedirs(SlideOutputDir)</span>
-<span id="cb9-22"></span>
-<span id="cb9-23">CellStatsDir <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> os.path.join(SlideDir, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"CellStatsDir"</span>)</span>
-<span id="cb9-24">RunSummaryDir <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> os.path.join(SlideDir, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'RunSummary'</span>)</span>
-<span id="cb9-25">AnalysisDirParent <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> os.path.join(SlideDir, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'AnalysisResults'</span>)</span>
-<span id="cb9-26">AnalysisDirSubBasename <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> [i <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">for</span> i <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">in</span> listdir(AnalysisDirParent) <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">if</span> <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">not</span> i.startswith(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'.'</span>)]</span>
-<span id="cb9-27">AnalysisDir <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> os.path.join(AnalysisDirParent, AnalysisDirSubBasename[<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0</span>])</span>
-<span id="cb9-28"></span>
-<span id="cb9-29">cmd_stitch <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'stitch-images -i "'</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> CellStatsDir <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'" -f "'</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> RunSummaryDir <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'" -o '</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> SlideOutputDir</span>
-<span id="cb9-30"><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">!</span>{cmd_stitch}</span>
-<span id="cb9-31"></span>
-<span id="cb9-32">cmd_read_targets <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'read-targets "'</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> AnalysisDir <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'"'</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">' -o '</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> SlideOutputDir</span>
-<span id="cb9-33"><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">!</span>{cmd_read_targets}</span></code></pre></div>
-<p>And your output should look something like this:</p>
-<pre><code>Writing DNA multiscale output to zarr.
-Writing level 1 of 7, shape: (34043, 34043), chunksize: (8192, 8192)
-Writing level 2 of 7, shape: (17021, 17021), chunksize: (4096, 4096)
-Writing level 3 of 7, shape: (8510, 8510), chunksize: (2048, 2048)
-Writing level 4 of 7, shape: (4255, 4255), chunksize: (1024, 1024)
-Writing level 5 of 7, shape: (2127, 2127), chunksize: (512, 512)
-Writing level 6 of 7, shape: (1063, 1063), chunksize: (256, 256)
-Writing level 7 of 7, shape: (531, 531), chunksize: (128, 128)
-Calculating contrast limits
-Writing omero metadata...
-{'min': 136, 'max': 33272, 'start': 432, 'end': 28260}
-Reading targets from ...
-Writing targets to ...</code></pre>
-<section id="sec-launching-napari-cosmx-from-python" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="sec-launching-napari-cosmx-from-python"><span class="header-section-number">2.1</span> Viewing the results</h2>
-<p>As mentioned in the <a href="../../posts/napari-cosmx-basics/using-napari-cosmx.html">second napari series post</a>, one can use python directly to view CosMx SMI data. We can also launch napari from python directly. In the code below, I instantiated a <code>Gemini</code> class object, turned off the segmentation and FOV labels layers, added the PanCK and DNA channels and manually adjusted the contrast of PanCK. Finally, I launched the widget for further exploration.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">from</span> importlib.metadata <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> metadata</span>
-<span id="cb11-2"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> numpy</span>
-<span id="cb11-3"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> pandas <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">as</span> pd</span>
-<span id="cb11-4"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> os</span>
-<span id="cb11-5"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">from</span> napari_cosmx.gemini <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> Gemini</span>
-<span id="cb11-6"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> imageio</span>
-<span id="cb11-7"></span>
-<span id="cb11-8">napari_files_path <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> SlideOutputDir <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># i.e., 'your/SlideOutputDir/from/above'</span></span>
-<span id="cb11-9">gem <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> Gemini(napari_files_path)</span>
-<span id="cb11-10">gem.viewer.layers[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'Segmentation'</span>].visible <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">False</span></span>
-<span id="cb11-11">gem.viewer.layers[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'FOV labels'</span>].visible <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">False</span></span>
-<span id="cb11-12">gem.add_channel(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'PanCK'</span>, colormap <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'green'</span>)</span>
-<span id="cb11-13">panck <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> gem.viewer.layers[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'PanCK'</span>]</span>
-<span id="cb11-14">panck.contrast_limits <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> [<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">116.0</span>, <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">5903.646408839779</span>]</span>
-<span id="cb11-15">gem.add_channel(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'DNA'</span>, colormap <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'bop blue'</span>)</span>
-<span id="cb11-16">gem.show_widget()</span>
-<span id="cb11-17"></span>
-<span id="cb11-18">fig_path <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> napari_files_path <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"/fig-stitch-single-slide.png"</span></span>
-<span id="cb11-19"><span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">with</span> imageio.get_writer(fig_path, dpi<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">800</span>, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">800</span>)) <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">as</span> writer:</span>
-<span id="cb11-20">        screenshot <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> gem.viewer.screenshot(canvas_only<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">False</span>)</span>
-<span id="cb11-21">        writer.append_data(screenshot)</span></code></pre></div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>You’ll note in the widget section that the <code>Color Cells</code> widget is blank. That’s because we didn’t create metadata for this slide (<em>i.e.</em>, it was not present in the raw data). For an example of adding metadata, see the <a href="../../posts/napari-cosmx-intro/index.html#sec-adding-metadata">Adding and viewing metadata</a> section from the first post.</p>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div id="fig-stitch-single-slide" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-stitch-single-slide-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-stitching/figures/fig-stitch-single-slide.png" class="img-fluid figure-img" width="600">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-stitch-single-slide-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: The output from a single slide stitching. This image represent an 8-by-8 FOV grid. PanCK and DNA are shown in green and blue, respectively.
-</figcaption>
-</figure>
-</div>
-</div>
-</div>
-</section>
-</section>
-<section id="sec-multiple-slides" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Stitching multiple slides</h1>
-<p>We can process several slides serially in python. Let’s try it. Let’s say we have a <code>Batch</code> directory that contains five slides. Within each slide there is a folder containing the slide name and another folder named Logs. Here’s what the batch folder structure might look like.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># tree -f -L 2</span></span>
-<span id="cb12-2"><span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">.</span></span>
-<span id="cb12-3"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">├──</span> ./AUG29_6K_BRST_PS_S1</span>
-<span id="cb12-4"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">│&nbsp;&nbsp;</span> ├── ./AUG29_6K_BRST_PS_S1/20230829_212648_S1</span>
-<span id="cb12-5"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">│&nbsp;&nbsp;</span> ├── ./AUG29_6K_BRST_PS_S1/Logs</span>
-<span id="cb12-6"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">├──</span> ./AUG29_6K_BRST_PS_S2</span>
-<span id="cb12-7"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">│&nbsp;&nbsp;</span> ├── ./AUG29_6K_BRST_PS_S2/20230829_212648_S2</span>
-<span id="cb12-8"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">│&nbsp;&nbsp;</span> ├── ./AUG29_6K_BRST_PS_S2/Logs</span>
-<span id="cb12-9"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">├──</span> ./AUG29_6K_BRST_PS_S3</span>
-<span id="cb12-10"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">│&nbsp;&nbsp;</span> ├── ./AUG29_6K_BRST_PS_S3/20230829_212648_S3</span>
-<span id="cb12-11"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">│&nbsp;&nbsp;</span> ├── ./AUG29_6K_BRST_PS_S3/Logs</span>
-<span id="cb12-12"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">├──</span> ./AUG29_6K_BRST_PS_S4</span>
-<span id="cb12-13"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">│&nbsp;&nbsp;</span> ├── ./AUG29_6K_BRST_PS_S4/20230829_212648_S4</span>
-<span id="cb12-14"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">│&nbsp;&nbsp;</span> ├── ./AUG29_6K_BRST_PS_S4/Logs</span>
-<span id="cb12-15"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">├──</span> ./AUG29_6K_BRST_PS_S5</span>
-<span id="cb12-16"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">│&nbsp;&nbsp;</span> ├── ./AUG29_6K_BRST_PS_S5/20230829_212648_S5</span>
-<span id="cb12-17"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">│&nbsp;&nbsp;</span> ├── ./AUG29_6K_BRST_PS_S5/Logs</span></code></pre></div>
-</div>
-<p>In the python script below, we point <code>BatchFolder</code> to the location that contains these slide folders. We also define <code>OutputFolder</code> to store the napari folders (one for each slide). The script then searches through those folders and stitches the slides.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> numpy</span>
-<span id="cb13-2"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> pandas <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">as</span> pd</span>
-<span id="cb13-3"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> os</span>
-<span id="cb13-4"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">from</span> os <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> listdir</span>
-<span id="cb13-5"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">from</span> glob <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> iglob</span>
-<span id="cb13-6"></span>
-<span id="cb13-7"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Directory containing multiple slides</span></span>
-<span id="cb13-8">BatchFolder <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'/directory/containing/multiple/slides'</span></span>
-<span id="cb13-9"></span>
-<span id="cb13-10"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Output path</span></span>
-<span id="cb13-11">OutputFolder <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'/path/to/output/directory'</span></span>
-<span id="cb13-12"></span>
-<span id="cb13-13"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">### Functions</span></span>
-<span id="cb13-14"></span>
-<span id="cb13-15"><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">def</span> check_folder(path: <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">str</span>) <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-&gt;</span> <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">bool</span>:</span>
-<span id="cb13-16">  <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">""" Checks if a selected folder is a valid slide.</span></span>
-<span id="cb13-17"></span>
-<span id="cb13-18"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">      Description: </span></span>
-<span id="cb13-19"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">          A folder is a valid slide if it has the following folders:</span></span>
-<span id="cb13-20"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">          CellStatsDir, AnalysisResults/*, and RunSummary</span></span>
-<span id="cb13-21"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">        </span></span>
-<span id="cb13-22"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">      Returns:</span></span>
-<span id="cb13-23"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">          bool: True if valid, False if not valid</span></span>
-<span id="cb13-24"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">  """</span></span>
-<span id="cb13-25">  isValid <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">True</span></span>
-<span id="cb13-26">  <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">if</span> <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">not</span> os.path.isdir(path <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'/CellStatsDir'</span>):</span>
-<span id="cb13-27">    <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"No valid CellStatsDir"</span>)</span>
-<span id="cb13-28">    isValid <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">False</span></span>
-<span id="cb13-29">  <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">if</span> <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">not</span> os.path.isdir(path <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'/RunSummary'</span>):</span>
-<span id="cb13-30">    <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"No valid RunSummary"</span>)</span>
-<span id="cb13-31">    isValid <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">False</span> </span>
-<span id="cb13-32">  <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">if</span> <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">not</span> os.path.isdir(path <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'/AnalysisResults'</span>):</span>
-<span id="cb13-33">    <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"No valid AnalysisResults Parent folder"</span>)</span>
-<span id="cb13-34">    isValid <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">False</span></span>
-<span id="cb13-35">  <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">else</span>: </span>
-<span id="cb13-36">      <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># check if /AnalysisResults/&lt;random_subfolder_name&gt; exists</span></span>
-<span id="cb13-37">      analysis_sub_dir <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> [i <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">for</span> i <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">in</span> listdir(path <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'/AnalysisResults'</span>) <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">if</span> <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">not</span> i.startswith(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'.'</span>)]</span>
-<span id="cb13-38">      <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">if</span>(<span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">len</span>(analysis_sub_dir)<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">!=</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span>):</span>
-<span id="cb13-39">        <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"No valid AnalysisResults subfolder"</span>)</span>
-<span id="cb13-40">        isValid <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">False</span></span>
-<span id="cb13-41">  <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">return</span> isValid</span>
-<span id="cb13-42"></span>
-<span id="cb13-43"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">### Processing</span></span>
-<span id="cb13-44"></span>
-<span id="cb13-45"><span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">for</span> <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">dir</span> <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">in</span> listdir(BatchFolder):</span>
-<span id="cb13-46">  ParentFolder <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> os.path.join(BatchFolder, <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">dir</span>)</span>
-<span id="cb13-47">  <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">if</span> os.path.isfile(ParentFolder):</span>
-<span id="cb13-48">    <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Skipping file "</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">dir</span>)</span>
-<span id="cb13-49">    <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">continue</span></span>
-<span id="cb13-50">  <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">else</span>: </span>
-<span id="cb13-51">    <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'Processing Parent Folder: '</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">dir</span>)</span>
-<span id="cb13-52">    <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Process slides within the Parent folder</span></span>
-<span id="cb13-53">    <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">for</span> SlideDir <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">in</span> listdir(ParentFolder):</span>
-<span id="cb13-54">        <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">if</span> os.path.isfile(os.path.join(ParentFolder, SlideDir)):</span>
-<span id="cb13-55">          <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Skipping file "</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> SlideDir)</span>
-<span id="cb13-56">          <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">continue</span></span>
-<span id="cb13-57">        <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">else</span>:</span>
-<span id="cb13-58">          <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># check that it is a valid slide</span></span>
-<span id="cb13-59">          <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">if</span> <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">not</span> check_folder(os.path.join(ParentFolder, SlideDir)):</span>
-<span id="cb13-60">            <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Skipping folder "</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> SlideDir)</span>
-<span id="cb13-61">          <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">else</span>:</span>
-<span id="cb13-62">            SlideOutputDir <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> os.path.join(OutputFolder, <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">dir</span>)</span>
-<span id="cb13-63">            CellStatsDir <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> os.path.join(ParentFolder, SlideDir, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"CellStatsDir"</span>)</span>
-<span id="cb13-64">            RunSummaryDir <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> os.path.join(ParentFolder, SlideDir, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"RunSummary"</span>)</span>
-<span id="cb13-65">            AnalysisDirParent <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> os.path.join(ParentFolder, SlideDir, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'AnalysisResults'</span>)</span>
-<span id="cb13-66">            AnalysisDirSubBasename <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> [i <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">for</span> i <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">in</span> listdir(AnalysisDirParent) <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">if</span> <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">not</span> i.startswith(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'.'</span>)]</span>
-<span id="cb13-67">            AnalysisDir <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> os.path.join(AnalysisDirParent, AnalysisDirSubBasename[<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0</span>])</span>
-<span id="cb13-68">            <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">if</span> os.path.exists(SlideOutputDir):</span>
-<span id="cb13-69">              <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Skipping output "</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> SlideOutputDir <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">". Folder exists already"</span>)</span>
-<span id="cb13-70">              <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">continue</span></span>
-<span id="cb13-71">            <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">else</span>:</span>
-<span id="cb13-72">              os.makedirs(SlideOutputDir)</span>
-<span id="cb13-73">              cmd_stitch <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'stitch-images -i "'</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> CellStatsDir <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'" -f "'</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> RunSummaryDir <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'" -o '</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> SlideOutputDir</span>
-<span id="cb13-74">              <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">print</span>(cmd_stitch)</span>
-<span id="cb13-75">              <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">!</span>{cmd_stitch}</span>
-<span id="cb13-76">              cmd_read_targets <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'read-targets "'</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> AnalysisDir <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'"'</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">' -o '</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> SlideOutputDir</span>
-<span id="cb13-77">              <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">print</span>(cmd_read_targets)</span>
-<span id="cb13-78">              <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">!</span>{cmd_read_targets}</span>
-<span id="cb13-79">              <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"</span><span class="ch" style="color: #20794D;
-background-color: null;
-font-style: inherit;">\n</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"</span>)</span></code></pre></div>
-</div>
-<section id="conclusion" class="level2" data-number="3.1">
-<h2 data-number="3.1" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">3.1</span> Conclusion</h2>
-<p>In this post, I showed how to prepare napari-cosmx files folders from raw data programmatically. To do this, we used a virtual environment to install our plugin and created a script to install a single slide followed by a script to install multiple slides. I also showed how we can open a slide with <code>napari-cosmx</code> directly from python.</p>
-
-
-</section>
-</section>
-
- ]]></description>
-  <category>napari</category>
-  <category>how-tos</category>
-  <category>python</category>
-  <guid>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-stitching/napari-cosmx-stitching.html</guid>
-  <pubDate>Fri, 18 Oct 2024 00:00:00 GMT</pubDate>
-  <media:content url="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-stitching/figures/fig-stitch-single-slide.png" medium="image" type="image/png" height="77" width="144"/>
 </item>
 </channel>
 </rss>

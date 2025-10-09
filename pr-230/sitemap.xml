@@ -2,210 +2,214 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/about.html</loc>
-    <lastmod>2025-09-29T19:26:21.907Z</lastmod>
+    <lastmod>2025-10-09T15:39:34.511Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/assets/napari-cosmx releases/change_log.html</loc>
-    <lastmod>2025-09-29T19:26:21.920Z</lastmod>
+    <lastmod>2025-10-09T15:39:34.524Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/flat-file-exports/flat-files-compare.html</loc>
-    <lastmod>2025-09-29T19:26:22.248Z</lastmod>
+    <lastmod>2025-10-09T15:39:34.859Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/cellular-neighborhoods/cellular-neighborhoods.html</loc>
-    <lastmod>2025-09-29T19:26:22.240Z</lastmod>
+    <lastmod>2025-10-09T15:39:34.851Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-rois/cosmx-rois.html</loc>
-    <lastmod>2025-09-29T19:26:23.050Z</lastmod>
+    <lastmod>2025-10-09T15:39:35.656Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/insitucor/index.html</loc>
-    <lastmod>2025-09-29T19:26:22.834Z</lastmod>
+    <lastmod>2025-10-09T15:39:35.434Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/cell-typing-strategies/cell-typing-strategies.html</loc>
-    <lastmod>2025-09-29T19:26:22.240Z</lastmod>
+    <lastmod>2025-10-09T15:39:34.850Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/visuals-reduce-whitespace/index.html</loc>
-    <lastmod>2025-09-29T19:26:23.674Z</lastmod>
+    <lastmod>2025-10-09T15:39:36.278Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/tree-cell-typing/index.html</loc>
-    <lastmod>2025-09-29T19:26:23.649Z</lastmod>
+    <lastmod>2025-10-09T15:39:36.253Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/spatial-algorithm-zoo/index.html</loc>
-    <lastmod>2025-09-29T19:26:23.409Z</lastmod>
+    <lastmod>2025-10-09T15:39:36.013Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/cosmx-cell-profiles/index.html</loc>
-    <lastmod>2025-09-29T19:26:22.246Z</lastmod>
+    <lastmod>2025-10-09T15:39:34.857Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/background/index.html</loc>
-    <lastmod>2025-09-29T19:26:21.965Z</lastmod>
+    <lastmod>2025-10-09T15:39:34.569Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-cosmx-intro/index.html</loc>
-    <lastmod>2025-09-29T19:26:23.040Z</lastmod>
+    <lastmod>2025-10-09T15:39:35.646Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/visualize-cellular-neighborhood-in-gallery-mode/index.html</loc>
-    <lastmod>2025-09-29T19:26:23.673Z</lastmod>
+    <lastmod>2025-10-09T15:39:36.277Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/segmentation-error-evaluation/index.html</loc>
-    <lastmod>2025-09-29T19:26:23.353Z</lastmod>
+    <lastmod>2025-10-09T15:39:35.956Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/on-cell-typing-with-marker-genes/index.html</loc>
-    <lastmod>2025-09-29T19:26:23.297Z</lastmod>
+    <lastmod>2025-10-09T15:39:35.903Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/composite-images/making-composite-images.html</loc>
-    <lastmod>2025-09-29T19:26:22.245Z</lastmod>
+    <lastmod>2025-10-09T15:39:34.855Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/GeoMx-scMask-generation/index.html</loc>
-    <lastmod>2025-09-29T19:26:21.958Z</lastmod>
+    <lastmod>2025-10-09T15:39:34.562Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/h5ad_conversion/index.html</loc>
-    <lastmod>2025-09-29T19:26:22.274Z</lastmod>
+    <lastmod>2025-10-09T15:39:34.884Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/batchcorrection/index.html</loc>
-    <lastmod>2025-09-29T19:26:22.238Z</lastmod>
+    <lastmod>2025-10-09T15:39:34.849Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/smiDE/index.html</loc>
-    <lastmod>2025-09-29T19:26:23.409Z</lastmod>
+    <lastmod>2025-10-09T15:39:36.013Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/cell-typing-basics/index.html</loc>
-    <lastmod>2025-09-29T19:26:22.238Z</lastmod>
+    <lastmod>2025-10-09T15:39:34.849Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/deriving-cell-polygons-from-transcript-locations/index.html</loc>
-    <lastmod>2025-09-29T19:26:22.247Z</lastmod>
-  </url>
-  <url>
-    <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-protein-stitching/napari-cosmx-protein-stitching.html</loc>
-    <lastmod>2025-09-29T19:26:23.050Z</lastmod>
-  </url>
-  <url>
-    <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/immune-cell-typing-smooth/index.html</loc>
-    <lastmod>2025-09-29T19:26:22.833Z</lastmod>
-  </url>
-  <url>
-    <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/index.html</loc>
-    <lastmod>2025-09-29T19:26:21.925Z</lastmod>
-  </url>
-  <url>
-    <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/link-to-code.html</loc>
-    <lastmod>2025-09-29T19:26:21.925Z</lastmod>
-  </url>
-  <url>
-    <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/normalization/index.html</loc>
-    <lastmod>2025-09-29T19:26:23.297Z</lastmod>
-  </url>
-  <url>
-    <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/index.html</loc>
-    <lastmod>2025-09-29T19:26:21.930Z</lastmod>
+    <lastmod>2025-10-09T15:39:34.858Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/rss/index.html</loc>
-    <lastmod>2025-09-29T19:26:23.321Z</lastmod>
+    <lastmod>2025-10-09T15:39:35.926Z</lastmod>
+  </url>
+  <url>
+    <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/index.html</loc>
+    <lastmod>2025-10-09T15:39:34.535Z</lastmod>
+  </url>
+  <url>
+    <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/normalization/index.html</loc>
+    <lastmod>2025-10-09T15:39:35.903Z</lastmod>
+  </url>
+  <url>
+    <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/link-to-code.html</loc>
+    <lastmod>2025-10-09T15:39:34.529Z</lastmod>
+  </url>
+  <url>
+    <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/index.html</loc>
+    <lastmod>2025-10-09T15:39:34.529Z</lastmod>
+  </url>
+  <url>
+    <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/immune-cell-typing-smooth/index.html</loc>
+    <lastmod>2025-10-09T15:39:35.433Z</lastmod>
+  </url>
+  <url>
+    <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-protein-stitching/napari-cosmx-protein-stitching.html</loc>
+    <lastmod>2025-10-09T15:39:35.656Z</lastmod>
+  </url>
+  <url>
+    <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-alignment/index.html</loc>
+    <lastmod>2025-10-09T15:39:35.502Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/marker-gene-smoothing/index.html</loc>
-    <lastmod>2025-09-29T19:26:22.895Z</lastmod>
+    <lastmod>2025-10-09T15:39:35.495Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/big-data/index.html</loc>
-    <lastmod>2025-09-29T19:26:22.238Z</lastmod>
+    <lastmod>2025-10-09T15:39:34.849Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-alignment-tools/index.html</loc>
-    <lastmod>2025-09-29T19:26:22.974Z</lastmod>
+    <lastmod>2025-10-09T15:39:35.580Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-stitching/napari-cosmx-stitching.html</loc>
-    <lastmod>2025-09-29T19:26:23.279Z</lastmod>
+    <lastmod>2025-10-09T15:39:35.885Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/spatial-plotting/index.html</loc>
-    <lastmod>2025-09-29T19:26:23.611Z</lastmod>
+    <lastmod>2025-10-09T15:39:36.213Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/subcellular/index.html</loc>
-    <lastmod>2025-09-29T19:26:23.638Z</lastmod>
+    <lastmod>2025-10-09T15:39:36.242Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/image-segmentation-models/index.html</loc>
-    <lastmod>2025-09-29T19:26:22.496Z</lastmod>
+    <lastmod>2025-10-09T15:39:35.106Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/panel-comparison/index.html</loc>
-    <lastmod>2025-09-29T19:26:23.318Z</lastmod>
+    <lastmod>2025-10-09T15:39:35.923Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-cosmx-basics/using-napari-cosmx.html</loc>
-    <lastmod>2025-09-29T19:26:23.002Z</lastmod>
+    <lastmod>2025-10-09T15:39:35.608Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/squidpy-essentials/squidpy-essentials.html</loc>
-    <lastmod>2025-09-29T19:26:23.628Z</lastmod>
+    <lastmod>2025-10-09T15:39:36.231Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/cell-typing-cheat-sheets/index.html</loc>
-    <lastmod>2025-09-29T19:26:22.239Z</lastmod>
+    <lastmod>2025-10-09T15:39:34.850Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/fov-qc/index.html</loc>
-    <lastmod>2025-09-29T19:26:22.252Z</lastmod>
+    <lastmod>2025-10-09T15:39:34.863Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/transcript-segmentation/index.html</loc>
-    <lastmod>2025-09-29T19:26:23.647Z</lastmod>
+    <lastmod>2025-10-09T15:39:36.251Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis/index.html</loc>
-    <lastmod>2025-09-29T19:26:23.669Z</lastmod>
+    <lastmod>2025-10-09T15:39:36.272Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/high-plex-spatial/index.html</loc>
-    <lastmod>2025-09-29T19:26:22.277Z</lastmod>
+    <lastmod>2025-10-09T15:39:34.888Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/insitudiff/index.html</loc>
-    <lastmod>2025-09-29T19:26:22.835Z</lastmod>
+    <lastmod>2025-10-09T15:39:35.435Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-ome-tiff/cosmx-ome-tiff.html</loc>
-    <lastmod>2025-09-29T19:26:23.040Z</lastmod>
+    <lastmod>2025-10-09T15:39:35.646Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/nanoU/index.html</loc>
-    <lastmod>2025-09-29T19:26:22.895Z</lastmod>
+    <lastmod>2025-10-09T15:39:35.502Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/hybrid-reference-profiles/index.html</loc>
-    <lastmod>2025-09-29T19:26:22.277Z</lastmod>
+    <lastmod>2025-10-09T15:39:34.888Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/seurat-cosmx-basics/index.html</loc>
-    <lastmod>2025-09-29T19:26:23.375Z</lastmod>
+    <lastmod>2025-10-09T15:39:35.978Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/segmentation-error/index.html</loc>
-    <lastmod>2025-09-29T19:26:23.354Z</lastmod>
+    <lastmod>2025-10-09T15:39:35.957Z</lastmod>
   </url>
   <url>
     <loc>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/license.html</loc>
-    <lastmod>2025-09-29T19:26:21.925Z</lastmod>
+    <lastmod>2025-10-09T15:39:34.529Z</lastmod>
   </url>
 </urlset>

@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/multiomics-alignment/index.html",
       "/posts/DE-guide/index.html",
       "/posts/spatial-plotting/index.html",
       "/posts/napari-alignment-tools/index.html",

@@ -270,7 +270,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">September 29, 2025</p>
+        <p class="date-modified">October 9, 2025</p>
       </div>
     </div>
       
@@ -962,7 +962,7 @@ code from the tumor distance to T-cell example earlier.</p>
 </section>
 <section id="experimental-approach-stratifying-de-across-tissue-patches" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="experimental-approach-stratifying-de-across-tissue-patches"><span class="header-section-number">6</span> Experimental approach: stratifying DE across tissue patches</h2>
-<p>Here we describe an alternative, experimental approach to DE that we have found to be useful.</p>
+<p>Here we describe an alternative, experimental approach to DE that we have found to be useful. We emphasize that this approach is thus far <strong>very</strong> lightly tested, but we include it here before fully developing it in hopes that it proves useful and that community feedback strengthens a later release.</p>
 <p>Our motivation is twofold:</p>
 <ol type="1">
 <li>Biology: we’ll often expect a DE relationship to vary across space, or to only occur locally. For example, perhaps T-cells only respond to nearby tumor cells when they’re in the nutrient-rich stroma rather than the tumor interior. When we look across the whole tissue for this relationship, we have a harder time discovering it since we model both regions where it occurs and regions where it doesn’t. In statistical terminology: unobserved variables across the span of the tissue are acting as effect modifiers.</li>
@@ -970,21 +970,21 @@ code from the tumor distance to T-cell example earlier.</p>
 </ol>
 <p>Our solution is to divide the tissue into small patches, then to run DE separately within each patch. This produces a matrix of DE results across genes X patches. Then looking at patch-specific results, we can discover strong relationships that only occur in a few places. And using metaanalysis techniques across all patches, we recover our ability to discover relationships that exist broadly. In short, we get a more nuanced picture of DE behavior within a diverse tissue.</p>
 <p>This approach has one other benefit: when we analyze small patches, spatial correlation becomes less important, as the spatial context within a given patch will be less variable than spatial context across a whole tissue. This lets us run the super-fast algorithm above within each patch. The speed benefit of this approach is so great that even in a large WTX dataset we obtain full DE results across all patches in minutes, while running just a single tissue-wide model for each gene might take a day.</p>
-<p>To support patch-based DE. We have created an algorithm to partition a tissue into patches. This algorithm, “varrymander”, attempts to build patches that achieve a balance between the following goals:</p>
+<p>To support patch-based DE. We have created an algorithm to partition a tissue into patches. This algorithm, “patchDE”, attempts to build patches that achieve a balance between the following goals:</p>
 <ul>
 <li>Ensure each patch has reasonable statistical power</li>
 <li>Prevent overly large patches</li>
 <li>Build as many patches as possible</li>
 </ul>
 <p>In other words, we seek to gerrymander the tissue into districts of similar size and with high variance of the predictor variable.</p>
-<p>The varrymander algorithm is available as a .R script <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/blob/Main/_code/varrymander/varrymander.R" target="_blank">here</a>.</p>
-<p>Below is a demonstration of varrymander’s use in DE.</p>
-<p>First we use varrymander to define patches:</p>
+<p>The patchDE algorithm is available as a .R script <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/blob/Main/_code/PatchDE/DEutils.R" target="_blank">here</a>.</p>
+<p>Below is a demonstration of patchDE’s use.</p>
+<p>First we use define patches:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="do">### use Patch DE to partition the tissue into patches:</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/blob/Main/_code/PatchDE/DEutilsr.R"</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/blob/Main/_code/PatchDE/DEutils.R"</span>)</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># define your design variable:</span></span>
 <span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>inds.tumor <span class="ot">&lt;-</span> meta_data<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">"Tumor"</span></span>
@@ -998,26 +998,29 @@ code from the tumor distance to T-cell example earlier.</p>
 <span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>patches <span class="ot">&lt;-</span> <span class="fu">getPatches</span>(<span class="at">xy =</span> xy[inds.tumor, ], </span>
 <span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>                      <span class="at">X =</span> dist2tcell[inds.tumor], </span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>                      <span class="at">dbscan_eps =</span> <span class="fl">0.05</span>, <span class="at">maxdbsize =</span> <span class="dv">50</span>, </span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>                      <span class="at">maxradius =</span> <span class="fl">0.5</span>,</span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>                      <span class="at">totvarthresh =</span> <span class="dv">100</span>  <span class="co"># main driver of patch size</span></span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>) <span class="co"># produces a vector of patch assigments, potentially including NA's for cells not given a patch</span></span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a><span class="co"># to view, draw polygon boundaries around each patch:</span></span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>polys <span class="ot">&lt;-</span> <span class="fu">getPatchPolys</span>(<span class="at">xy =</span> xy[inds.tumor, ], <span class="at">patch =</span> patches)</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>                      <span class="at">npatches =</span> <span class="dv">12</span>,</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>                      <span class="at">bitesize =</span> <span class="fl">0.1</span>,</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>                      <span class="at">maxradius =</span> <span class="fl">0.5</span>,</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>                      <span class="at">roundness =</span> <span class="fl">0.5</span>,</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>                      <span class="at">initwithhotspots =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>                      <span class="at">n_iters =</span> <span class="dv">25</span></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>) <span class="co"># produces a vector of patch assigments, potentially including NA's for cells not given a patch</span></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a><span class="co"># plot patches:</span></span>
-<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">0</span>))</span>
-<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy[inds.tumor, ], <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.3</span>, <span class="at">asp =</span> <span class="dv">1</span>,</span>
-<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Tumor cells colored by distance to T-cell, with patches for stratified DE"</span>,</span>
-<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="fu">c</span>(<span class="st">"#A6CEE3"</span>,<span class="st">"#1F78B4"</span>,<span class="st">"#081D58"</span>, <span class="st">"black"</span>)))(<span class="dv">101</span>)[</span>
-<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>       <span class="dv">1</span> <span class="sc">+</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> dist2tcell <span class="sc">/</span> <span class="fu">max</span>(dist2tcell))[inds.tumor]</span>
-<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>     ],</span>
-<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">ylab =</span> <span class="st">""</span>)</span>
-<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(polys)) {</span>
-<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">polygon</span>(polys[[i]], <span class="at">border =</span> <span class="st">"black"</span>)</span>
-<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a><span class="co"># to view, draw polygon boundaries around each patch:</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>patchhulls <span class="ot">&lt;-</span> <span class="fu">getPatchHulls</span>(<span class="at">xy =</span> xy[inds.tumor, ], <span class="at">patch =</span> patches) </span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a><span class="co"># plot patches:</span></span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">0</span>))</span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy[inds.tumor, ], <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.3</span>, <span class="at">asp =</span> <span class="dv">1</span>,</span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Tumor cells colored by distance to T-cell, with patches for stratified DE"</span>,</span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="fu">c</span>(<span class="st">"#A6CEE3"</span>,<span class="st">"#1F78B4"</span>,<span class="st">"#081D58"</span>, <span class="st">"black"</span>)))(<span class="dv">101</span>)[</span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>       <span class="dv">1</span> <span class="sc">+</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> dist2tcell <span class="sc">/</span> <span class="fu">max</span>(dist2tcell))[inds.tumor]</span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>     ],</span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">ylab =</span> <span class="st">""</span>)</span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(patchhulls)) {</span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(patchhulls[[i]], <span class="at">border =</span> <span class="st">"black"</span>, <span class="at">wpoints =</span> <span class="cn">FALSE</span>, <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
@@ -1043,7 +1046,7 @@ code from the tumor distance to T-cell example earlier.</p>
 <span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="co"># find genes with strong results in any region</span></span>
 <span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>lowestp <span class="ot">&lt;-</span> <span class="fu">apply</span>(deresults<span class="sc">$</span>dist2tcell<span class="sc">$</span>pvals, <span class="dv">1</span>, min)</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>topgenes1 <span class="ot">&lt;-</span> <span class="fu">names</span>(lowestp)[<span class="fu">order</span>(lowestp, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>]]</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>topgenes1 <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(<span class="fu">names</span>(lowestp)[<span class="fu">order</span>(lowestp, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>]], <span class="cn">NA</span>)</span>
 <span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="co"># use meta-analysis to summarize genes' trends across patches</span></span>
 <span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>metapvals <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">rownames</span>(deresults<span class="sc">$</span>dist2tcell<span class="sc">$</span>pvals), <span class="cf">function</span>(gene) {</span>
@@ -1052,15 +1055,15 @@ code from the tumor distance to T-cell example earlier.</p>
 <span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>                          <span class="at">method =</span> <span class="st">"REML"</span>)</span>
 <span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(fit<span class="sc">$</span>pval)</span>
 <span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>topgenes2 <span class="ot">&lt;-</span> <span class="fu">names</span>(metapvals)[<span class="fu">order</span>(metapvals, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>]]</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>topgenes2 <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(<span class="fu">names</span>(metapvals)[<span class="fu">order</span>(metapvals, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>]], <span class="cn">NA</span>)</span>
 <span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a><span class="do">## now use a heatmap to plot results from either list of top genes:</span></span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>pheatmap<span class="sc">::</span><span class="fu">pheatmap</span>((ests <span class="sc">*</span> (pvals <span class="sc">&lt;</span> <span class="fl">1e-3</span>))[topgenes1, ],</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>pheatmap<span class="sc">::</span><span class="fu">pheatmap</span>((deresults<span class="sc">$</span>dist2tcell<span class="sc">$</span>ests <span class="sc">*</span> (deresults<span class="sc">$</span>dist2tcell<span class="sc">$</span>pvals <span class="sc">&lt;</span> <span class="fl">1e-3</span>))[topgenes1, ],</span>
 <span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"darkblue"</span>, <span class="st">"white"</span>, <span class="st">"darkred"</span>))(<span class="dv">100</span>),</span>
 <span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="at">length.out =</span> <span class="dv">101</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>Below is an example snippet of a heatmap of DE results on varrymander patches from a larger study:</p>
+<p>Below is an example snippet of a heatmap of DE results on patches from a larger study:</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -1070,6 +1073,11 @@ code from the tumor distance to T-cell example earlier.</p>
 </div>
 </div>
 </div>
+<p>A note on multiplicity: when we run DE across dozens of patches, the problem of multiple testing gets even worse. So, before getting excited about a single gene in a single patch, take one of these countermeasures to multiplicity:</p>
+<ul>
+<li>Confirm the gene x patch has a strong adjusted p-value <em>considering all the p-values from all the genes x patches</em>.</li>
+<li>Confirm the gene has a strong adjusted p-value from the metaanalysis, considering the p-values from all the genes’ metaanalysis results.</li>
+</ul>
 </section>
 <section id="comment-on-statistical-power-and-false-discoveries" class="level2" data-number="7">
 <h2 data-number="7" class="anchored" data-anchor-id="comment-on-statistical-power-and-false-discoveries"><span class="header-section-number">7</span> Comment on statistical power and false discoveries</h2>
