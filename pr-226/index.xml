@@ -10,7 +10,228 @@
 <atom:link href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/index.xml" rel="self" type="application/rss+xml"/>
 <description>NanoString&#39;s CosMx Analysis Scratch Space</description>
 <generator>quarto-1.6.30</generator>
-<lastBuildDate>Wed, 20 Aug 2025 00:00:00 GMT</lastBuildDate>
+<lastBuildDate>Thu, 02 Oct 2025 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Aligning CosMx® Same-Cell Multiomics Data</title>
+  <dc:creator>Mithra Korukonda</dc:creator>
+  <dc:creator>Claire Williams</dc:creator>
+  <link>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-alignment/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<section id="cosmx-multiomics-data" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> CosMx Multiomics Data</h1>
+<p>CosMx<sup>®</sup> SMI allows users to acquire protein and RNA data from the same tissue as consecutive experiments. These data are acquired as independent runs and therefore need to be aligned, post-acquisition, to combine them into a multiomic study. This alignment process brings the decoded RNA transcripts into the coordinate system of protein data. To accomplish this, we have developed a standalone alignment tool that can be used to align CosMx data exported from AtoMx<sup>®</sup> SIP. The tool has a 2-step workflow represented in Figure&nbsp;1:</p>
+<p>Step 1: Align the RNA morphology fields of view (FOVs) to protein references.</p>
+<p>Step 2: Assign the RNA transcripts to the protein cell segmentation labels.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-align-workflow" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-align-workflow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-alignment/figures/Figure1.png" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-align-workflow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Multiomics alignment workflow
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="{callout-note}">
+<p>Like other items in our <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/about.html" target="_blank">CosMx Analysis Scratch Space</a>, the multiomics alignment tool presented here is experimental so the usual <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/about.html" target="_blank">caveats</a> and <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/license.html" target="_blank">license</a> applies.</p>
+</div>
+</section>
+<section id="export-cosmx-multiomics-data-from-atomx-sip" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Export CosMx Multiomics Data from AtoMx SIP</h1>
+<p>To export data from AtoMx SIP, you will need an sFTP application such as WinSCP. Launch the AtoMx Export function to obtain the AtoMx Hostname and Username (Figure&nbsp;2, left). Use those credentials, with the AtoMx SIP user’s password, to open a WinSCP portal (Figure&nbsp;2, right).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-data-export" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-data-export-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-alignment/figures/Figure2.png" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-data-export-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Establishing export access between AtoMx SIP and WinSCP
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Next, export data from the protein experiment according to Figure&nbsp;3 (a). Export data from the RNA experiment according to Figure&nbsp;3 (b).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-data-selection" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-data-selection-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-alignment/figures/Figure3.png" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-data-selection-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Data selection for (a) Protein and (b) RNA export from AtoMx SIP
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Check the exported data to confirm the following contents:</p>
+<ul>
+<li><p>Protein <code>CellStatsDir</code> folder and <code>Morphology2D</code> folder within</p></li>
+<li><p>RNA <code>CellStatsDir</code> folder and <code>Morphology2D</code> folder within</p></li>
+<li><p>RNA <code>AnalysisResults</code> folder</p></li>
+</ul>
+</section>
+<section id="download-and-use-alignment-tool" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Download and Use Alignment Tool</h1>
+<p>Download and unzip the <code>MultiO_Alignment_Tool_OCT2025.zip</code> file available <a href="https://bruker-my.sharepoint.com/:u:/p/s_korukonda/EcSqJPZSai9GqLbGC14iTCsBvPaMhe5VVo7MOe2zQeK9rA?e=osmGIY" target="_blank">here</a>. Once the file has been unzipped, launch the tool by double-clicking the <code>MultiOAligmentUI.bat</code> file. The executable will launch an interactive graphical user interface (GUI) as shown in Figure&nbsp;4.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This multiomics alignment tool is actively and continuously under development in the RnD groups at Bruker Spatial Biology. Please be aware that there may be bugs and that it has not gone through the regular level of quality and testing. Our goal here is to bring the capabilities of multiomics to CosMx SMI users as fast as possible. For technical support, please contact support.spatial@bruker.com.</p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-gui" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-gui-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-alignment/figures/Figure4.png" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-gui-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Standalone multiomics alignment tool GUI
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<section id="step-1-calculate-2d-shift" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="step-1-calculate-2d-shift"><span class="header-section-number">3.1</span> Step 1: Calculate 2D Shift</h2>
+<p>To launch image alignment, select the <code>Morphology2D</code> folders for both the protein and RNA runs and click <code>Perform Alignment</code>. The standard search area used for the alignment is by default 500 pixels or roughly 60 microns. This range is large enough to account for shifts introduced by slide replacement. This search area is editable and can be increased to 750 if the user suspects a larger shift (though adjustment is typically not needed – the software makes an assessment of search range need prior to alignment).</p>
+<p>During alignment a new folder called <code>AlignmentQC</code> is created within the RNA data folder structure and is populated with the outputs from the alignment. Occasionally, certain FOVs may be discarded from the multiomic analysis if they fail alignment. This can happen in cases of tissue peeling or significant cell loss. These FOVs, identified as outliers, are recorded in the <code>Alignment_Stats_Curated.csv</code> file and are excluded from the transcript re-assignment process. Refer to Table&nbsp;1 for a list of <code>AlignmentQC</code> folder outputs and descriptions of the individual files.</p>
+<div id="tbl-alignment-qc-outputs" class="quarto-float quarto-figure quarto-figure-center anchored" data-tbl-colwidths="[40,60]">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-alignment-qc-outputs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Folder outputs and descriptions
+</figcaption>
+<div aria-describedby="tbl-alignment-qc-outputs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 40%">
+<col style="width: 60%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>AlignmentQC Folder Outputs</th>
+<th style="text-align: left;">Description of individual files</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Alignment_Stats.csv</td>
+<td style="text-align: left;">List of the paired Protein and RNA FOVs along with the computed XY shift (in pixels) between them.</td>
+</tr>
+<tr class="even">
+<td>FOV_mask.TIF</td>
+<td style="text-align: left;">Binary Map of the FOV Locations.</td>
+</tr>
+<tr class="odd">
+<td>FOV_Cluster.TIF</td>
+<td style="text-align: left;">Visualization of FOV Clusters.</td>
+</tr>
+<tr class="even">
+<td>Displacement_Vectors.png</td>
+<td style="text-align: left;">Visualization of the FOV displacement with marker outliers.</td>
+</tr>
+<tr class="odd">
+<td>Alignment_Stats_Curated.csv</td>
+<td style="text-align: left;">Updated Stats file with associated cluster label and outlier flag.</td>
+</tr>
+<tr class="even">
+<td>Stats_Report.txt</td>
+<td style="text-align: left;">Reports the percentage of FOVs that were successfully aligned, along with a list of FOVs that failed alignment and were excluded from target re-assignment.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+</section>
+<section id="step-2-shift-and-assign-transcripts" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="step-2-shift-and-assign-transcripts"><span class="header-section-number">3.2</span> Step 2: Shift and Assign Transcripts</h2>
+<p>Once the alignment process has been completed for all the FOVs, the path of the final alignment will appear in the GUI Alignment box (Figure&nbsp;5 ). The user can review the computed alignment to verify accuracy of the results.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-alignment-folders" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-alignment-folders-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-alignment/figures/Figure5.png" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-alignment-folders-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Alignment tool generates XY registration between the protein and RNA images
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Once the image registration is complete, the next step is to apply the computed shifts to transcripts and re-assign them to protein segmentation labels. For this step, select the Protein <code>CellStatsDir</code> and the location of the RNA transcripts folder (Figure&nbsp;6 ). If the original folder structure of export is maintained, these folders will be automatically populated when the RNA and protein morphology folders are selected. Once the inputs have been chosen, click <code>Assign transcripts</code> as shown in Figure&nbsp;6 (a).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-final-output" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-final-output-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-alignment/figures/Figure6.png" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-final-output-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: (a) Alignment tool shifts and re-assigns RNA transcripts to protein segmentation labels. (b) Final output fo the alignment.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>For every FOV, the assignment process takes as input the calculated shift and applies it to the transcript locations and then updates the cell id based on the associated protein cell label data. Once the re-assignment is complete, the final output is a folder with the updated transcripts data as shown in Figure&nbsp;6 (b).</p>
+</section>
+</section>
+<section id="conclusions" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Conclusions</h1>
+<p>After using the off-AtoMx alignment tool to apply protein cell segmentation boundaries and cell ID labels to the RNA data, you can use transcript-to-cell alignments found in the <code>*_FOV#####__complete_code_cell_target_call_coords.csv</code> per FOV files within the <code>AnalysisResults_shifted</code> folder to continue analysis with the aligned RNA dataset. These updated files can be used alongside the protein run flat files to create a new multiomic data object. It’s important to note that all transcripts in the aligned RNA data will now reference the segmentation results and metadata from the protein run.</p>
+<p>If you prefer to integrate the aligned RNA data into an existing data object, you can do so by starting with the protein run object and either replacing the protein expression matrix with an aligned RNA matrix or appending the RNA data as an additional assay.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Once the protein and RNA data are exported from AtoMx and modified through alignment, the updated data cannot be re-imported into AtoMx. As of AtoMx v2.2 and earlier, the platform retains only the original, pre-aligned data.</p>
+</div>
+</div>
+
+
+</section>
+
+ ]]></description>
+  <category>multiomics</category>
+  <category>algorithms</category>
+  <category>protein</category>
+  <category>RNA</category>
+  <category>alignment</category>
+  <guid>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-alignment/</guid>
+  <pubDate>Thu, 02 Oct 2025 00:00:00 GMT</pubDate>
+  <media:content url="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-alignment/figures/CosMx_Protein_RNA_Image.png" medium="image" type="image/png" height="46" width="144"/>
+</item>
 <item>
   <title>Visualizing Spatial Transcriptomics: A Guide to Effective Plotting</title>
   <dc:creator>Claire Williams</dc:creator>
@@ -9558,7 +9779,7 @@ Tip
   author = {Lidan Wu and Aster Wardhani and Joseph-Tin Phan},
   year = {2025},
   url = {https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/image-segmentation-models/},
-  note = {Accessed: 2025-09-15}
+  note = {Accessed: 2025-10-10}
 }</code></pre>
 </div>
 <div id="tabset-1-4" class="tab-pane" aria-labelledby="tabset-1-4-tab">
@@ -22070,33 +22291,6 @@ font-style: inherit;">"</span>)</span></code></pre></div>
   <guid>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-stitching/napari-cosmx-stitching.html</guid>
   <pubDate>Fri, 18 Oct 2024 00:00:00 GMT</pubDate>
   <media:content url="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-stitching/figures/fig-stitch-single-slide.png" medium="image" type="image/png" height="77" width="144"/>
-</item>
-<item>
-  <title>New Features of AtoMx® SIP v1.3.2</title>
-  <dc:creator>Evelyn Metzger</dc:creator>
-  <link>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/nanoU/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<p>Cross posting for our colleagues at <a href="https://university.nanostring.com/">NanoU</a>.</p>
-<p>Course links to AtoMx<sup>®</sup> SIP v.1.3.2 release notes and a video discussing and demoing new features covering:</p>
-<ul>
-<li>Image Viewer and Data Plotting Improvements</li>
-<li>Data Pipeline Orchestrator Improvements</li>
-<li>Protein Cell Segmentation</li>
-</ul>
-<p>can be found here: <a href="https://university.nanostring.com/new-features-of-atomxtm-v132">https://university.nanostring.com/new-features-of-atomxtm-v132</a>.</p>
-
-
-
- ]]></description>
-  <category>nanoU</category>
-  <guid>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/nanoU/</guid>
-  <pubDate>Thu, 17 Oct 2024 00:00:00 GMT</pubDate>
-  <media:content url="https://cc.sj-cdn.net/instructor/j3v0702q7qcg-nanostring-university/courses/3ppjfhs3ah3wf/promo-image.1728930731.png" medium="image" type="image/png"/>
 </item>
 </channel>
 </rss>

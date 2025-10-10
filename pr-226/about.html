@@ -40,7 +40,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-a4a11d514c7d463668e07712114998e6.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-1e08c8f6417baecef84d4f393aff9728.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-8dd817d487e8e26707729065bc6b7e6d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
@@ -176,7 +176,7 @@ cookieconsent.run({
   </div>
 </header> <main class="content" id="quarto-document-content">
 <p>Welcome to CosMx Scratch Space!</p>
-<p>This repository is an exploratory resource to accelerate opensource analysis of CosMx<sup>®</sup> Spatial Molecular Imager (SMI) data. Contained here are and writeups and vignettes addressing a variety of topics discussed when analyzing single-cell spatial data.</p>
+<p>This repository is an exploratory resource to accelerate opensource analysis of CosMx<sup>®</sup> Spatial Molecular Imager (SMI) data. Contained here are writeups and vignettes addressing a variety of topics discussed when analyzing single-cell spatial data.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -204,6 +204,7 @@ Note
 <li><label><input type="checkbox" checked=""><a href="./posts/h5ad_conversion/index.html">Creating an <code>anndata</code> object from AtoMx<sup>®</sup> exported results for interactive viewer and python-based analysis</a></label></li>
 <li><label><input type="checkbox" checked=""><a href="./posts/composite-images/making-composite-images.html">Making composite images from layered morphology 2D images</a></label></li>
 <li><label><input type="checkbox" checked=""><a href="./posts/flat-file-exports/flat-files-compare.html">Comparing AtoMx<sup>®</sup> SIP flat files with the legacy format</a></label></li>
+<li><label><input type="checkbox" checked=""><a href="./posts/multiomics-alignment/index.html">Tool for aligning protein and RNA data</a></label></li>
 </ul>
 </section>
 <section id="analysis-strategies" class="level2">
@@ -211,9 +212,7 @@ Note
 <ul class="task-list">
 <li><label><input type="checkbox" checked=""><a href="./posts/high-plex-spatial/index.html">What is spatial data for?</a></label></li>
 <li><label><input type="checkbox" checked=""><a href="./posts/vignette-basic-analysis/index.html">Vignette: basics of CosMx<sup>®</sup> analysis in R</a></label></li>
-<li><label><input type="checkbox" checked=""><a href="./posts/seurat-cosmx-basics/index.html">Visualizing spatial data with Seurat</a></label></li>
 <li><label><input type="checkbox" checked=""><a href="./posts/squidpy-essentials/squidpy-essentials.html">Using Squidpy with AtoMx<sup>®</sup> SIP exports</a></label></li>
-<li><label><input type="checkbox" checked=""><a href="./posts/spatial-plotting/index.html">Plotting spatial data</a></label></li>
 <li><label><input type="checkbox" checked=""><a href="./posts/normalization/index.html">QC and normalization of RNA data</a></label></li>
 <li><label><input type="checkbox" checked=""><a href="./posts/fov-qc/index.html">FOV QC from single-cell gene expression in spatial dataset</a></label></li>
 <li><label><input type="checkbox" checked=""><a href="./posts/background/index.html">Impacts of background in CosMx<sup>®</sup> data</a></label></li>
@@ -225,10 +224,7 @@ Note
 <li><label><input type="checkbox" checked=""><a href="./posts/big-data/index.html">Big datasets: strategies for memory-efficient analysis</a></label></li>
 <li><label><input type="checkbox">lots without excessive file sizes</label></li>
 <li><label><input type="checkbox" checked=""><a href="./posts/visuals-reduce-whitespace/index.html">Functions for condensing FOVs and tissues to minimize whitespace</a></label></li>
-<li><label><input type="checkbox" checked=""><a href="./posts/deriving-cell-polygons-from-transcript-locations/index.html">cellPoly: Inferring cell polygons from transcript locations</a></label></li>
 <li><label><input type="checkbox" checked=""><a href="./posts/cellular-neighborhoods/cellular-neighborhoods.html">Cellular neighborhoods: a useful, simple and flexible analysis framework</a></label></li>
-<li><label><input type="checkbox">(For fun) Spatial transcriptomics plots in stained glass</label></li>
-<li><label><input type="checkbox" checked=""><a href="./posts/visualize-cellular-neighborhood-in-gallery-mode/index.html">NeighVizGallery: Visualization of cellular neighborhood in gallery mode</a></label></li>
 <li><label><input type="checkbox" checked=""><a href="./posts/insitudiff/index.html">InSituDiff: Perturbation analysis of disease vs.&nbsp;control cellular neighborhoods</a></label></li>
 <li><label><input type="checkbox" checked=""><a href="./posts/insitucor/index.html">InSituCor: Discovering modules of spatially correlated genes</a></label></li>
 <li><label><input type="checkbox" checked=""><a href="./posts/panel-comparison/index.html">Guide to comparing data from different CosMx panels</a></label></li>
@@ -238,6 +234,7 @@ Note
 <h2 data-anchor-id="cell-typing">Cell typing</h2>
 <ul class="task-list">
 <li><label><input type="checkbox" checked=""><a href="./posts/cell-typing-basics/index.html">Cell typing: what we’ve found to work</a></label></li>
+<li><label><input type="checkbox" checked=""><a href="./posts/cell-typing-strategies/cell-typing-strategies.html">Cell typing: advanced strategies</a></label></li>
 <li><label><input type="checkbox" checked=""><a href="./posts/hybrid-reference-profiles/index.html">Creating reference profiles</a></label></li>
 <li><label><input type="checkbox" checked=""><a href="./posts/on-cell-typing-with-marker-genes/index.html">On the use of marker genes</a></label></li>
 <li><label><input type="checkbox" checked=""><a href="./posts/tree-cell-typing/index.html">Hierarchical tree-style cell typing</a></label></li>
@@ -254,6 +251,17 @@ Note
 <li><label><input type="checkbox" checked=""><a href="./posts/segmentation-error-evaluation/index.html">FastReseg: Evaluating cell segmentation error based on transcripional spatial profiles</a></label></li>
 <li><label><input type="checkbox" checked=""><a href="./posts/transcript-segmentation/index.html">Guide to run transcript-based segmentation and refinement on CosMx data</a></label></li>
 <li><label><input type="checkbox" checked=""><a href="./posts/image-segmentation-models/index.html">Advancing cell segmentation in spatial omics: new models for diverse morphologies</a></label></li>
+</ul>
+</section>
+<section id="data-visualization" class="level2">
+<h2 data-anchor-id="data-visualization">Data visualization</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked=""><a href="./posts/spatial-plotting/index.html">Plotting spatial data</a></label></li>
+<li><label><input type="checkbox" checked=""><a href="./posts/seurat-cosmx-basics/index.html">Visualizing spatial data with Seurat</a></label></li>
+<li><label><input type="checkbox" checked=""><a href="./posts/visualize-cellular-neighborhood-in-gallery-mode/index.html">NeighVizGallery: Visualization of cellular neighborhood in gallery mode</a></label></li>
+<li><label><input type="checkbox" checked=""><a href="./posts/visuals-reduce-whitespace/index.html">Functions for condensing FOVs and tissues to minimize whitespace</a></label></li>
+<li><label><input type="checkbox" checked=""><a href="./posts/deriving-cell-polygons-from-transcript-locations/index.html">cellPoly: Inferring cell polygons from transcript locations</a></label></li>
+<li><label><input type="checkbox">(For fun) Spatial transcriptomics plots in stained glass</label></li>
 </ul>
 </section>
 <section id="viewing-cosmx-smi-data-with-napari" class="level2">
