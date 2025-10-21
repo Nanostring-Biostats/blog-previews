@@ -62,7 +62,7 @@
 <section id="improved-auc-across-immune-cell-types" class="level3" data-number="3.0.2">
 <h3 data-number="3.0.2" class="anchored" data-anchor-id="improved-auc-across-immune-cell-types"><span class="header-section-number">3.0.2</span> Improved AUC across immune cell types</h3>
 <p>We saw a similar trend as that demonstrated above across immune cell types.<br>
-Here, for the most important ‘index markers’ of each immune cell type, we show the area under the ROC curve for RNA-only, protein-only, and multiomic celltyping results (code for this analysis can be found here in the end-to-end code section). In general, there appears to be an improvement in AUC for both RNA and protein markers compared to if one of the analytes were removed. NK cells were the smallest of the immune cell types</p>
+Here, for the most important ‘index markers’ of each immune cell type, we show the area under the ROC curve for RNA-only, protein-only, and multiomic celltyping results (code for this analysis can be found here in the end-to-end code section). In general, there appears to be an improvement in AUC for both RNA and protein markers compared to if one of the analytes were removed.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
