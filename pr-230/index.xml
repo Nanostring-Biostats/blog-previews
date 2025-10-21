@@ -256,7 +256,7 @@ Important
 </ul>
 <p>Or, in the general form:</p>
 <p>“How does <em>my favorite cell type</em> change in response to <em>some aspect of its environment</em>?”</p>
-<p>The goal of this post is to review major topics in DE in spatial transcriptomics, and to provide code when necessary.</p>
+<p>This post reviews major topics in DE in spatial transcriptomics, providing code when necessary.</p>
 </section>
 <section id="setting-up-a-de-question" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="setting-up-a-de-question"><span class="header-section-number">2</span> Setting up a DE question</h2>
@@ -267,7 +267,7 @@ Important
 <section id="transformations" class="level4" data-number="2.1.1">
 <h4 data-number="2.1.1" class="anchored" data-anchor-id="transformations"><span class="header-section-number">2.1.1</span> Transformations:</h4>
 <ul>
-<li>If you think distance to a feature matters because of some diffused signals, then concentration of those molecules will vary with <img src="https://latex.codecogs.com/png.latex?distance%5E%7B-1%7D">.</li>
+<li>If you think distance to a feature matters because of some diffused signals, then concentration of those molecules will vary with 1/distance.</li>
 <li>If neighborhood expression of a molecule is strongly right-tailed, which is likely, then a log transformation could prevent the end of the tail from having undue influence.</li>
 <li>To make effect sizes more interpretable, scale the variable from 0-1.</li>
 <li>For variables with strong skew or long tails, a quantile transformation can prevent extreme values from exerting excess influence on DE results.</li>
@@ -393,84 +393,32 @@ font-style: inherit;">0.3</span>))</span>
 </div>
 </div>
 </div>
-<p>As with DE models fitting to bins, use a likelihood ratio test against an intercept-only null model, just as you would with a binned variable. To explore your results, plot mean values across bins for your most significant genes.</p>
+<p>To measure a gene’s significance when using splines, use a likelihood ratio test against an intercept-only null model, just as you would with a binned variable. To explore your results, plot mean values across bins for your most significant genes as in the above heatmap.</p>
 </section>
 </section>
 <section id="example-data" class="level3" data-number="2.2">
 <h3 data-number="2.2" class="anchored" data-anchor-id="example-data"><span class="header-section-number">2.2</span> Example data</h3>
-<p>First, let’s pull in data in a standard format. We’ll assume you’re starting with flat files exported from AtoMx, loaded with code similar to the below.</p>
+<p>First, let’s pull in data in a standard format. We’ll assume you’re starting with flat files exported from AtoMx, read into R as demonstrated in our basic analysis vignettes.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="co" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="do" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;"># Define paths</span></span>
-<span id="cb2-2">raw_data_dir <span class="ot" style="color: #003B4F;
+font-style: italic;">## Expected inputs:</span></span>
+<span id="cb2-2"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+font-style: inherit;"># - counts: a sparse matrix of expression in cells * genes</span></span>
+<span id="cb2-3"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">"/path/to/raw/data"</span></span>
-<span id="cb2-3">out_dir <span class="ot" style="color: #003B4F;
+font-style: inherit;"># - metadata: a data frame or data table of cell metadata, aligned by row to counts</span></span>
+<span id="cb2-4"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"/path/to/out/dir"</span></span>
-<span id="cb2-4">slide_name <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"slideName"</span> <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Set this to your slide name, i.e. the identifier at the front of each flat file</span></span>
+font-style: inherit;"># - xy: a 2-column matrix of xy positions, aligned by row to counts</span></span>
 <span id="cb2-5"></span>
-<span id="cb2-6"><span class="co" style="color: #5E5E5E;
+<span id="cb2-6"><span class="do" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;"># Read flat file exports: </span></span>
-<span id="cb2-7">meta_data <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">read.csv</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">paste0</span>(raw_data_dir, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"/"</span>, slide_name, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"_metadata_file.csv.gz"</span>)) <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#Note this is a small file and we read it into a data frame for convenience</span></span>
-<span id="cb2-8">xy <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> meta_data[, <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"x_slide_mm"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"y_slide_mm"</span>)]  </span>
-<span id="cb2-9">counts <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">as.matrix</span>(data.table<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">fread</span>(  </span>
-<span id="cb2-10">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">file.path</span>(raw_data_dir, <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">paste0</span>(slide_name, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"_exprMat_file.csv.gz"</span>))</span>
-<span id="cb2-11">))  <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># &lt;-------------------------------- PROBABLY WRONG ------------------------ #</span></span>
-<span id="cb2-12"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># normalize:</span></span>
-<span id="cb2-13">norm_factors <span class="ot" style="color: #003B4F;
+font-style: italic;">## Further calculations: get normalized counts:</span></span>
+<span id="cb2-7">norm_factors <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -481,7 +429,7 @@ background-color: null;
 font-style: inherit;">/</span> meta_data<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>nCount_RNA </span>
-<span id="cb2-14">norm <span class="ot" style="color: #003B4F;
+<span id="cb2-8">norm <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> Matrix<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -660,7 +608,7 @@ font-style: inherit;">0.7</span>)</span></code></pre></div>
 </section>
 <section id="gallery-of-differential-expression-setups" class="level3" data-number="2.3">
 <h3 data-number="2.3" class="anchored" data-anchor-id="gallery-of-differential-expression-setups"><span class="header-section-number">2.3</span> Gallery of Differential Expression setups</h3>
-<p>Below are examples of variables useful for DE. In each case, we’ll plot the variable spatially and provide code for defining it.</p>
+<p>Below we demonstrate a variety of ways to define predictor variables for DE. In each case, we’ll plot the variable spatially and provide code for defining it.</p>
 <section id="niche-spatial-domain-unsupervised" class="level4" data-number="2.3.1">
 <h4 data-number="2.3.1" class="anchored" data-anchor-id="niche-spatial-domain-unsupervised"><span class="header-section-number">2.3.1</span> Niche / spatial domain (unsupervised)</h4>
 <p>A great many algorithms exist for clustering cellular neighborhoods into niches / spatial domains. Lately we favor the Novae algorithm. However you define niches, they’re often a reasonable basis for a DE analysis.</p>
@@ -1057,6 +1005,7 @@ font-style: inherit;">0.7</span>)</span></code></pre></div>
 <h3 data-number="2.6" class="anchored" data-anchor-id="distance-to-nearest-cell-from-an-anatomical-structure"><span class="header-section-number">2.6</span> Distance to nearest cell from an anatomical structure</h3>
 <p>Many cell types fall in structures, e.g.&nbsp;blood vessels, tumor glands, or glomeruli. When calculating distance to a structure, it is tempting to simply record distance to the nearest relevant cell type, e.g.&nbsp;endothelial cells for blood vessels, or tumor cells for tumor glands, or podocytes and mesangial cells for glomeruli. However, this approach is easily distorted by sporadic cell typing errors. It is more robust to look at distance to the nearest <em>spatially contiguous group</em> of the target cell type.</p>
 <p>Below, we’ll define an annotation for ‘vascular structure’, based on contiguous groups of endothelial cells. We use DBSCAN algorithm, an incredibly fast algorithm which can cluster together cells within a fixed radius of each other. We’ll keep only cells that fall in clusters of at least 3.</p>
+<p>First let’s look at our target cell type:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1146,6 +1095,7 @@ font-style: inherit;">"darkred"</span>)</span></code></pre></div>
 </div>
 </div>
 </div>
+<p>Then retain only the spatially-contiguous groups:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2380,7 +2330,7 @@ font-style: inherit;">TRUE</span>) </span></code></pre></div>
 </div>
 </div>
 </div>
-<p>Note that the <code>identify()</code> function used by <code>defineROI()</code> above can be finnicky and surprisingly challenging to debug. If it works in your R environment, great. If not, then you can instead call the <code>defineROI()</code> function as below code to flag cells inside a set of xy coordinates.</p>
+<p>Note that the <code>identify()</code> function used by <code>defineROI()</code> above can be finnicky and surprisingly challenging to debug. If it works in your R environment, great. If not, then you can instead call the <code>defineROI()</code> function as in below code to flag cells inside a set of pre-defined xy coordinates.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2500,7 +2450,7 @@ font-style: inherit;">""</span>)</span>
 <span id="cb12-6"></span>
 <span id="cb12-7"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;"># place a grid over it to determine where to pick boudnary points:</span></span>
+font-style: inherit;"># place a grid over it to determine where to pick boundary points:</span></span>
 <span id="cb12-8"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">abline</span>(<span class="at" style="color: #657422;
@@ -2832,8 +2782,7 @@ font-style: inherit;">"Other cells"</span>))</span></code></pre></div>
 <section id="accounting-for-spatial-correlation" class="level3" data-number="3.2">
 <h3 data-number="3.2" class="anchored" data-anchor-id="accounting-for-spatial-correlation"><span class="header-section-number">3.2</span> Accounting for spatial correlation</h3>
 <p>Due to the large number of cells in most experiments, it’s common for DE analyses to produce infinitesimal p-values, e.g.&nbsp;10^-60. This seems intuitively wrong: how can a dataset hold such strong evidence for expression changes? Where traditional models differ from our intuition (and from common sense) is the assumption that every cell is <em>independent</em> from every other cell. This is almost never true: cells nearby each other are subject to similar environmental influences unrelated to our design variables, so so their standard errors will be dependent, or correlated. In practice, this means that p-values from models assuming independence will be profoundly over-excitable.</p>
-<p>The field of spatial statistics has long grappled with inference in the presence of spatial correlation such as this, and a sizeable arsenal of methods has been developed. In Vasconcelos &amp; McGuire et al., the aforementioned preprint, we characterize the performance of many of these methods, along with some new ones we propose. We find a tradeoff between accuracy and computational efficiency, with the best methods taking unacceptably long to run in large datasets. Our key finding is that ignoring spatial correlation, i.e.&nbsp;running a traditional DE method, leads to large numbers of false positive hits, often far in excess of the presumed true positive hits whose p-values survive accounting for spatial correlation. Whichever method in the paper seems suitable for your study, you can run it using<br>
-<a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/smiDE" target="_blank">our R package smiDE</a>.</p>
+<p>The field of spatial statistics has long grappled with inference in the presence of spatial correlation such as this, and a sizeable arsenal of methods has been developed. In Vasconcelos &amp; McGuire et al., the aforementioned preprint, we characterize the performance of many of these methods, along with some new ones we propose. We find a tradeoff between accuracy and computational efficiency, with the best methods taking unacceptably long to run in large datasets. Our key finding is that ignoring spatial correlation, i.e.&nbsp;running a traditional DE method, leads to large numbers of false positive hits, often far in excess of the presumed true positive hits whose p-values survive accounting for spatial correlation. Whichever method in the paper seems suitable for your study, you can run it using <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/smiDE" target="_blank">our R package smiDE</a>.</p>
 </section>
 <section id="other-model-choice-considerations" class="level3" data-number="3.3">
 <h3 data-number="3.3" class="anchored" data-anchor-id="other-model-choice-considerations"><span class="header-section-number">3.3</span> Other model choice considerations</h3>
@@ -2843,13 +2792,15 @@ font-style: inherit;">"Other cells"</span>))</span></code></pre></div>
 </section>
 <section id="approach-for-maximal-speed-simultaneous-fitting-of-all-genes-using-linear-algebra" class="level2" data-number="4">
 <h2 data-number="4" class="anchored" data-anchor-id="approach-for-maximal-speed-simultaneous-fitting-of-all-genes-using-linear-algebra"><span class="header-section-number">4</span> Approach for maximal speed: simultaneous fitting of all genes using linear algebra</h2>
-<p>Unfortunately, there’s a cost in compute time and money to many of the more theoretically optimal DE approaches (e.g.&nbsp;using a NB distribution, accounting for spatial correlation, adjusting for bias from segmentation errors). An analysis of 19k genes in hundreds of thousands of cells can take a reasonably powerful EC2 instance a day or more to complete. When computation time is a concern, or when simply pursuing exploratory analysis, we recommend using a less optimal but much faster approach. In the code below, we demonstrate how to run a basic Gaussian / “ordinary least squares” regression simultaneously across all genes at once. This code returns reasonable DE results in seconds. This approach cannot model spatial correlation, nor can it even adjust for confounding from cell segmentation errors. But its speed makes it very useful for exploratory analyses. It could also be used to prioritize genes for more computationally expensive models.</p>
+<p>Unfortunately, there’s a cost in compute time and money to many of the more theoretically optimal DE approaches (e.g.&nbsp;using a NB distribution, accounting for spatial correlation, adjusting for bias from segmentation errors). An analysis of 19k genes in hundreds of thousands of cells can take a reasonably powerful EC2 instance a day or more to complete. When computation time is a concern, or when simply pursuing exploratory analysis, we recommend using a less optimal but much faster approach. In the code below, we demonstrate how to run a basic Gaussian / “ordinary least squares” regression simultaneously across all genes at once. This code returns reasonable DE results in seconds. This approach cannot model spatial correlation, nor can it adjust for confounding from cell segmentation errors. But its speed makes it very useful for exploratory analyses. It could also be used to prioritize genes for more computationally expensive models.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">source</span>()</span>
+font-style: inherit;">source</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/blob/Main/_code/PatchDE/DEutils.R"</span>)</span>
 <span id="cb14-2"></span>
 <span id="cb14-3"><span class="do" style="color: #5E5E5E;
 background-color: null;
@@ -2947,12 +2898,12 @@ font-style: inherit;">str</span>(out)</span></code></pre></div>
 <section id="experimental-approach-stratifying-de-across-tissue-patches" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="experimental-approach-stratifying-de-across-tissue-patches"><span class="header-section-number">6</span> Experimental approach: stratifying DE across tissue patches</h2>
 <p>Here we describe an alternative, experimental approach to DE that we have found to be useful. We emphasize that this approach is thus far <strong>very</strong> lightly tested, but we include it here before fully developing it in hopes that it proves useful and that community feedback strengthens a later release.</p>
-<p>Our motivation is twofold:</p>
+<p>Our motivation arises from two complaints about typical tissue-wide DE:</p>
 <ol type="1">
-<li>Biology: we’ll often expect a DE relationship to vary across space, or to only occur locally. For example, perhaps T-cells only respond to nearby tumor cells when they’re in the nutrient-rich stroma rather than the tumor interior. When we look across the whole tissue for this relationship, we have a harder time discovering it since we model both regions where it occurs and regions where it doesn’t. In statistical terminology: unobserved variables across the span of the tissue are acting as effect modifiers.</li>
-<li>Convenience: because accounting for spatial correlation can be slow, running DE on a highly abundant cell type often means making a choice between extreme compute times or using sub-optimal methods that ignore spatial correlation.</li>
+<li><strong>Biology</strong>: we’ll often expect a DE relationship to vary across space, or to only occur locally. For example, perhaps T-cells only respond to nearby tumor cells when they’re in the nutrient-rich stroma rather than the tumor interior. When we look across the whole tissue for this relationship, we have a harder time discovering it since we model both regions where it occurs and regions where it doesn’t. In statistical terminology: unobserved variables across the span of the tissue are acting as effect modifiers.</li>
+<li><strong>Convenience</strong>: because accounting for spatial correlation can be slow, running DE on a highly abundant cell type often means making a choice between extreme compute times or using sub-optimal methods that ignore spatial correlation.</li>
 </ol>
-<p>Our solution is to divide the tissue into small patches, then to run DE separately within each patch. This produces a matrix of DE results across genes X patches. Then looking at patch-specific results, we can discover strong relationships that only occur in a few places. And using metaanalysis techniques across all patches, we recover our ability to discover relationships that exist broadly. In short, we get a more nuanced picture of DE behavior within a diverse tissue.</p>
+<p>Our solution is to divide the tissue into small patches, then to run DE separately within each patch. This produces a matrix of DE results across genes and patches. Then, looking at patch-specific results, we can discover strong relationships that only occur in a few places. And using metaanalysis techniques across all patches, we recover our ability to discover relationships that exist broadly. In short, we get a more nuanced picture of DE behavior within a diverse tissue.</p>
 <p>This approach has one other benefit: when we analyze small patches, spatial correlation becomes less important, as the spatial context within a given patch will be less variable than spatial context across a whole tissue. This lets us run the super-fast algorithm above within each patch. The speed benefit of this approach is so great that even in a large WTX dataset we obtain full DE results across all patches in minutes, while running just a single tissue-wide model for each gene might take a day.</p>
 <p>To support patch-based DE. We have created an algorithm to partition a tissue into patches. This algorithm, “patchDE”, attempts to build patches that achieve a balance between the following goals:</p>
 <ul>
@@ -2960,8 +2911,8 @@ font-style: inherit;">str</span>(out)</span></code></pre></div>
 <li>Prevent overly large patches</li>
 <li>Build as many patches as possible</li>
 </ul>
-<p>In other words, we seek to gerrymander the tissue into districts of similar size and with high variance of the predictor variable.</p>
-<p>The patchDE algorithm is available as a .R script <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/blob/Main/_code/PatchDE/DEutils.R" target="_blank">here</a>.</p>
+<p>In other words, we seek to partition the tissue into reasonably-shaped districts that are all well-powered to run DE against the predictor variable.</p>
+<p>The patchDE algorithm is available as an R script <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/blob/Main/_code/PatchDE/DEutils.R" target="_blank">here</a>.</p>
 <p>Below is a demonstration of patchDE’s use.</p>
 <p>First we use define patches:</p>
 <div class="cell">
@@ -3036,60 +2987,78 @@ font-style: inherit;">$</span>nn.dist[, <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>]</span>
 <span id="cb15-13"></span>
-<span id="cb15-14">patches <span class="ot" style="color: #003B4F;
+<span id="cb15-14"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## derive patches:</span></span>
+<span id="cb15-15"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Suggested tuning parameters to use: </span></span>
+<span id="cb15-16"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#  1. Control granularity: npatches.</span></span>
+<span id="cb15-17"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#  2. Control learning rate: bizesize, then possibly alpha. </span></span>
+<span id="cb15-18"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#  3. Patch size and shape: maxradius, roundness</span></span>
+<span id="cb15-19"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#  4. Patch position: initwithhotspots</span></span>
+<span id="cb15-20">patches <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">getPatches</span>(<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">xy =</span> xy[inds.tumor, ], </span>
-<span id="cb15-15">                      <span class="at" style="color: #657422;
+<span id="cb15-21">                      <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">X =</span> dist2tcell[inds.tumor], </span>
-<span id="cb15-16">                      <span class="at" style="color: #657422;
+<span id="cb15-22">                      <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">npatches =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">12</span>,</span>
-<span id="cb15-17">                      <span class="at" style="color: #657422;
+<span id="cb15-23">                      <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">bitesize =</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.1</span>,</span>
-<span id="cb15-18">                      <span class="at" style="color: #657422;
+<span id="cb15-24">                      <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">maxradius =</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.5</span>,</span>
-<span id="cb15-19">                      <span class="at" style="color: #657422;
+<span id="cb15-25">                      <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">roundness =</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.25</span>,</span>
-<span id="cb15-20">                      <span class="at" style="color: #657422;
+<span id="cb15-26">                      <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">initwithhotspots =</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">TRUE</span>,</span>
-<span id="cb15-21">                      <span class="at" style="color: #657422;
+<span id="cb15-27">                      <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">n_iters =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">25</span>,</span>
-<span id="cb15-22">                      <span class="at" style="color: #657422;
+<span id="cb15-28">                      <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">plotprogress =</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">TRUE</span></span>
-<span id="cb15-23">) <span class="co" style="color: #5E5E5E;
+<span id="cb15-29">) <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># produces a vector of patch assigments, potentially including NA's for cells not given a patch</span></span>
-<span id="cb15-24"></span>
-<span id="cb15-25"></span>
-<span id="cb15-26"><span class="co" style="color: #5E5E5E;
+<span id="cb15-30"></span>
+<span id="cb15-31"></span>
+<span id="cb15-32"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># to view, draw polygon boundaries around each patch:</span></span>
-<span id="cb15-27">patchhulls <span class="ot" style="color: #003B4F;
+<span id="cb15-33">patchhulls <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -3098,11 +3067,11 @@ background-color: null;
 font-style: inherit;">xy =</span> xy[inds.tumor, ], <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">patch =</span> patches) </span>
-<span id="cb15-28"></span>
-<span id="cb15-29"><span class="co" style="color: #5E5E5E;
+<span id="cb15-34"></span>
+<span id="cb15-35"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># plot patches:</span></span>
-<span id="cb15-30"><span class="fu" style="color: #4758AB;
+<span id="cb15-36"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">par</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -3117,7 +3086,7 @@ background-color: null;
 font-style: inherit;">2</span>,<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span>))</span>
-<span id="cb15-31"><span class="fu" style="color: #4758AB;
+<span id="cb15-37"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(xy[inds.tumor, ], <span class="at" style="color: #657422;
 background-color: null;
@@ -3132,12 +3101,12 @@ background-color: null;
 font-style: inherit;">asp =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>,</span>
-<span id="cb15-32">     <span class="at" style="color: #657422;
+<span id="cb15-38">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Tumor cells colored by distance to T-cell, with patches for stratified DE"</span>,</span>
-<span id="cb15-33">     <span class="at" style="color: #657422;
+<span id="cb15-39">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">col =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -3156,7 +3125,7 @@ background-color: null;
 font-style: inherit;">"black"</span>)))(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">101</span>)[</span>
-<span id="cb15-34">       <span class="dv" style="color: #AD0000;
+<span id="cb15-40">       <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -3171,8 +3140,8 @@ background-color: null;
 font-style: inherit;">/</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">max</span>(dist2tcell))[inds.tumor]</span>
-<span id="cb15-35">     ],</span>
-<span id="cb15-36">     <span class="at" style="color: #657422;
+<span id="cb15-41">     ],</span>
+<span id="cb15-42">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">xlab =</span> <span class="st" style="color: #20794D;
 background-color: null;
@@ -3181,7 +3150,7 @@ background-color: null;
 font-style: inherit;">ylab =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">""</span>)</span>
-<span id="cb15-37"><span class="cf" style="color: #003B4F;
+<span id="cb15-43"><span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">for</span> (i <span class="cf" style="color: #003B4F;
@@ -3194,7 +3163,7 @@ background-color: null;
 font-style: inherit;">:</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">length</span>(patchhulls)) {</span>
-<span id="cb15-38">  <span class="fu" style="color: #4758AB;
+<span id="cb15-44">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(patchhulls[[i]], <span class="at" style="color: #657422;
 background-color: null;
@@ -3209,12 +3178,21 @@ background-color: null;
 font-style: inherit;">add =</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">TRUE</span>)</span>
-<span id="cb15-39">}</span></code></pre></div>
+<span id="cb15-45">}</span></code></pre></div>
 </details>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/patches.png" class="img-fluid figure-img" style="width:120.0%"></p>
+</figure>
+</div>
+</div>
 </div>
 <p>Below you can see the patches evolve over iterations. Our goal is to get a high “predictor sum of squares” (which determines statistical power) in each patch. You will notice that the per-patch power tends to improve over iterations, especially the early ones, as cells are moved from over-powered patches to under-powered ones. Also note that there algorithm does not converge to a single optimal solution; it ends up wandering around through a space of similarly satisfactory solutions.</p>
 <p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/figures/patchanimation.gif" class="img-fluid"></p>
-<p>And now we run DE within each patch:</p>
+<p>With patches in hand, we can run a computationally-efficient DE test within each patch:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -3290,69 +3268,179 @@ font-style: inherit;">#   .. .. ..$ : chr [1:12] "patch8" "patch3" "patch4" "pat
 <p>Now we’ve got DE results for every gene x patch. Next comes the hard part: figuring our which results to prioritize. We recommend two approaches:</p>
 <ol type="1">
 <li>Find genes that have significant and large effect sizes in at least a few patches (strong but possibly sporadic results).</li>
-<li>Find genes with strong meta-analysis p-values (consistent but less dramatic results). <strong>Warning</strong>: most meta-analyses, including the version demonstrated below, assume each patch is independent. Under the realistic scenario where neighboring patches will have correlated results, this assumption fails, producing over-optimistic p-values.</li>
+<li>Find genes with strong meta-analysis p-values (consistent but less dramatic results). <strong>Warning</strong>: most meta-analyses, including the version demonstrated below, will assume each patch is independent. Under the realistic scenario where neighboring patches will have correlated results, this assumption fails, producing overly optimistic p-values.</li>
 </ol>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><span class="do" style="color: #5E5E5E;
 background-color: null;
-font-style: italic;">### explore the results:</span></span>
+font-style: italic;">### prep for gene prioritization:</span></span>
 <span id="cb17-2"></span>
 <span id="cb17-3"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;"># find genes with strong results in any region</span></span>
-<span id="cb17-4">lowestp <span class="ot" style="color: #003B4F;
+font-style: inherit;"># replace NA results - arising from all-0 expression - with 0s:</span></span>
+<span id="cb17-4">ps <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">apply</span>(deresults<span class="sc" style="color: #5E5E5E;
+font-style: inherit;">replace</span>(deres[[<span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">$</span>dist2tcell<span class="sc" style="color: #5E5E5E;
+font-style: inherit;">1</span>]]<span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">$</span>pvals, <span class="dv" style="color: #AD0000;
+font-style: inherit;">$</span>pvals, <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">1</span>, min)</span>
-<span id="cb17-5">topgenes1 <span class="ot" style="color: #003B4F;
+font-style: inherit;">is.na</span>(deres[[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]]<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>pvals), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb17-5">ests <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">setdiff</span>(<span class="fu" style="color: #4758AB;
+font-style: inherit;">replace</span>(deres[[<span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">names</span>(lowestp)[<span class="fu" style="color: #4758AB;
+font-style: inherit;">1</span>]]<span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">order</span>(lowestp, <span class="at" style="color: #657422;
+font-style: inherit;">$</span>ests, <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">decreasing =</span> <span class="cn" style="color: #8f5902;
+font-style: inherit;">is.na</span>(deres[[<span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">TRUE</span>)[<span class="dv" style="color: #AD0000;
+font-style: inherit;">1</span>]]<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>pvals), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>)</span>
+<span id="cb17-6">ses <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">replace</span>(deres[[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]]<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>ses, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">is.na</span>(deres[[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]]<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>pvals), <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1e6</span>)</span>
+<span id="cb17-7"></span>
+<span id="cb17-8"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># scale ests by genes' mean expression:</span></span>
+<span id="cb17-9">genefactors <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">pmax</span>(Matrix<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">colMeans</span>(norm[inds.tumor, ]), <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1</span>)</span>
+<span id="cb17-10">ests <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sweep</span>(ests, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, genefactors[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rownames</span>(ests)], <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"/"</span>)</span>
+<span id="cb17-11"></span>
+<span id="cb17-12"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">### identify genes with a few strong patches:</span></span>
+<span id="cb17-13">est.thresh <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span></span>
+<span id="cb17-14">p.thresh <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.01</span></span>
+<span id="cb17-15">crit <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> (<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">abs</span>(ests) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> est.thresh) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&amp;</span> (ps <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;</span> p.thresh)</span>
+<span id="cb17-16">critdir <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
+font-style: inherit;">*</span>((ests <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">50</span>]], <span class="cn" style="color: #8f5902;
+font-style: inherit;">&gt;</span> est.thresh) <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">NA</span>)</span>
-<span id="cb17-6"></span>
-<span id="cb17-7"><span class="co" style="color: #5E5E5E;
+font-style: inherit;">&amp;</span> (ps <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;"># use meta-analysis to summarize genes' trends across patches</span></span>
-<span id="cb17-8">metapvals <span class="ot" style="color: #003B4F;
+font-style: inherit;">&lt;</span> p.thresh)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>((ests <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>est.thresh) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&amp;</span> (ps <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;</span> p.thresh))</span>
+<span id="cb17-17">topgenes1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">names</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">which</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rowSums</span>(crit) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>))</span>
+<span id="cb17-18"></span>
+<span id="cb17-19"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">### use meta-analysis to summarize genes' trends across patches</span></span>
+<span id="cb17-20">metapvals <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">sapply</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">rownames</span>(deresults<span class="sc" style="color: #5E5E5E;
+font-style: inherit;">rownames</span>(deresults[[<span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">$</span>dist2tcell<span class="sc" style="color: #5E5E5E;
+font-style: inherit;">1</span>]]<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>pvals), <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">function</span>(gene) {</span>
-<span id="cb17-9">  fit <span class="ot" style="color: #003B4F;
+<span id="cb17-21">  fit <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> metafor<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -3360,30 +3448,30 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rma.uni</span>(<span class="at" style="color: #657422;
 background-color: null;
-font-style: inherit;">yi =</span> deresults<span class="sc" style="color: #5E5E5E;
+font-style: inherit;">yi =</span> deresults[[<span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">$</span>dist2tcell<span class="sc" style="color: #5E5E5E;
+font-style: inherit;">1</span>]]<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>ests[gene, ], </span>
-<span id="cb17-10">                          <span class="at" style="color: #657422;
+<span id="cb17-22">                          <span class="at" style="color: #657422;
 background-color: null;
-font-style: inherit;">sei =</span> deresults<span class="sc" style="color: #5E5E5E;
+font-style: inherit;">sei =</span> deresults[[<span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">$</span>dist2tcell<span class="sc" style="color: #5E5E5E;
+font-style: inherit;">1</span>]]<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>ses[gene, ], </span>
-<span id="cb17-11">                          <span class="at" style="color: #657422;
+<span id="cb17-23">                          <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">method =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"REML"</span>)</span>
-<span id="cb17-12">  <span class="fu" style="color: #4758AB;
+<span id="cb17-24">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">return</span>(fit<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>pval)</span>
-<span id="cb17-13">})</span>
-<span id="cb17-14">topgenes2 <span class="ot" style="color: #003B4F;
+<span id="cb17-25">})</span>
+<span id="cb17-26">topgenes2 <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -3417,15 +3505,15 @@ font-style: italic;">## now use a heatmap to plot results from either list of to
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">pheatmap</span>((deresults<span class="sc" style="color: #5E5E5E;
+font-style: inherit;">pheatmap</span>((deresults[[<span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">$</span>dist2tcell<span class="sc" style="color: #5E5E5E;
+font-style: inherit;">1</span>]]<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>ests <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">*</span> (deresults<span class="sc" style="color: #5E5E5E;
+font-style: inherit;">*</span> (deresults[[<span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">$</span>dist2tcell<span class="sc" style="color: #5E5E5E;
+font-style: inherit;">1</span>]]<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>pvals <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -3482,7 +3570,7 @@ font-style: inherit;">101</span>))</span></code></pre></div>
 </section>
 <section id="comment-on-statistical-power-and-false-discoveries" class="level2" data-number="7">
 <h2 data-number="7" class="anchored" data-anchor-id="comment-on-statistical-power-and-false-discoveries"><span class="header-section-number">7</span> Comment on statistical power and false discoveries</h2>
-<p>Very large numbers of cells give us very high statistical power to detect even tiny effect sizes. Paradoxically, this creates a hazard for analysts, as our high statistical power applies both to real effects <strong>and</strong> to the effects of unmeasured confounding variables. Now it’s usually a safe assumption that a given gene is being influences by a variety of factors in a tissue, many of them unmeasured and at least lightly correlated with your design variable. In other words, any given gene is likely subject to unmeasured confounding, meaning there’s a false positive signal that we are well-powered to find significant and get fooled by.</p>
+<p>Very large numbers of cells give us very high statistical power to detect even tiny effect sizes. Paradoxically, this creates a hazard for analysts, as our high statistical power applies both to real effects <strong>and</strong> to the effects of unmeasured confounding variables. Now it’s usually a safe assumption that a given gene is being influenced by a variety of factors in a tissue, many of them unmeasured and at least lightly correlated with your design variable. In other words, any given gene is likely subject to unmeasured confounding, meaning there’s a false positive signal that we are well-powered to find significant and get fooled by.</p>
 <p>The countermeasure to this phenomenon is simple: don’t get excited by p-values, but rather focus on effect sizes. The stronger a gene’s fold-change with your design variable, the more likely the change you see is driven by your design variable rather than unobserved confounders. You should still apply a reasonable p-value or FDR cutoff, but beyond that cutoff you should rank genes by effect size.</p>
 </section>
 <section id="the-limitations-of-de" class="level2" data-number="8">
