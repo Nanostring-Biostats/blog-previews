@@ -270,7 +270,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">October 9, 2025</p>
+        <p class="date-modified">October 21, 2025</p>
       </div>
     </div>
       
@@ -559,7 +559,7 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">## show the target cell type: endothelial cells:</span></span>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">## show the target cell type: vasculature</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>inds <span class="ot">&lt;-</span> meta_data<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">"Vasculature"</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">0</span>))</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy[, ], <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.1</span>, <span class="at">asp =</span> <span class="dv">1</span>,</span>
@@ -1001,37 +1001,31 @@ code from the tumor distance to T-cell example earlier.</p>
 <span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>                      <span class="at">npatches =</span> <span class="dv">12</span>,</span>
 <span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>                      <span class="at">bitesize =</span> <span class="fl">0.1</span>,</span>
 <span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>                      <span class="at">maxradius =</span> <span class="fl">0.5</span>,</span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>                      <span class="at">roundness =</span> <span class="fl">0.5</span>,</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>                      <span class="at">roundness =</span> <span class="fl">0.25</span>,</span>
 <span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>                      <span class="at">initwithhotspots =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>                      <span class="at">n_iters =</span> <span class="dv">25</span></span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>) <span class="co"># produces a vector of patch assigments, potentially including NA's for cells not given a patch</span></span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>                      <span class="at">n_iters =</span> <span class="dv">25</span>,</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>                      <span class="at">plotprogress =</span> <span class="cn">TRUE</span></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>) <span class="co"># produces a vector of patch assigments, potentially including NA's for cells not given a patch</span></span>
 <span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a><span class="co"># to view, draw polygon boundaries around each patch:</span></span>
-<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>patchhulls <span class="ot">&lt;-</span> <span class="fu">getPatchHulls</span>(<span class="at">xy =</span> xy[inds.tumor, ], <span class="at">patch =</span> patches) </span>
-<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a><span class="co"># plot patches:</span></span>
-<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">0</span>))</span>
-<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy[inds.tumor, ], <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.3</span>, <span class="at">asp =</span> <span class="dv">1</span>,</span>
-<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Tumor cells colored by distance to T-cell, with patches for stratified DE"</span>,</span>
-<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="fu">c</span>(<span class="st">"#A6CEE3"</span>,<span class="st">"#1F78B4"</span>,<span class="st">"#081D58"</span>, <span class="st">"black"</span>)))(<span class="dv">101</span>)[</span>
-<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>       <span class="dv">1</span> <span class="sc">+</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> dist2tcell <span class="sc">/</span> <span class="fu">max</span>(dist2tcell))[inds.tumor]</span>
-<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>     ],</span>
-<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">ylab =</span> <span class="st">""</span>)</span>
-<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(patchhulls)) {</span>
-<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(patchhulls[[i]], <span class="at">border =</span> <span class="st">"black"</span>, <span class="at">wpoints =</span> <span class="cn">FALSE</span>, <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a><span class="co"># to view, draw polygon boundaries around each patch:</span></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>patchhulls <span class="ot">&lt;-</span> <span class="fu">getPatchHulls</span>(<span class="at">xy =</span> xy[inds.tumor, ], <span class="at">patch =</span> patches) </span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a><span class="co"># plot patches:</span></span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">0</span>))</span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy[inds.tumor, ], <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.3</span>, <span class="at">asp =</span> <span class="dv">1</span>,</span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Tumor cells colored by distance to T-cell, with patches for stratified DE"</span>,</span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="fu">c</span>(<span class="st">"#A6CEE3"</span>,<span class="st">"#1F78B4"</span>,<span class="st">"#081D58"</span>, <span class="st">"black"</span>)))(<span class="dv">101</span>)[</span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>       <span class="dv">1</span> <span class="sc">+</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> dist2tcell <span class="sc">/</span> <span class="fu">max</span>(dist2tcell))[inds.tumor]</span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>     ],</span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">ylab =</span> <span class="st">""</span>)</span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(patchhulls)) {</span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(patchhulls[[i]], <span class="at">border =</span> <span class="st">"black"</span>, <span class="at">wpoints =</span> <span class="cn">FALSE</span>, <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="figures/patches.png" class="img-fluid figure-img" style="width:170.0%"></p>
-</figure>
-</div>
-</div>
-</div>
+<p>Below you can see the patches evolve over iterations. Our goal is to get a high “predictor sum of squares” (which determines statistical power) in each patch. You will notice that the per-patch power tends to improve over iterations, especially the early ones, as cells are moved from over-powered patches to under-powered ones. Also note that there algorithm does not converge to a single optimal solution; it ends up wandering around through a space of similarly satisfactory solutions.</p>
+<p><img src="figures/patchanimation.gif" class="img-fluid"></p>
 <p>And now we run DE within each patch:</p>
 <div class="cell">
 <details class="code-fold">
@@ -1040,30 +1034,57 @@ code from the tumor distance to T-cell example earlier.</p>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>deresults <span class="ot">&lt;-</span> <span class="fu">patchDE</span>(<span class="at">y =</span> norm[inds.tumor, ],</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">df =</span> <span class="fu">data.frame</span>(<span class="st">"dist2tcell"</span> <span class="ot">=</span> dist2tcell[inds.tumor]),</span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">patch =</span> patches)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="do">### explore the results:</span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="co"># find genes with strong results in any region</span></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>lowestp <span class="ot">&lt;-</span> <span class="fu">apply</span>(deresults<span class="sc">$</span>dist2tcell<span class="sc">$</span>pvals, <span class="dv">1</span>, min)</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>topgenes1 <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(<span class="fu">names</span>(lowestp)[<span class="fu">order</span>(lowestp, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>]], <span class="cn">NA</span>)</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="co"># use meta-analysis to summarize genes' trends across patches</span></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>metapvals <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">rownames</span>(deresults<span class="sc">$</span>dist2tcell<span class="sc">$</span>pvals), <span class="cf">function</span>(gene) {</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  fit <span class="ot">&lt;-</span> metafor<span class="sc">::</span><span class="fu">rma.uni</span>(<span class="at">yi =</span> deresults<span class="sc">$</span>dist2tcell<span class="sc">$</span>ests[gene, ], </span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>                          <span class="at">sei =</span> deresults<span class="sc">$</span>dist2tcell<span class="sc">$</span>ses[gene, ], </span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>                          <span class="at">method =</span> <span class="st">"REML"</span>)</span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(fit<span class="sc">$</span>pval)</span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>topgenes2 <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(<span class="fu">names</span>(metapvals)[<span class="fu">order</span>(metapvals, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>]], <span class="cn">NA</span>)</span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a><span class="do">## now use a heatmap to plot results from either list of top genes:</span></span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>pheatmap<span class="sc">::</span><span class="fu">pheatmap</span>((deresults<span class="sc">$</span>dist2tcell<span class="sc">$</span>ests <span class="sc">*</span> (deresults<span class="sc">$</span>dist2tcell<span class="sc">$</span>pvals <span class="sc">&lt;</span> <span class="fl">1e-3</span>))[topgenes1, ],</span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"darkblue"</span>, <span class="st">"white"</span>, <span class="st">"darkred"</span>))(<span class="dv">100</span>),</span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="at">length.out =</span> <span class="dv">101</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(deresults)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># List of 1</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co">#  $ dist2tcell:List of 3</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   ..$ pvals: num [1:3, 1:12] 2.59e-01 7.85e-01 3.61e-12 5.70e-01 7.52e-02 ...</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   .. ..- attr(*, "dimnames")=List of 2</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   .. .. ..$ : chr [1:3] "PGC" "CXCL14" "VEGFA"</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="co">#   .. .. ..$ : chr [1:12] "patch8" "patch3" "patch4" "patch12" ...</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="co">#   ..$ ests : num [1:3, 1:12] 1.0276 0.0797 6.3659 -0.3679 -0.2379 ...</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="co">#   .. ..- attr(*, "dimnames")=List of 2</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="co">#   .. .. ..$ : chr [1:3] "PGC" "CXCL14" "VEGFA"</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="co">#   .. .. ..$ : chr [1:12] "patch8" "patch3" "patch4" "patch12" ...</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   ..$ ses  : num [1:3, 1:12] 0.911 0.292 0.91 0.647 0.134 ...</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="co">#   .. ..- attr(*, "dimnames")=List of 2</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="co">#   .. .. ..$ : chr [1:3] "PGC" "CXCL14" "VEGFA"</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="co">#   .. .. ..$ : chr [1:12] "patch8" "patch3" "patch4" "patch12" ...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>Below is an example snippet of a heatmap of DE results on patches from a larger study:</p>
+<p>Now we’ve got DE results for every gene x patch. Next comes the hard part: figuring our which results to prioritize. We recommend two approaches:</p>
+<ol type="1">
+<li>Find genes that have significant and large effect sizes in at least a few patches (strong but possibly sporadic results).</li>
+<li>Find genes with strong meta-analysis p-values (consistent but less dramatic results). <strong>Warning</strong>: most meta-analyses, including the version demonstrated below, assume each patch is independent. Under the realistic scenario where neighboring patches will have correlated results, this assumption fails, producing over-optimistic p-values.</li>
+</ol>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="do">### explore the results:</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># find genes with strong results in any region</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>lowestp <span class="ot">&lt;-</span> <span class="fu">apply</span>(deresults<span class="sc">$</span>dist2tcell<span class="sc">$</span>pvals, <span class="dv">1</span>, min)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>topgenes1 <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(<span class="fu">names</span>(lowestp)[<span class="fu">order</span>(lowestp, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>]], <span class="cn">NA</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># use meta-analysis to summarize genes' trends across patches</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>metapvals <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">rownames</span>(deresults<span class="sc">$</span>dist2tcell<span class="sc">$</span>pvals), <span class="cf">function</span>(gene) {</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  fit <span class="ot">&lt;-</span> metafor<span class="sc">::</span><span class="fu">rma.uni</span>(<span class="at">yi =</span> deresults<span class="sc">$</span>dist2tcell<span class="sc">$</span>ests[gene, ], </span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>                          <span class="at">sei =</span> deresults<span class="sc">$</span>dist2tcell<span class="sc">$</span>ses[gene, ], </span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>                          <span class="at">method =</span> <span class="st">"REML"</span>)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(fit<span class="sc">$</span>pval)</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>topgenes2 <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(<span class="fu">names</span>(metapvals)[<span class="fu">order</span>(metapvals, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>]], <span class="cn">NA</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Once you’ve prioritized genes via the above two lists (<code>topgenes1</code> and <code>topgenes2</code>), we recommend making a heatmap of their DE results:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="do">## now use a heatmap to plot results from either list of top genes:</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>pheatmap<span class="sc">::</span><span class="fu">pheatmap</span>((deresults<span class="sc">$</span>dist2tcell<span class="sc">$</span>ests <span class="sc">*</span> (deresults<span class="sc">$</span>dist2tcell<span class="sc">$</span>pvals <span class="sc">&lt;</span> <span class="fl">1e-3</span>))[topgenes1, ],</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"darkblue"</span>, <span class="st">"white"</span>, <span class="st">"darkred"</span>))(<span class="dv">100</span>),</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="at">length.out =</span> <span class="dv">101</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -1073,7 +1094,8 @@ code from the tumor distance to T-cell example earlier.</p>
 </div>
 </div>
 </div>
-<p>A note on multiplicity: when we run DE across dozens of patches, the problem of multiple testing gets even worse. So, before getting excited about a single gene in a single patch, take one of these countermeasures to multiplicity:</p>
+<p>From there, it’s the usual exploration of DE results, leaning heavily on spatial plots and literature searches.</p>
+<p>Finally, a note on multiplicity: when we run DE across dozens of patches, the problem of multiple testing gets even worse. So, before getting excited about a single gene in a single patch, take one of these countermeasures to multiplicity:</p>
 <ul>
 <li>Confirm the gene x patch has a strong adjusted p-value <em>considering all the p-values from all the genes x patches</em>.</li>
 <li>Confirm the gene has a strong adjusted p-value from the metaanalysis, considering the p-values from all the genes’ metaanalysis results.</li>
@@ -1093,12 +1115,12 @@ code from the tumor distance to T-cell example earlier.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>inds.tumor <span class="ot">&lt;-</span> meta_data<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">"Tumor"</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>W <span class="ot">&lt;-</span> spdep<span class="sc">::</span><span class="fu">dnearneigh</span>(xy[inds.tumor, ], <span class="dv">0</span>, <span class="fu">quantile</span>(FNN<span class="sc">::</span><span class="fu">get.knn</span>(xy[inds.tumor, ], <span class="at">k=</span><span class="dv">1</span>)<span class="sc">$</span>nn.dist[,<span class="dv">1</span>], .<span class="dv">95</span>))</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>Wl <span class="ot">&lt;-</span> spdep<span class="sc">::</span><span class="fu">nb2listw</span>(W, <span class="at">style=</span><span class="st">"W"</span>, <span class="at">zero.policy =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>outcome <span class="ot">&lt;-</span> norm[inds.tumor, <span class="st">"VEGFA"</span>]</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>predictor <span class="ot">&lt;-</span> dist2tcell</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>spdep<span class="sc">::</span><span class="fu">moran.test</span>(<span class="fu">residuals</span>(<span class="fu">lm</span>(outcome <span class="sc">~</span> predictor)), Wl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>inds.tumor <span class="ot">&lt;-</span> meta_data<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">"Tumor"</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>W <span class="ot">&lt;-</span> spdep<span class="sc">::</span><span class="fu">dnearneigh</span>(xy[inds.tumor, ], <span class="dv">0</span>, <span class="fu">quantile</span>(FNN<span class="sc">::</span><span class="fu">get.knn</span>(xy[inds.tumor, ], <span class="at">k=</span><span class="dv">1</span>)<span class="sc">$</span>nn.dist[,<span class="dv">1</span>], .<span class="dv">95</span>))</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>Wl <span class="ot">&lt;-</span> spdep<span class="sc">::</span><span class="fu">nb2listw</span>(W, <span class="at">style=</span><span class="st">"W"</span>, <span class="at">zero.policy =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>outcome <span class="ot">&lt;-</span> norm[inds.tumor, <span class="st">"VEGFA"</span>]</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>predictor <span class="ot">&lt;-</span> dist2tcell</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>spdep<span class="sc">::</span><span class="fu">moran.test</span>(<span class="fu">residuals</span>(<span class="fu">lm</span>(outcome <span class="sc">~</span> predictor)), Wl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <ol start="2" type="1">
