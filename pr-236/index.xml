@@ -4015,30 +4015,28 @@ font-style: italic;">## posterior probabilities for each cell type</span></span>
 </div>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>         cell_ID celltype_thresh celltype_granular best_score_granular
-          &lt;char&gt;          &lt;char&gt;            &lt;char&gt;               &lt;num&gt;
- 1:    c_1_100_1          immune          monocyte           0.2832607
- 2:   c_1_100_10          plasma            plasma           0.9505284
- 3:  c_1_100_100      epithelial        epithelial           0.9894404
- 4: c_1_100_1000              l1         cd4_naive           0.1029328
- 5: c_1_100_1001              l1       endothelial           0.3917291
- 6: c_1_100_1002          immune        macrophage           0.2146396
- 7: c_1_100_1003          plasma            plasma           0.9697994
- 8: c_1_100_1004          immune         dendritic           0.3165272
- 9: c_1_100_1005              l1        fibroblast           0.2769950
-10: c_1_100_1006          plasma            plasma           0.9283903
-    best_score_thresh
-                &lt;num&gt;
- 1:         0.9979747
- 2:         0.9505284
- 3:         0.9894404
- 4:         0.4220678
- 5:         0.3917291
- 6:         0.5871081
- 7:         0.9697994
- 8:         0.9999999
- 9:         0.2769950
-10:         0.9283903</code></pre>
+<pre><code>        cell_ID celltype_thresh celltype_granular best_score_granular
+1     c_1_100_1          immune          monocyte           0.2832607
+2    c_1_100_10          plasma            plasma           0.9505284
+3   c_1_100_100      epithelial        epithelial           0.9894404
+4  c_1_100_1000              l1         cd4_naive           0.1029328
+5  c_1_100_1001              l1       endothelial           0.3917291
+6  c_1_100_1002          immune        macrophage           0.2146396
+7  c_1_100_1003          plasma            plasma           0.9697994
+8  c_1_100_1004          immune         dendritic           0.3165272
+9  c_1_100_1005              l1        fibroblast           0.2769950
+10 c_1_100_1006          plasma            plasma           0.9283903
+   best_score_thresh
+1          0.9979747
+2          0.9505284
+3          0.9894404
+4          0.4220678
+5          0.3917291
+6          0.5871081
+7          0.9697994
+8          0.9999999
+9          0.2769950
+10         0.9283903</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -4192,8 +4190,7 @@ font-style: inherit;">print</span>(hm_protein)</span></code></pre></div>
 </section>
 <section id="integrating-unsupervised-clusters-with-immune-cell-type-labels" class="level1" data-number="5">
 <h1 data-number="5"><span class="header-section-number">5</span> Integrating unsupervised clusters with immune cell type labels</h1>
-HieraType was designed to find celltypes with known, pre-specified markers. Often, unsupervised clustering is sufficiently granular to identify very distinct tissue-specific clusters, but may not identify commune immune cell types of interest due to relative sparsity of the immune markers. We demonstrate an easy way (code) to reconcile the labels between HieraType and unsupervised clustering; keeping the HieraType label when a cell is classified as immune, and taking the unsupervised cluster label otherwise.<br>
-
+HieraType was designed to find celltypes with known, pre-specified markers. Often, unsupervised clustering is sufficiently granular to identify very distinct tissue-specific clusters, but may not identify commune immune cell types of interest due to relative sparsity of the immune markers. We demonstrate an easy way (code) to reconcile the labels between HieraType and unsupervised clustering; keeping the HieraType label when a cell is classified as immune, and taking the unsupervised cluster label otherwise. This can be a useful technique regardless of whether one is using RNA, protein, or both to cell type their single cell dataset.
 <div class="wider-image">
 <p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-hieratype/figures/xyp_multi_semisup.png" alt="Wide Image"></p>
 </div>
