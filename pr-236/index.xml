@@ -3562,8 +3562,20 @@ $use_offclass_markers_as_negative_predictors
 </section>
 <section id="protein-data-normalization-and-constructing-a-multiomic-adjacency_matrix" class="level5">
 <h5 class="anchored" data-anchor-id="protein-data-normalization-and-constructing-a-multiomic-adjacency_matrix">Protein data normalization and constructing a multiomic adjacency_matrix</h5>
-<p>Protein data should be normalized, then combined with a sparse un-normalized RNA counts matrix before passing to HieraType. Here we’ll use pearson residuals from a gamma regression model as a normalization method, although other reasonable methods might be considered and left to the user’s disgression. We then add the “_protein” suffix to the protein names, so they’ll align with the HieraType markerlists.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>Below, we make use of the <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/scPearsonPCA">scPearsonPCA package</a>. This R package provides convenience functions for getting the principal component embeddings for pearson-residual normalized data directly from a raw counts matrix. When normalized protein is also available, we can get the PC decomposition from both RNA and normalized protein using the functions below. For more detail on the package, please check out the <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/scPearsonPCA">README</a>.</p>
+</div>
+</div>
+<p>Protein data should be normalized, then combined with a sparse un-normalized RNA counts matrix before passing to HieraType. Here we’ll use pearson residuals from a gamma regression model as a normalization method, although other reasonable methods might be considered and left to the user’s disgression. We then add the “_protein” suffix to the protein names, so they’ll align with the HieraType markerlists.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="do" style="color: #5E5E5E;
 background-color: null;
@@ -3983,6 +3995,200 @@ font-style: inherit;">rownames</span>(multimat)]</span>
 <span id="cb5-37"> )</span></code></pre></div>
 </div>
 </section>
+<section id="outputs" class="level5">
+<h5 class="anchored" data-anchor-id="outputs">Outputs</h5>
+<p>For extensive description of the outputs we get from HieraType, we refer the reader to the original post. Here, we’ll demonstrate how to make a few marker heatmaps from the RNA and protein data to sanity check our cell typing results.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">multictobj<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>post_probs[[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]][<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>] <span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## posterior probabilities for each cell type</span></span></code></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>         cell_ID celltype_thresh celltype_granular best_score_granular
+          &lt;char&gt;          &lt;char&gt;            &lt;char&gt;               &lt;num&gt;
+ 1:    c_1_100_1          immune          monocyte           0.2832607
+ 2:   c_1_100_10          plasma            plasma           0.9505284
+ 3:  c_1_100_100      epithelial        epithelial           0.9894404
+ 4: c_1_100_1000              l1         cd4_naive           0.1029328
+ 5: c_1_100_1001              l1       endothelial           0.3917291
+ 6: c_1_100_1002          immune        macrophage           0.2146396
+ 7: c_1_100_1003          plasma            plasma           0.9697994
+ 8: c_1_100_1004          immune         dendritic           0.3165272
+ 9: c_1_100_1005              l1        fibroblast           0.2769950
+10: c_1_100_1006          plasma            plasma           0.9283903
+    best_score_thresh
+                &lt;num&gt;
+ 1:         0.9979747
+ 2:         0.9505284
+ 3:         0.9894404
+ 4:         0.4220678
+ 5:         0.3917291
+ 6:         0.5871081
+ 7:         0.9697994
+ 8:         0.9999999
+ 9:         0.2769950
+10:         0.9283903</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">### Use the major cell type categories for a heatmap</span></span>
+<span id="cb8-2">ppmulti <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">copy</span>(multictobj<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>post_probs<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>l1)</span>
+<span id="cb8-3">ppmulti[,celltype_multi_major<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">=</span>celltype_granular]</span>
+<span id="cb8-4">ppmulti[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">grepl</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"cd4"</span>,celltype_multi_major),celltype_multi_major<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"cd4_tcell"</span>]</span>
+<span id="cb8-5">ppmulti[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">grepl</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"cd8"</span>,celltype_multi_major),celltype_multi_major<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"cd8_tcell"</span>]</span>
+<span id="cb8-6">ppmulti[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">grepl</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"mono|macro"</span>,celltype_multi_major),celltype_multi_major<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"macrophage_monocyte"</span>]</span>
+<span id="cb8-7"></span>
+<span id="cb8-8"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">### fold change metrics to show in RNA heatmap</span></span>
+<span id="cb8-9">fctbl_rna <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> </span>
+<span id="cb8-10"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">clusterwise_foldchange_metrics</span>(sem_rna[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"RNA"</span>]]<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">@</span>counts[use_genes,]</span>
+<span id="cb8-11">                               ,<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">totalcounts =</span> Matrix<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">colSums</span>(sem_rna[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"RNA"</span>]]<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">@</span>counts)</span>
+<span id="cb8-12">                               ,<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">metadata =</span> ppmulti</span>
+<span id="cb8-13">                               ,<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">cluster_column =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"celltype_multi_major"</span></span>
+<span id="cb8-14">                               ,<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">cellid_column =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"cell_ID"</span></span>
+<span id="cb8-15">                               )</span>
+<span id="cb8-16"></span>
+<span id="cb8-17">hm_rna <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">add_ncells</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">marker_heatmap</span>(fctbl_rna))</span>
+<span id="cb8-18"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">print</span>(hm_rna)</span></code></pre></div>
+</div>
+<div class="wider-image">
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-hieratype/figures/hm_rna_multi.png" alt="Wide Image"></p>
+</div>
+<p>For the protein data, almost all proteins have some positive measurement in each cell. We can use the pearson residuals to set a cutoff for computing the proportion of positive cells by marker and by cell type. Below, we’ll use cutoff of ‘pearson residual &gt; 1’ to determine the size of the bubble in the heatmap.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1">fctbl_protein <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> </span>
+<span id="cb9-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">clusterwise_foldchange_metrics_protein</span>(sem_protein[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"RNA"</span>]]<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">@</span>counts[,overlapping_cells]</span>
+<span id="cb9-3">                               ,<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">metadata =</span> ppmulti</span>
+<span id="cb9-4">                               ,<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">cluster_column =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"celltype_multi_major"</span></span>
+<span id="cb9-5">                               ,<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">propd =</span> (pgamm[,overlapping_cells] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>))</span>
+<span id="cb9-6"></span>
+<span id="cb9-7">hm_protein <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">add_ncells</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">marker_heatmap</span>(fctbl_protein))</span>
+<span id="cb9-8"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">print</span>(hm_protein)</span></code></pre></div>
+</div>
+<div class="wider-image">
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-hieratype/figures/hm_protein_multi.png" alt="Wide Image"></p>
+</div>
+</section>
 </section>
 <section id="integrating-unsupervised-clusters-with-immune-cell-type-labels" class="level1" data-number="5">
 <h1 data-number="5"><span class="header-section-number">5</span> Integrating unsupervised clusters with immune cell type labels</h1>
@@ -4004,60 +4210,60 @@ Overall, we found improved cell typing performance in the breast cancer sample a
 <section id="reading-in-the-data" class="level5">
 <h5 class="anchored" data-anchor-id="reading-in-the-data">Reading in the data</h5>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><span class="fu" style="color: #4758AB;
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">library</span>(ggplot2)</span>
-<span id="cb6-2"><span class="fu" style="color: #4758AB;
+<span id="cb10-2"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">library</span>(ggrepel)</span>
-<span id="cb6-3"><span class="fu" style="color: #4758AB;
+<span id="cb10-3"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">library</span>(data.table)</span>
-<span id="cb6-4"><span class="fu" style="color: #4758AB;
+<span id="cb10-4"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">library</span>(scPearsonPCA)</span>
-<span id="cb6-5"><span class="fu" style="color: #4758AB;
+<span id="cb10-5"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">library</span>(HieraType)</span>
-<span id="cb6-6"><span class="fu" style="color: #4758AB;
+<span id="cb10-6"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">library</span>(data.table)</span>
-<span id="cb6-7"><span class="fu" style="color: #4758AB;
+<span id="cb10-7"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">library</span>(pROC)</span>
-<span id="cb6-8"><span class="fu" style="color: #4758AB;
+<span id="cb10-8"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">library</span>(mclust)</span>
-<span id="cb6-9"></span>
-<span id="cb6-10"><span class="do" style="color: #5E5E5E;
+<span id="cb10-9"></span>
+<span id="cb10-10"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## Note, using a v3-style Seurat Object below, i.e., `sem[["RNA"]]@counts`</span></span>
-<span id="cb6-11"><span class="do" style="color: #5E5E5E;
+<span id="cb10-11"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## For v5-style, the syntax would be like `sem[["RNA"]]$counts`</span></span>
-<span id="cb6-12"><span class="fu" style="color: #4758AB;
+<span id="cb10-12"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">options</span>(<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">Seurat.object.assay.version =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"v3"</span>)  </span>
-<span id="cb6-13"></span>
-<span id="cb6-14">sem_protein <span class="ot" style="color: #003B4F;
+<span id="cb10-13"></span>
+<span id="cb10-14">sem_protein <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">readRDS</span>(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Breast/sem_protein.rds"</span>)</span>
-<span id="cb6-15">sem_rna <span class="ot" style="color: #003B4F;
+<span id="cb10-15">sem_rna <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">readRDS</span>(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Breast/sem_rna.rds"</span>)</span>
-<span id="cb6-16">sem_rna <span class="ot" style="color: #003B4F;
+<span id="cb10-16">sem_rna <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -4071,10 +4277,10 @@ font-style: inherit;">100</span>)</span></code></pre></div>
 <section id="normalizing-protein-data" class="level5">
 <h5 class="anchored" data-anchor-id="normalizing-protein-data">Normalizing protein data</h5>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="do" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## normalize each protein taking pearson residuals from gamma generalized linear model.</span></span>
-<span id="cb7-2">pgamm <span class="ot" style="color: #003B4F;
+<span id="cb11-2">pgamm <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> scPearsonPCA<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -4087,18 +4293,18 @@ background-color: null;
 font-style: inherit;">"RNA"</span>]]<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">@</span>counts)</span>
-<span id="cb7-3">                                                   ,<span class="at" style="color: #657422;
+<span id="cb11-3">                                                   ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">upper_q_thresh =</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.99</span></span>
-<span id="cb7-4">                                                   ,<span class="at" style="color: #657422;
+<span id="cb11-4">                                                   ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">lower_q_thresh =</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.01</span></span>
-<span id="cb7-5">                                                   )</span>
-<span id="cb7-6"><span class="fu" style="color: #4758AB;
+<span id="cb11-5">                                                   )</span>
+<span id="cb11-6"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rownames</span>(pgamm) <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -4114,13 +4320,13 @@ font-style: inherit;">"_protein"</span>)</span></code></pre></div>
 <section id="multiunsup" class="level5">
 <h5 class="anchored" data-anchor-id="multiunsup">Multiomic pearson residual PCA analysis using the protein and RNA</h5>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><span class="do" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## select genes from RNA data to use for PCA analysis.</span></span>
-<span id="cb8-2"><span class="do" style="color: #5E5E5E;
+<span id="cb12-2"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## Will take the top 2k features as well as any pre-defined immune celltyping markers from HieraType</span></span>
-<span id="cb8-3">sem_rna <span class="ot" style="color: #003B4F;
+<span id="cb12-3">sem_rna <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> Seurat<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -4131,7 +4337,7 @@ background-color: null;
 font-style: inherit;">nfeatures =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">2000</span>)</span>
-<span id="cb8-4">markerg <span class="ot" style="color: #003B4F;
+<span id="cb12-4">markerg <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -4140,27 +4346,27 @@ background-color: null;
 font-style: inherit;">lapply</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">c</span>(</span>
-<span id="cb8-5">  HieraType<span class="sc" style="color: #5E5E5E;
+<span id="cb12-5">  HieraType<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span>markerslist_l1</span>
-<span id="cb8-6">  ,HieraType<span class="sc" style="color: #5E5E5E;
+<span id="cb12-6">  ,HieraType<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span>markerslist_immune</span>
-<span id="cb8-7">  ,HieraType<span class="sc" style="color: #5E5E5E;
+<span id="cb12-7">  ,HieraType<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span>markerslist_cd8tminor</span>
-<span id="cb8-8">  ,HieraType<span class="sc" style="color: #5E5E5E;
+<span id="cb12-8">  ,HieraType<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span>markerslist_cd4tminor</span>
-<span id="cb8-9">  ,HieraType<span class="sc" style="color: #5E5E5E;
+<span id="cb12-9">  ,HieraType<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span>markerslist_tcellmajor</span>
-<span id="cb8-10">), <span class="st" style="color: #20794D;
+<span id="cb12-10">), <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"[["</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"predictors"</span>))</span>
-<span id="cb8-11">use_genes <span class="ot" style="color: #003B4F;
+<span id="cb12-11">use_genes <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -4177,11 +4383,11 @@ background-color: null;
 font-style: inherit;">intersect</span>(markerg, <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rownames</span>(sem_rna))))</span>
-<span id="cb8-12"></span>
-<span id="cb8-13"><span class="do" style="color: #5E5E5E;
+<span id="cb12-12"></span>
+<span id="cb12-13"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">### total counts and gene frequency from RNA data computed across full dataset</span></span>
-<span id="cb8-14">tc <span class="ot" style="color: #003B4F;
+<span id="cb12-14">tc <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> Matrix<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -4192,7 +4398,7 @@ background-color: null;
 font-style: inherit;">"RNA"</span>]]<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">@</span>counts)</span>
-<span id="cb8-15">genefreq <span class="ot" style="color: #003B4F;
+<span id="cb12-15">genefreq <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> scPearsonPCA<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -4203,11 +4409,11 @@ background-color: null;
 font-style: inherit;">"RNA"</span>]]<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">@</span>counts)</span>
-<span id="cb8-16"></span>
-<span id="cb8-17"><span class="do" style="color: #5E5E5E;
+<span id="cb12-16"></span>
+<span id="cb12-17"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">### add a '_protein' suffix to the protein names - helps differentiate proteins and RNA's with the same name. </span></span>
-<span id="cb8-18"><span class="fu" style="color: #4758AB;
+<span id="cb12-18"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rownames</span>(pgamm) <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -4218,14 +4424,14 @@ background-color: null;
 font-style: inherit;">rownames</span>(pgamm), <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"_protein"</span>)</span>
-<span id="cb8-19"></span>
-<span id="cb8-20"><span class="do" style="color: #5E5E5E;
+<span id="cb12-19"></span>
+<span id="cb12-20"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">### Principal components derived from the combined covariance matrix of pearson residual normalized RNA and protein.</span></span>
-<span id="cb8-21"><span class="do" style="color: #5E5E5E;
+<span id="cb12-21"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">### </span></span>
-<span id="cb8-22">pcaobj_multi <span class="ot" style="color: #003B4F;
+<span id="cb12-22">pcaobj_multi <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> scPearsonPCA<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -4236,38 +4442,38 @@ background-color: null;
 font-style: inherit;">"RNA"</span>]]<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">@</span>counts[use_genes,]</span>
-<span id="cb8-23">                                                                       ,<span class="at" style="color: #657422;
+<span id="cb12-23">                                                                       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">totalcounts =</span> tc</span>
-<span id="cb8-24">                                                                       ,<span class="at" style="color: #657422;
+<span id="cb12-24">                                                                       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">grate =</span> genefreq[use_genes]</span>
-<span id="cb8-25">                                                                       ,<span class="at" style="color: #657422;
+<span id="cb12-25">                                                                       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">xother =</span> pgamm <span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## normalized protein</span></span>
-<span id="cb8-26">                                                                       ,<span class="at" style="color: #657422;
+<span id="cb12-26">                                                                       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">do.scale =</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">TRUE</span></span>
-<span id="cb8-27">                                                                       ,<span class="at" style="color: #657422;
+<span id="cb12-27">                                                                       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">do.center =</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">TRUE</span></span>
-<span id="cb8-28">                                                                       ,<span class="at" style="color: #657422;
+<span id="cb12-28">                                                                       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">scale.max =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">10</span></span>
-<span id="cb8-29">                                                                       ,<span class="at" style="color: #657422;
+<span id="cb12-29">                                                                       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">ncores =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span></span>
-<span id="cb8-30">)</span></code></pre></div>
+<span id="cb12-30">)</span></code></pre></div>
 </div>
 <div class="cell">
 <div class="cell-output cell-output-stderr">
@@ -4299,10 +4505,10 @@ Negative:  PD-L2_protein, FOXP3_protein, LAG3_protein, 4-1BB_protein, GITR_prote
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><span class="do" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">### Make a cell-cell adjacency matrix for HieraType </span></span>
-<span id="cb10-2">multi_simgrph <span class="ot" style="color: #003B4F;
+<span id="cb14-2">multi_simgrph <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> uwot<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -4313,23 +4519,23 @@ background-color: null;
 font-style: inherit;">$</span>reduction.data<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">@</span>cell.embeddings</span>
-<span id="cb10-3">                                  ,<span class="at" style="color: #657422;
+<span id="cb14-3">                                  ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">n_neighbors =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">30</span></span>
-<span id="cb10-4">                                  ,<span class="at" style="color: #657422;
+<span id="cb14-4">                                  ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">nn_method =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"annoy"</span></span>
-<span id="cb10-5">                                  ,<span class="at" style="color: #657422;
+<span id="cb14-5">                                  ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">metric =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'cosine'</span></span>
-<span id="cb10-6">                                  )</span>
-<span id="cb10-7"><span class="fu" style="color: #4758AB;
+<span id="cb14-6">                                  )</span>
+<span id="cb14-7"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rownames</span>(multi_simgrph) <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -4344,12 +4550,12 @@ background-color: null;
 font-style: inherit;">$</span>reduction.data<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">@</span>cell.embeddings)</span>
-<span id="cb10-8"></span>
-<span id="cb10-9"></span>
-<span id="cb10-10"><span class="do" style="color: #5E5E5E;
+<span id="cb14-8"></span>
+<span id="cb14-9"></span>
+<span id="cb14-10"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">###  Unsupervised clusters using multiomic cell-cell adjacency graph</span></span>
-<span id="cb10-11">sem_rna[[<span class="st" style="color: #20794D;
+<span id="cb14-11">sem_rna[[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"multigrph"</span>]] <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -4362,7 +4568,7 @@ background-color: null;
 font-style: inherit;">colnames</span>(sem_rna),<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">colnames</span>(sem_rna)])</span>
-<span id="cb10-12">sem_rna <span class="ot" style="color: #003B4F;
+<span id="cb14-12">sem_rna <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> Seurat<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -4373,7 +4579,7 @@ background-color: null;
 font-style: inherit;">graph.name=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"multigrph"</span>)</span>
-<span id="cb10-13">sem_rna<span class="sc" style="color: #5E5E5E;
+<span id="cb14-13">sem_rna<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">@</span>meta.data<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -4384,8 +4590,8 @@ background-color: null;
 font-style: inherit;">@</span>meta.data<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>seurat_clusters</span>
-<span id="cb10-14"></span>
-<span id="cb10-15">xyp_multi_unsup <span class="ot" style="color: #003B4F;
+<span id="cb14-14"></span>
+<span id="cb14-15">xyp_multi_unsup <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -4404,21 +4610,21 @@ background-color: null;
 font-style: inherit;">+</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">coord_fixed</span>()</span>
-<span id="cb10-16"></span>
-<span id="cb10-17"><span class="fu" style="color: #4758AB;
+<span id="cb14-16"></span>
+<span id="cb14-17"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">ggsave</span>(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"figures/xyp_multi_unsup.png"</span></span>
-<span id="cb10-18">       ,<span class="at" style="color: #657422;
+<span id="cb14-18">       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">plot=</span>xyp_multi_unsup</span>
-<span id="cb10-19">       ,<span class="at" style="color: #657422;
+<span id="cb14-19">       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">device =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"png"</span></span>
-<span id="cb10-20">       ,<span class="at" style="color: #657422;
+<span id="cb14-20">       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">width =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
@@ -4429,7 +4635,7 @@ background-color: null;
 font-style: inherit;">sqrt</span>(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">20</span>)</span>
-<span id="cb10-21">       ,<span class="at" style="color: #657422;
+<span id="cb14-21">       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">height=</span><span class="dv" style="color: #AD0000;
 background-color: null;
@@ -4440,22 +4646,22 @@ background-color: null;
 font-style: inherit;">sqrt</span>(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">20</span>)</span>
-<span id="cb10-22">       ,<span class="at" style="color: #657422;
+<span id="cb14-22">       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">units =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'px'</span></span>
-<span id="cb10-23">)</span></code></pre></div>
+<span id="cb14-23">)</span></code></pre></div>
 </div>
 </section>
 <section id="multiomic-cell-typing-code-using-hieratype" class="level5">
 <h5 class="anchored" data-anchor-id="multiomic-cell-typing-code-using-hieratype">Multiomic cell typing code using HieraType</h5>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><span class="do" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## Define the pipeline using multiomic markerlists in HieraType package</span></span>
-<span id="cb11-2"></span>
-<span id="cb11-3">overlapping_cells <span class="ot" style="color: #003B4F;
+<span id="cb15-2"></span>
+<span id="cb15-3">overlapping_cells <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -4464,14 +4670,14 @@ background-color: null;
 font-style: inherit;">colnames</span>(sem_protein), <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">colnames</span>(sem_rna))</span>
-<span id="cb11-4">multimat <span class="ot" style="color: #003B4F;
+<span id="cb15-4">multimat <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> Matrix<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">t</span>(pgamm[,overlapping_cells])</span>
-<span id="cb11-5">multimat <span class="ot" style="color: #003B4F;
+<span id="cb15-5">multimat <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -4484,164 +4690,164 @@ background-color: null;
 font-style: inherit;">"RNA"</span>]]<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">@</span>counts[use_genes,overlapping_cells]))</span>
-<span id="cb11-6"></span>
-<span id="cb11-7"></span>
-<span id="cb11-8">pipeline_io_multiomics <span class="ot" style="color: #003B4F;
+<span id="cb15-6"></span>
+<span id="cb15-7"></span>
+<span id="cb15-8">pipeline_io_multiomics <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> HieraType<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">make_pipeline</span>(</span>
-<span id="cb11-9">  <span class="at" style="color: #657422;
+<span id="cb15-9">  <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">markerslists =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">list</span>(</span>
-<span id="cb11-10">    <span class="st" style="color: #20794D;
+<span id="cb15-10">    <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"l1"</span> <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> HieraType<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span>markerslist_multiomic_l1</span>
-<span id="cb11-11">    ,<span class="st" style="color: #20794D;
+<span id="cb15-11">    ,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"l2"</span> <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> HieraType<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span>markerslist_multiomic_immune</span>
-<span id="cb11-12">    ,<span class="st" style="color: #20794D;
+<span id="cb15-12">    ,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"lt"</span> <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> HieraType<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span>markerslist_multiomic_tcellmajor</span>
-<span id="cb11-13">    ,<span class="st" style="color: #20794D;
+<span id="cb15-13">    ,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"lt4minor"</span> <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> HieraType<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span>markerslist_multiomic_cd4tminor</span>
-<span id="cb11-14">    ,<span class="st" style="color: #20794D;
+<span id="cb15-14">    ,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"lt8minor"</span> <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> HieraType<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span>markerslist_multiomic_cd8tminor</span>
-<span id="cb11-15">  )</span>
-<span id="cb11-16">  ,<span class="at" style="color: #657422;
+<span id="cb15-15">  )</span>
+<span id="cb15-16">  ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">priors =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">list</span>(</span>
-<span id="cb11-17">    <span class="st" style="color: #20794D;
+<span id="cb15-17">    <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"l2"</span> <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"l1"</span></span>
-<span id="cb11-18">    ,<span class="st" style="color: #20794D;
+<span id="cb15-18">    ,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"lt"</span> <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"l2"</span></span>
-<span id="cb11-19">    ,<span class="st" style="color: #20794D;
+<span id="cb15-19">    ,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"lt4minor"</span> <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"lt"</span></span>
-<span id="cb11-20">    ,<span class="st" style="color: #20794D;
+<span id="cb15-20">    ,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"lt8minor"</span> <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"lt"</span></span>
-<span id="cb11-21">  )</span>
-<span id="cb11-22">  ,<span class="at" style="color: #657422;
+<span id="cb15-21">  )</span>
+<span id="cb15-22">  ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">priors_category =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">list</span>(</span>
-<span id="cb11-23">    <span class="st" style="color: #20794D;
+<span id="cb15-23">    <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"l2"</span> <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"immune"</span></span>
-<span id="cb11-24">    ,<span class="st" style="color: #20794D;
+<span id="cb15-24">    ,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"lt"</span> <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"tcell"</span></span>
-<span id="cb11-25">    ,<span class="st" style="color: #20794D;
+<span id="cb15-25">    ,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"lt4minor"</span> <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"cd4t"</span></span>
-<span id="cb11-26">    ,<span class="st" style="color: #20794D;
+<span id="cb15-26">    ,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"lt8minor"</span> <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"cd8t"</span></span>
-<span id="cb11-27">  )</span>
-<span id="cb11-28">)</span>
-<span id="cb11-29"></span>
-<span id="cb11-30">multictobj <span class="ot" style="color: #003B4F;
+<span id="cb15-27">  )</span>
+<span id="cb15-28">)</span>
+<span id="cb15-29"></span>
+<span id="cb15-30">multictobj <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> HieraType<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">run_pipeline</span>(</span>
-<span id="cb11-31">  <span class="at" style="color: #657422;
+<span id="cb15-31">  <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">pipeline =</span> pipeline_io_multiomics</span>
-<span id="cb11-32">  ,<span class="at" style="color: #657422;
+<span id="cb15-32">  ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">totalcounts=</span> tc[<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rownames</span>(multimat)]</span>
-<span id="cb11-33">  ,<span class="at" style="color: #657422;
+<span id="cb15-33">  ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">gene_wise_frequency =</span> genefreq</span>
-<span id="cb11-34">  ,<span class="at" style="color: #657422;
+<span id="cb15-34">  ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">counts_matrix =</span> multimat</span>
-<span id="cb11-35">  ,<span class="at" style="color: #657422;
+<span id="cb15-35">  ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">adjacency_matrix =</span> multi_simgrph[<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rownames</span>(multimat), <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rownames</span>(multimat)]</span>
-<span id="cb11-36">)</span></code></pre></div>
+<span id="cb15-36">)</span></code></pre></div>
 </div>
 </section>
 <section id="rnaonly" class="level5">
 <h5 class="anchored" data-anchor-id="rnaonly">RNA-only cell typing</h5>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><span class="do" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">### RNA-only PCA and similarity graph</span></span>
-<span id="cb12-2">pcaobj_rna <span class="ot" style="color: #003B4F;
+<span id="cb16-2">pcaobj_rna <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> scPearsonPCA<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -4652,38 +4858,38 @@ background-color: null;
 font-style: inherit;">"RNA"</span>]]<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">@</span>counts[use_genes,]</span>
-<span id="cb12-3">                                                       ,<span class="at" style="color: #657422;
+<span id="cb16-3">                                                       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">totalcounts =</span> tc</span>
-<span id="cb12-4">                                                       ,<span class="at" style="color: #657422;
+<span id="cb16-4">                                                       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">grate =</span> genefreq[use_genes]</span>
-<span id="cb12-5">                                                       ,<span class="at" style="color: #657422;
+<span id="cb16-5">                                                       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">do.scale =</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">TRUE</span></span>
-<span id="cb12-6">                                                       ,<span class="at" style="color: #657422;
+<span id="cb16-6">                                                       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">do.center =</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">TRUE</span></span>
-<span id="cb12-7">                                                       ,<span class="at" style="color: #657422;
+<span id="cb16-7">                                                       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">scale.max =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">10</span></span>
-<span id="cb12-8">                                                       ,<span class="at" style="color: #657422;
+<span id="cb16-8">                                                       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">ncores =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span></span>
-<span id="cb12-9">)</span>
-<span id="cb12-10"></span>
-<span id="cb12-11"><span class="do" style="color: #5E5E5E;
+<span id="cb16-9">)</span>
+<span id="cb16-10"></span>
+<span id="cb16-11"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">### Make a cell-cell adjacency matrix for HieraType </span></span>
-<span id="cb12-12">rna_simgrph <span class="ot" style="color: #003B4F;
+<span id="cb16-12">rna_simgrph <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> uwot<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -4694,23 +4900,23 @@ background-color: null;
 font-style: inherit;">$</span>reduction.data<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">@</span>cell.embeddings</span>
-<span id="cb12-13">                                  ,<span class="at" style="color: #657422;
+<span id="cb16-13">                                  ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">n_neighbors =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">30</span></span>
-<span id="cb12-14">                                  ,<span class="at" style="color: #657422;
+<span id="cb16-14">                                  ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">nn_method =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"annoy"</span></span>
-<span id="cb12-15">                                  ,<span class="at" style="color: #657422;
+<span id="cb16-15">                                  ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">metric =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'cosine'</span></span>
-<span id="cb12-16">                                  )</span>
-<span id="cb12-17"><span class="fu" style="color: #4758AB;
+<span id="cb16-16">                                  )</span>
+<span id="cb16-17"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rownames</span>(rna_simgrph) <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -4725,55 +4931,55 @@ background-color: null;
 font-style: inherit;">$</span>reduction.data<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">@</span>cell.embeddings)</span>
-<span id="cb12-18"></span>
-<span id="cb12-19"><span class="do" style="color: #5E5E5E;
+<span id="cb16-18"></span>
+<span id="cb16-19"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## RNA-only hieratype</span></span>
-<span id="cb12-20">rnactobj <span class="ot" style="color: #003B4F;
+<span id="cb16-20">rnactobj <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> HieraType<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">run_pipeline</span>(</span>
-<span id="cb12-21">  <span class="at" style="color: #657422;
+<span id="cb16-21">  <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">pipeline =</span> pipeline_io_multiomics <span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## the _protein markers are automatically excluded, </span></span>
-<span id="cb12-22">                                    <span class="do" style="color: #5E5E5E;
+<span id="cb16-22">                                    <span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## because they won't be found in the counts_matrix below</span></span>
-<span id="cb12-23">  ,<span class="at" style="color: #657422;
+<span id="cb16-23">  ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">totalcounts=</span> tc[<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rownames</span>(multimat)]</span>
-<span id="cb12-24">  ,<span class="at" style="color: #657422;
+<span id="cb16-24">  ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">gene_wise_frequency =</span> genefreq[use_genes]</span>
-<span id="cb12-25">  ,<span class="at" style="color: #657422;
+<span id="cb16-25">  ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">counts_matrix =</span> multimat[,use_genes] <span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## exclude proteins, only use the 'use_genes'.  </span></span>
-<span id="cb12-26">  ,<span class="at" style="color: #657422;
+<span id="cb16-26">  ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">adjacency_matrix =</span> rna_simgrph[<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rownames</span>(multimat), <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rownames</span>(multimat)]</span>
-<span id="cb12-27">)</span></code></pre></div>
+<span id="cb16-27">)</span></code></pre></div>
 </div>
 </section>
 <section id="proteinonly" class="level5">
 <h5 class="anchored" data-anchor-id="proteinonly">Protein-only cell typing</h5>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1">pgamm_prot <span class="ot" style="color: #003B4F;
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1">pgamm_prot <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> pgamm</span>
-<span id="cb13-2"><span class="fu" style="color: #4758AB;
+<span id="cb17-2"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rownames</span>(pgamm_prot) <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -4786,7 +4992,7 @@ background-color: null;
 font-style: inherit;">""</span>, <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rownames</span>(pgamm_prot))</span>
-<span id="cb13-3">sem_protein <span class="ot" style="color: #003B4F;
+<span id="cb17-3">sem_protein <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> Seurat<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -4799,14 +5005,14 @@ background-color: null;
 font-style: inherit;">"data"</span>, <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">new.data =</span> pgamm_prot)</span>
-<span id="cb13-4">sem_protein <span class="ot" style="color: #003B4F;
+<span id="cb17-4">sem_protein <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> Seurat<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">ScaleData</span>(sem_protein)</span>
-<span id="cb13-5">sem_protein <span class="ot" style="color: #003B4F;
+<span id="cb17-5">sem_protein <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> Seurat<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -4817,10 +5023,10 @@ background-color: null;
 font-style: inherit;">features =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rownames</span>(sem_protein))</span>
-<span id="cb13-6"><span class="do" style="color: #5E5E5E;
+<span id="cb17-6"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">### Make a cell-cell adjacency matrix for HieraType </span></span>
-<span id="cb13-7">protein_simgrph <span class="ot" style="color: #003B4F;
+<span id="cb17-7">protein_simgrph <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> uwot<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -4833,23 +5039,23 @@ background-color: null;
 font-style: inherit;">$</span>pca<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">@</span>cell.embeddings</span>
-<span id="cb13-8">                                  ,<span class="at" style="color: #657422;
+<span id="cb17-8">                                  ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">n_neighbors =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">30</span></span>
-<span id="cb13-9">                                  ,<span class="at" style="color: #657422;
+<span id="cb17-9">                                  ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">nn_method =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"annoy"</span></span>
-<span id="cb13-10">                                  ,<span class="at" style="color: #657422;
+<span id="cb17-10">                                  ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">metric =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'cosine'</span></span>
-<span id="cb13-11">                                  )</span>
-<span id="cb13-12"><span class="fu" style="color: #4758AB;
+<span id="cb17-11">                                  )</span>
+<span id="cb17-12"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rownames</span>(protein_simgrph) <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -4866,19 +5072,19 @@ background-color: null;
 font-style: inherit;">$</span>pca<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">@</span>cell.embeddings)</span>
-<span id="cb13-13"><span class="do" style="color: #5E5E5E;
+<span id="cb17-13"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">#### Make a copy of the cell typing pipeline to use for protein</span></span>
-<span id="cb13-14"><span class="do" style="color: #5E5E5E;
+<span id="cb17-14"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">#### -- Remove 'mast' cells, which dont have a specific protein marker.</span></span>
-<span id="cb13-15"><span class="do" style="color: #5E5E5E;
+<span id="cb17-15"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">#### -- remove the minor T8 and T4 subtypes</span></span>
-<span id="cb13-16">pipeline_io_protein <span class="ot" style="color: #003B4F;
+<span id="cb17-16">pipeline_io_protein <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> pipeline_io_multiomics</span>
-<span id="cb13-17">pipeline_io_protein<span class="sc" style="color: #5E5E5E;
+<span id="cb17-17">pipeline_io_protein<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>markerslists<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -4889,7 +5095,7 @@ background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">NULL</span></span>
-<span id="cb13-18">pipeline_io_protein<span class="sc" style="color: #5E5E5E;
+<span id="cb17-18">pipeline_io_protein<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>markerslists<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -4898,7 +5104,7 @@ background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">NULL</span></span>
-<span id="cb13-19">pipeline_io_protein<span class="sc" style="color: #5E5E5E;
+<span id="cb17-19">pipeline_io_protein<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>markerslists<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -4907,7 +5113,7 @@ background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">NULL</span></span>
-<span id="cb13-20">pipeline_io_protein<span class="sc" style="color: #5E5E5E;
+<span id="cb17-20">pipeline_io_protein<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>priors<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -4916,7 +5122,7 @@ background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">NULL</span></span>
-<span id="cb13-21">pipeline_io_protein<span class="sc" style="color: #5E5E5E;
+<span id="cb17-21">pipeline_io_protein<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>priors<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -4925,7 +5131,7 @@ background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">NULL</span></span>
-<span id="cb13-22">pipeline_io_protein<span class="sc" style="color: #5E5E5E;
+<span id="cb17-22">pipeline_io_protein<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>priors_category<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -4934,7 +5140,7 @@ background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">NULL</span></span>
-<span id="cb13-23">pipeline_io_protein<span class="sc" style="color: #5E5E5E;
+<span id="cb17-23">pipeline_io_protein<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>priors_category<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -4943,18 +5149,18 @@ background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">NULL</span></span>
-<span id="cb13-24"></span>
-<span id="cb13-25">proteinctobj <span class="ot" style="color: #003B4F;
+<span id="cb17-24"></span>
+<span id="cb17-25">proteinctobj <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> HieraType<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">run_pipeline</span>(</span>
-<span id="cb13-26">  <span class="at" style="color: #657422;
+<span id="cb17-26">  <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">pipeline =</span> pipeline_io_protein</span>
-<span id="cb13-27">  ,<span class="at" style="color: #657422;
+<span id="cb17-27">  ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">counts_matrix =</span> multimat[,<span class="fu" style="color: #4758AB;
 background-color: null;
@@ -4967,27 +5173,27 @@ background-color: null;
 font-style: inherit;">value=</span><span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">TRUE</span>)]</span>
-<span id="cb13-28">  ,<span class="at" style="color: #657422;
+<span id="cb17-28">  ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">adjacency_matrix =</span> protein_simgrph[<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rownames</span>(multimat), <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rownames</span>(multimat)]</span>
-<span id="cb13-29">)</span></code></pre></div>
+<span id="cb17-29">)</span></code></pre></div>
 </div>
 </section>
 <section id="combining-metadata" class="level5">
 <h5 class="anchored" data-anchor-id="combining-metadata">Combining metadata</h5>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><span class="do" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">### Combining metadata</span></span>
-<span id="cb14-2"></span>
-<span id="cb14-3"><span class="do" style="color: #5E5E5E;
+<span id="cb18-2"></span>
+<span id="cb18-3"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## Adding on multiomic celltype annotations</span></span>
-<span id="cb14-4">ppmulti <span class="ot" style="color: #003B4F;
+<span id="cb18-4">ppmulti <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -4996,12 +5202,12 @@ background-color: null;
 font-style: inherit;">$</span>post_probs<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>l1)</span>
-<span id="cb14-5">ppmulti[,celltype_multi_major<span class="sc" style="color: #5E5E5E;
+<span id="cb18-5">ppmulti[,celltype_multi_major<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span><span class="er" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">=</span>celltype_granular]</span>
-<span id="cb14-6">ppmulti[<span class="fu" style="color: #4758AB;
+<span id="cb18-6">ppmulti[<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">grepl</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -5012,7 +5218,7 @@ background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"cd4_tcell"</span>]</span>
-<span id="cb14-7">ppmulti[<span class="fu" style="color: #4758AB;
+<span id="cb18-7">ppmulti[<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">grepl</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -5023,7 +5229,7 @@ background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"cd8_tcell"</span>]</span>
-<span id="cb14-8">ppmulti[<span class="fu" style="color: #4758AB;
+<span id="cb18-8">ppmulti[<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">grepl</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -5034,15 +5240,15 @@ background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"macrophage_monocyte"</span>]</span>
-<span id="cb14-9">ppmulti[,.N,by<span class="ot" style="color: #003B4F;
+<span id="cb18-9">ppmulti[,.N,by<span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span>.(celltype_multi_major, celltype_granular)]</span>
-<span id="cb14-10"></span>
-<span id="cb14-11"></span>
-<span id="cb14-12"><span class="do" style="color: #5E5E5E;
+<span id="cb18-10"></span>
+<span id="cb18-11"></span>
+<span id="cb18-12"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## Adding on RNA-only based  celltype annotations</span></span>
-<span id="cb14-13">ppmulti <span class="ot" style="color: #003B4F;
+<span id="cb18-13">ppmulti <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -5051,7 +5257,7 @@ background-color: null;
 font-style: inherit;">$</span>post_probs<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>l1[,.(cell_ID, celltype_granular)]</span>
-<span id="cb14-14">                 ,<span class="at" style="color: #657422;
+<span id="cb18-14">                 ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">by=</span><span class="st" style="color: #20794D;
 background-color: null;
@@ -5064,13 +5270,13 @@ background-color: null;
 font-style: inherit;">"_multi"</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"_rna"</span>))</span>
-<span id="cb14-15"></span>
-<span id="cb14-16">ppmulti[,celltype_rna_major<span class="sc" style="color: #5E5E5E;
+<span id="cb18-15"></span>
+<span id="cb18-16">ppmulti[,celltype_rna_major<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span><span class="er" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">=</span>celltype_granular_rna]</span>
-<span id="cb14-17">ppmulti[<span class="fu" style="color: #4758AB;
+<span id="cb18-17">ppmulti[<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">grepl</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -5081,7 +5287,7 @@ background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"cd4_tcell"</span>]</span>
-<span id="cb14-18">ppmulti[<span class="fu" style="color: #4758AB;
+<span id="cb18-18">ppmulti[<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">grepl</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -5092,7 +5298,7 @@ background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"cd8_tcell"</span>]</span>
-<span id="cb14-19">ppmulti[<span class="fu" style="color: #4758AB;
+<span id="cb18-19">ppmulti[<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">grepl</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -5103,14 +5309,14 @@ background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"macrophage_monocyte"</span>]</span>
-<span id="cb14-20">ppmulti[,.N,by<span class="ot" style="color: #003B4F;
+<span id="cb18-20">ppmulti[,.N,by<span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span>.(celltype_rna_major, celltype_granular_rna)]</span>
-<span id="cb14-21"></span>
-<span id="cb14-22"><span class="do" style="color: #5E5E5E;
+<span id="cb18-21"></span>
+<span id="cb18-22"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## Adding protein-only based celltype annotations</span></span>
-<span id="cb14-23">ppmulti <span class="ot" style="color: #003B4F;
+<span id="cb18-23">ppmulti <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -5119,7 +5325,7 @@ background-color: null;
 font-style: inherit;">$</span>post_probs<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>l1[,.(cell_ID, celltype_granular)]</span>
-<span id="cb14-24">                 ,<span class="at" style="color: #657422;
+<span id="cb18-24">                 ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">by=</span><span class="st" style="color: #20794D;
 background-color: null;
@@ -5132,7 +5338,7 @@ background-color: null;
 font-style: inherit;">"_multi"</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"_protein"</span>))</span>
-<span id="cb14-25"><span class="fu" style="color: #4758AB;
+<span id="cb18-25"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">setnames</span>(ppmulti, <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -5143,12 +5349,12 @@ background-color: null;
 font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"celltype_granular_protein"</span>))</span>
-<span id="cb14-26">ppmulti[,celltype_protein_major<span class="sc" style="color: #5E5E5E;
+<span id="cb18-26">ppmulti[,celltype_protein_major<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span><span class="er" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">=</span>celltype_granular_protein]</span>
-<span id="cb14-27">ppmulti[<span class="fu" style="color: #4758AB;
+<span id="cb18-27">ppmulti[<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">grepl</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -5159,7 +5365,7 @@ background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"cd4_tcell"</span>]</span>
-<span id="cb14-28">ppmulti[<span class="fu" style="color: #4758AB;
+<span id="cb18-28">ppmulti[<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">grepl</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -5170,7 +5376,7 @@ background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"cd8_tcell"</span>]</span>
-<span id="cb14-29">ppmulti[<span class="fu" style="color: #4758AB;
+<span id="cb18-29">ppmulti[<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">grepl</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -5181,7 +5387,7 @@ background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"macrophage_monocyte"</span>]</span>
-<span id="cb14-30">ppmulti[,.N,by<span class="ot" style="color: #003B4F;
+<span id="cb18-30">ppmulti[,.N,by<span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span>.(celltype_protein_major, celltype_granular_protein)]</span></code></pre></div>
 </div>
@@ -5189,13 +5395,13 @@ font-style: inherit;">=</span>.(celltype_protein_major, celltype_granular_protei
 <section id="integrateunsup" class="level5">
 <h5 class="anchored" data-anchor-id="integrateunsup">Integrating unsupervised clusters with immune cell type labels</h5>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><span class="do" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">### Annotating non-immune clusters with unsupervised labels, creating more granular annotations</span></span>
-<span id="cb15-2"><span class="do" style="color: #5E5E5E;
+<span id="cb19-2"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">### </span></span>
-<span id="cb15-3">ppmulti <span class="ot" style="color: #003B4F;
+<span id="cb19-3">ppmulti <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -5208,12 +5414,12 @@ background-color: null;
 font-style: inherit;">by =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"cell_ID"</span>)</span>
-<span id="cb15-4">ppmulti[,celltype_multi_semi<span class="sc" style="color: #5E5E5E;
+<span id="cb19-4">ppmulti[,celltype_multi_semi<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span><span class="er" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">=</span>celltype_multi_major]</span>
-<span id="cb15-5">ppmulti[celltype_multi_semi <span class="sc" style="color: #5E5E5E;
+<span id="cb19-5">ppmulti[celltype_multi_semi <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">%in%</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -5232,10 +5438,10 @@ background-color: null;
 font-style: inherit;">:</span><span class="er" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">=</span>clusters_multi_unsup]</span>
-<span id="cb15-6">ppmulti[,.N,by<span class="ot" style="color: #003B4F;
+<span id="cb19-6">ppmulti[,.N,by<span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span>.(clusters_multi_unsup, celltype_multi_major)]</span>
-<span id="cb15-7">class_other <span class="ot" style="color: #003B4F;
+<span id="cb19-7">class_other <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> ppmulti[,.N,by<span class="ot" style="color: #003B4F;
 background-color: null;
@@ -5254,14 +5460,14 @@ background-color: null;
 font-style: inherit;">order</span>(<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-</span>prop)][</span>
-<span id="cb15-8">  ,<span class="fu" style="color: #4758AB;
+<span id="cb19-8">  ,<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">head</span>(.SD,<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>),by<span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span>.(clusters_multi_unsup)]</span>
-<span id="cb15-9">others <span class="ot" style="color: #003B4F;
+<span id="cb19-9">others <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> class_other[<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -5282,7 +5488,7 @@ background-color: null;
 font-style: inherit;">"smooth_muscle"</span>)][[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"clusters_multi_unsup"</span>]]</span>
-<span id="cb15-10">ppmulti[celltype_multi_semi <span class="sc" style="color: #5E5E5E;
+<span id="cb19-10">ppmulti[celltype_multi_semi <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">%in%</span> others, celltype_multi_semi<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -5291,10 +5497,10 @@ background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"other"</span>]</span>
-<span id="cb15-11"></span>
-<span id="cb15-12">  </span>
-<span id="cb15-13"></span>
-<span id="cb15-14">xyp_multi_semisup <span class="ot" style="color: #003B4F;
+<span id="cb19-11"></span>
+<span id="cb19-12">  </span>
+<span id="cb19-13"></span>
+<span id="cb19-14">xyp_multi_semisup <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -5311,21 +5517,21 @@ background-color: null;
 font-style: inherit;">+</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">coord_fixed</span>()</span>
-<span id="cb15-15"></span>
-<span id="cb15-16"><span class="fu" style="color: #4758AB;
+<span id="cb19-15"></span>
+<span id="cb19-16"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">ggsave</span>(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"figures/xyp_multi_semisup.png"</span></span>
-<span id="cb15-17">       ,<span class="at" style="color: #657422;
+<span id="cb19-17">       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">plot=</span>xyp_multi_semisup</span>
-<span id="cb15-18">       ,<span class="at" style="color: #657422;
+<span id="cb19-18">       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">device =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"png"</span></span>
-<span id="cb15-19">       ,<span class="at" style="color: #657422;
+<span id="cb19-19">       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">width =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
@@ -5336,7 +5542,7 @@ background-color: null;
 font-style: inherit;">sqrt</span>(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">20</span>)</span>
-<span id="cb15-20">       ,<span class="at" style="color: #657422;
+<span id="cb19-20">       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">height=</span><span class="dv" style="color: #AD0000;
 background-color: null;
@@ -5347,21 +5553,21 @@ background-color: null;
 font-style: inherit;">sqrt</span>(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">20</span>)</span>
-<span id="cb15-21">       ,<span class="at" style="color: #657422;
+<span id="cb19-21">       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">units =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'px'</span></span>
-<span id="cb15-22">)</span></code></pre></div>
+<span id="cb19-22">)</span></code></pre></div>
 </div>
 </section>
 <section id="ari" class="level5">
 <h5 class="anchored" data-anchor-id="ari">ARI quantifying agreement between cell type labels</h5>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><span class="do" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb20" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## ARI</span></span>
-<span id="cb16-2">mclust<span class="sc" style="color: #5E5E5E;
+<span id="cb20-2">mclust<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -5370,7 +5576,7 @@ background-color: null;
 font-style: inherit;">$</span>celltype_multi_major, ppmulti<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>celltype_protein_major)</span>
-<span id="cb16-3">mclust<span class="sc" style="color: #5E5E5E;
+<span id="cb20-3">mclust<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -5379,7 +5585,7 @@ background-color: null;
 font-style: inherit;">$</span>celltype_multi_major, ppmulti<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>celltype_rna_major)</span>
-<span id="cb16-4">mclust<span class="sc" style="color: #5E5E5E;
+<span id="cb20-4">mclust<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -5393,10 +5599,10 @@ font-style: inherit;">$</span>celltype_rna_major)</span></code></pre></div>
 <section id="making-roc-curves-computing-and-plotting-area-under-the-curve" class="level5">
 <h5 class="anchored" data-anchor-id="making-roc-curves-computing-and-plotting-area-under-the-curve">Making ROC curves, computing and plotting area under the curve</h5>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><span class="do" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">### Get the most important 'index markers' for each celltype (including proteins and RNAs)</span></span>
-<span id="cb17-2">index_markers <span class="ot" style="color: #003B4F;
+<span id="cb21-2">index_markers <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -5409,7 +5615,7 @@ background-color: null;
 font-style: inherit;">"[["</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"index_marker"</span>))</span>
-<span id="cb17-3">index_markers <span class="ot" style="color: #003B4F;
+<span id="cb21-3">index_markers <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -5423,27 +5629,27 @@ font-style: inherit;">::</span>markerslist_multiomic_immune), <span class="cf" s
 background-color: null;
 font-weight: bold;
 font-style: inherit;">function</span>(ct){</span>
-<span id="cb17-4">  markerdt <span class="ot" style="color: #003B4F;
+<span id="cb21-4">  markerdt <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">data.table</span>(<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">celltype =</span> ct</span>
-<span id="cb17-5">                         ,<span class="at" style="color: #657422;
+<span id="cb21-5">                         ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">marker =</span> HieraType<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span>markerslist_multiomic_immune[[ct]][[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"index_marker"</span>]]</span>
-<span id="cb17-6">                         ,<span class="at" style="color: #657422;
+<span id="cb21-6">                         ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">typ =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"rna"</span></span>
-<span id="cb17-7">  )</span>
-<span id="cb17-8">  markerdt[<span class="fu" style="color: #4758AB;
+<span id="cb21-7">  )</span>
+<span id="cb21-8">  markerdt[<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">grepl</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -5454,7 +5660,7 @@ background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"protein"</span>]</span>
-<span id="cb17-9">  markerdt[,marker<span class="sc" style="color: #5E5E5E;
+<span id="cb21-9">  markerdt[,marker<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span><span class="er" style="color: #AD0000;
 background-color: null;
@@ -5465,7 +5671,7 @@ background-color: null;
 font-style: inherit;">"_protein$"</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">""</span>, marker)]</span>
-<span id="cb17-10">  markerdt <span class="ot" style="color: #003B4F;
+<span id="cb21-10">  markerdt <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> markerdt[(typ<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -5490,15 +5696,15 @@ background-color: null;
 font-style: inherit;">%in%</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rownames</span>(sem_protein))]</span>
-<span id="cb17-11">  <span class="fu" style="color: #4758AB;
+<span id="cb21-11">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">return</span>(markerdt)</span>
-<span id="cb17-12">}))</span>
-<span id="cb17-13"></span>
-<span id="cb17-14"><span class="do" style="color: #5E5E5E;
+<span id="cb21-12">}))</span>
+<span id="cb21-13"></span>
+<span id="cb21-14"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">### Combine macrophage and monocyte due to similarity</span></span>
-<span id="cb17-15">index_markers[celltype <span class="sc" style="color: #5E5E5E;
+<span id="cb21-15">index_markers[celltype <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">%in%</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -5513,17 +5719,17 @@ background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"macrophage_monocyte"</span>]</span>
-<span id="cb17-16">aucrocl <span class="ot" style="color: #003B4F;
+<span id="cb21-16">aucrocl <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">list</span>()</span>
-<span id="cb17-17">plotdata_markerl <span class="ot" style="color: #003B4F;
+<span id="cb21-17">plotdata_markerl <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">list</span>()</span>
-<span id="cb17-18"><span class="fu" style="color: #4758AB;
+<span id="cb21-18"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rownames</span>(pgamm) <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -5536,7 +5742,7 @@ background-color: null;
 font-style: inherit;">""</span>, <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rownames</span>(pgamm))</span>
-<span id="cb17-19"><span class="cf" style="color: #003B4F;
+<span id="cb21-19"><span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">for</span>(ii <span class="cf" style="color: #003B4F;
@@ -5549,30 +5755,30 @@ background-color: null;
 font-style: inherit;">:</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">nrow</span>(index_markers)){</span>
-<span id="cb17-20">  <span class="fu" style="color: #4758AB;
+<span id="cb21-20">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">print</span>(ii)</span>
-<span id="cb17-21">  res <span class="ot" style="color: #003B4F;
+<span id="cb21-21">  res <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> index_markers[ii]</span>
-<span id="cb17-22">  typ <span class="ot" style="color: #003B4F;
+<span id="cb21-22">  typ <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> res[[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"typ"</span>]]</span>
-<span id="cb17-23"></span>
-<span id="cb17-24"></span>
-<span id="cb17-25">  marker <span class="ot" style="color: #003B4F;
+<span id="cb21-23"></span>
+<span id="cb21-24"></span>
+<span id="cb21-25">  marker <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> res[[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"marker"</span>]]</span>
-<span id="cb17-26">  celltype <span class="ot" style="color: #003B4F;
+<span id="cb21-26">  celltype <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> res[[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"celltype"</span>]] </span>
-<span id="cb17-27">  <span class="cf" style="color: #003B4F;
+<span id="cb21-27">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span>(typ<span class="sc" style="color: #5E5E5E;
@@ -5580,7 +5786,7 @@ background-color: null;
 font-style: inherit;">==</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"rna"</span>){</span>
-<span id="cb17-28">    x <span class="ot" style="color: #003B4F;
+<span id="cb21-28">    x <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> sem_rna[[<span class="st" style="color: #20794D;
 background-color: null;
@@ -5589,7 +5795,7 @@ background-color: null;
 font-style: inherit;">@</span>counts[marker,ppmulti[[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"cell_ID"</span>]]]</span>
-<span id="cb17-29">    tc <span class="ot" style="color: #003B4F;
+<span id="cb21-29">    tc <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> Matrix<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -5602,12 +5808,12 @@ background-color: null;
 font-style: inherit;">@</span>counts[,ppmulti[[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"cell_ID"</span>]]])</span>
-<span id="cb17-30">    muhat <span class="ot" style="color: #003B4F;
+<span id="cb21-30">    muhat <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> genefreq[marker] <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">*</span> tc </span>
-<span id="cb17-31">    x <span class="ot" style="color: #003B4F;
+<span id="cb21-31">    x <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> (x <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -5618,23 +5824,23 @@ background-color: null;
 font-style: inherit;">sqrt</span>(muhat) <span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## normalized expression for marker (pearson residuals)</span></span>
-<span id="cb17-32">  }  <span class="cf" style="color: #003B4F;
+<span id="cb21-32">  }  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">else</span> {</span>
-<span id="cb17-33">    x <span class="ot" style="color: #003B4F;
+<span id="cb21-33">    x <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> pgamm[marker,ppmulti[[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"cell_ID"</span>]]]</span>
-<span id="cb17-34">  }</span>
-<span id="cb17-35">  </span>
-<span id="cb17-36">  pdlbl <span class="ot" style="color: #003B4F;
+<span id="cb21-34">  }</span>
+<span id="cb21-35">  </span>
+<span id="cb21-36">  pdlbl <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">list</span>() </span>
-<span id="cb17-37">  <span class="cf" style="color: #003B4F;
+<span id="cb21-37">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">for</span>(labelname <span class="cf" style="color: #003B4F;
@@ -5649,13 +5855,13 @@ background-color: null;
 font-style: inherit;">"celltype_rna_major"</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"celltype_protein_major"</span>)){</span>
-<span id="cb17-38">    <span class="fu" style="color: #4758AB;
+<span id="cb21-38">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">print</span>(labelname)</span>
-<span id="cb17-39">    labels <span class="ot" style="color: #003B4F;
+<span id="cb21-39">    labels <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> ppmulti[[labelname]]</span>
-<span id="cb17-40">    labels[<span class="fu" style="color: #4758AB;
+<span id="cb21-40">    labels[<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">grep</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -5664,14 +5870,14 @@ background-color: null;
 font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"tcell"</span> </span>
-<span id="cb17-41">    y <span class="ot" style="color: #003B4F;
+<span id="cb21-41">    y <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">as.integer</span>(labels<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">==</span>celltype)</span>
-<span id="cb17-42">    <span class="cf" style="color: #003B4F;
+<span id="cb21-42">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span>(<span class="fu" style="color: #4758AB;
@@ -5681,7 +5887,7 @@ background-color: null;
 font-style: inherit;">&gt;</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span>){</span>
-<span id="cb17-43">      roc_obj <span class="ot" style="color: #003B4F;
+<span id="cb21-43">      roc_obj <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -5690,7 +5896,7 @@ background-color: null;
 font-style: inherit;">quiet =</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">TRUE</span>)</span>
-<span id="cb17-44">      res[,(labelname)<span class="sc" style="color: #5E5E5E;
+<span id="cb21-44">      res[,(labelname)<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span><span class="er" style="color: #AD0000;
 background-color: null;
@@ -5699,11 +5905,11 @@ background-color: null;
 font-style: inherit;">as.numeric</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">auc</span>(roc_obj))]</span>
-<span id="cb17-45">    }</span>
-<span id="cb17-46">    pdlbl[[labelname]] <span class="ot" style="color: #003B4F;
+<span id="cb21-45">    }</span>
+<span id="cb21-46">    pdlbl[[labelname]] <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> </span>
-<span id="cb17-47">      <span class="fu" style="color: #4758AB;
+<span id="cb21-47">      <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">data.table</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -5730,8 +5936,8 @@ background-color: null;
 font-style: inherit;">1</span>,.N,<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">10</span>), .N))]</span>
-<span id="cb17-48">  }</span>
-<span id="cb17-49">  plotdata_markerl[[ii]] <span class="ot" style="color: #003B4F;
+<span id="cb21-48">  }</span>
+<span id="cb21-49">  plotdata_markerl[[ii]] <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -5748,10 +5954,10 @@ background-color: null;
 font-style: inherit;">marker=</span>marker, <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">typ =</span> typ)]</span>
-<span id="cb17-50">  <span class="co" style="color: #5E5E5E;
+<span id="cb21-50">  <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#ggplot(rbindlist(pdlbl)[seq(1,.N,by=10)],aes(x = (1-spec), y = sens, color=label)) + geom_line()</span></span>
-<span id="cb17-51">  aucrocl[[ii]] <span class="ot" style="color: #003B4F;
+<span id="cb21-51">  aucrocl[[ii]] <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> data.table<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -5760,13 +5966,13 @@ background-color: null;
 font-style: inherit;">copy</span>(res) <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#return(res)</span></span>
-<span id="cb17-52">}</span></code></pre></div>
+<span id="cb21-52">}</span></code></pre></div>
 </div>
 </section>
 <section id="average-auc-across-markers-and-celltypes" class="level4" data-number="7.0.0.1">
 <h4 data-number="7.0.0.1" class="anchored" data-anchor-id="average-auc-across-markers-and-celltypes"><span class="header-section-number">7.0.0.1</span> Average AUC across markers and celltypes</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1">aucroc[celltype<span class="sc" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb22" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1">aucroc[celltype<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">!=</span><span class="st" style="color: #20794D;
 background-color: null;
@@ -5786,7 +5992,7 @@ font-style: inherit;">6</span>]</span></code></pre></div>
 <section id="t-cell-roc-curves" class="level4" data-number="7.0.0.2">
 <h4 data-number="7.0.0.2" class="anchored" data-anchor-id="t-cell-roc-curves"><span class="header-section-number">7.0.0.2</span> T cell ROC curves</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1">  shw <span class="ot" style="color: #003B4F;
+<div class="sourceCode cell-code" id="cb23" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1">  shw <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -5801,7 +6007,7 @@ background-color: null;
 font-style: inherit;">"CD3D"</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"CD2"</span>)]</span>
-<span id="cb19-2">  shw[,method<span class="sc" style="color: #5E5E5E;
+<span id="cb23-2">  shw[,method<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span><span class="er" style="color: #AD0000;
 background-color: null;
@@ -5828,10 +6034,10 @@ background-color: null;
 font-style: inherit;">"rna-only cell typing"</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"protein-only cell typing"</span>))]</span>
-<span id="cb19-3">  <span class="fu" style="color: #4758AB;
+<span id="cb23-3">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">merge</span>(shw, aucrocl)</span>
-<span id="cb19-4">  data.table<span class="sc" style="color: #5E5E5E;
+<span id="cb23-4">  data.table<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -5844,7 +6050,7 @@ background-color: null;
 font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"analyte"</span>))</span>
-<span id="cb19-5">  shw[,marker<span class="sc" style="color: #5E5E5E;
+<span id="cb23-5">  shw[,marker<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span><span class="er" style="color: #AD0000;
 background-color: null;
@@ -5861,20 +6067,20 @@ background-color: null;
 font-style: inherit;">"CD3D"</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"CD2"</span>))]</span>
-<span id="cb19-6">  shw <span class="ot" style="color: #003B4F;
+<span id="cb23-6">  shw <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> shw[<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">order</span>(marker)]</span>
-<span id="cb19-7">  aucroc[marker <span class="sc" style="color: #5E5E5E;
+<span id="cb23-7">  aucroc[marker <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">%in%</span> shw<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>marker]</span>
-<span id="cb19-8">  rocplot_tcell <span class="ot" style="color: #003B4F;
+<span id="cb23-8">  rocplot_tcell <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> </span>
-<span id="cb19-9">    <span class="fu" style="color: #4758AB;
+<span id="cb23-9">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">ggplot</span>(shw, <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -5897,7 +6103,7 @@ background-color: null;
 font-style: inherit;">geom_line</span>() <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> </span>
-<span id="cb19-10">    <span class="fu" style="color: #4758AB;
+<span id="cb23-10">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">facet_wrap</span>(<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -5908,12 +6114,12 @@ background-color: null;
 font-style: inherit;">labeller=</span>label_both) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> </span>
-<span id="cb19-11">    <span class="fu" style="color: #4758AB;
+<span id="cb23-11">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">theme_bw</span>() <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> </span>
-<span id="cb19-12">    <span class="fu" style="color: #4758AB;
+<span id="cb23-12">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">scale_x_continuous</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -5946,7 +6152,7 @@ background-color: null;
 font-style: inherit;">"specificity"</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> </span>
-<span id="cb19-13">    <span class="fu" style="color: #4758AB;
+<span id="cb23-13">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">scale_y_continuous</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -5965,7 +6171,7 @@ background-color: null;
 font-style: inherit;">"sensitivity"</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> </span>
-<span id="cb19-14">    <span class="fu" style="color: #4758AB;
+<span id="cb23-14">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">scale_color_manual</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -5986,10 +6192,10 @@ background-color: null;
 font-style: inherit;">2</span>,<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">3</span>)]</span>
-<span id="cb19-15">    <span class="co" style="color: #5E5E5E;
+<span id="cb23-15">    <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#scale_color_manual(values = brewer.pal(8,"Dark2")[c(1:3)]</span></span>
-<span id="cb19-16">                       , <span class="at" style="color: #657422;
+<span id="cb23-16">                       , <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">guide=</span><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -6004,7 +6210,7 @@ background-color: null;
 font-style: inherit;">2</span>)))  <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> </span>
-<span id="cb19-17">    <span class="fu" style="color: #4758AB;
+<span id="cb23-17">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -6017,7 +6223,7 @@ background-color: null;
 font-style: inherit;">16</span>)) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> </span>
-<span id="cb19-18">    <span class="fu" style="color: #4758AB;
+<span id="cb23-18">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -6026,7 +6232,7 @@ background-color: null;
 font-style: inherit;">"bottom"</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span>  </span>
-<span id="cb19-19">    <span class="fu" style="color: #4758AB;
+<span id="cb23-19">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -6041,16 +6247,16 @@ background-color: null;
 font-style: inherit;">\n</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">either RNA or protein alone when considering cell type markers measured on both analytes"</span>)</span>
-<span id="cb19-20">  </span>
-<span id="cb19-21">  lbld <span class="ot" style="color: #003B4F;
+<span id="cb23-20">  </span>
+<span id="cb23-21">  lbld <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> </span>
-<span id="cb19-22">    aucroc[marker <span class="sc" style="color: #5E5E5E;
+<span id="cb23-22">    aucroc[marker <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">%in%</span> shw<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>marker]</span>
-<span id="cb19-23">  lbld <span class="ot" style="color: #003B4F;
+<span id="cb23-23">  lbld <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -6073,14 +6279,14 @@ background-color: null;
 font-style: inherit;">variable.name=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"label"</span>)</span>
-<span id="cb19-24">  lbld[,method<span class="sc" style="color: #5E5E5E;
+<span id="cb23-24">  lbld[,method<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span><span class="er" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">=</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">factor</span>(label</span>
-<span id="cb19-25">                       ,<span class="at" style="color: #657422;
+<span id="cb23-25">                       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">levels=</span><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -6091,7 +6297,7 @@ background-color: null;
 font-style: inherit;">"celltype_rna_major"</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"celltype_protein_major"</span>)</span>
-<span id="cb19-26">                       ,<span class="at" style="color: #657422;
+<span id="cb23-26">                       ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">labels=</span><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -6102,7 +6308,7 @@ background-color: null;
 font-style: inherit;">"rna-only cell typing"</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"protein-only cell typing"</span>))]</span>
-<span id="cb19-27">  lbld[,marker<span class="sc" style="color: #5E5E5E;
+<span id="cb23-27">  lbld[,marker<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span><span class="er" style="color: #AD0000;
 background-color: null;
@@ -6119,12 +6325,12 @@ background-color: null;
 font-style: inherit;">"CD3D"</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"CD2"</span>))]</span>
-<span id="cb19-28">  lbld[,analyte<span class="sc" style="color: #5E5E5E;
+<span id="cb23-28">  lbld[,analyte<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span><span class="er" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">=</span>typ]</span>
-<span id="cb19-29">  lbld[,lbl<span class="sc" style="color: #5E5E5E;
+<span id="cb23-29">  lbld[,lbl<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span><span class="er" style="color: #AD0000;
 background-color: null;
@@ -6139,14 +6345,14 @@ background-color: null;
 font-style: inherit;">digits=</span><span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">3</span>))]</span>
-<span id="cb19-30">  lbld[,spec<span class="sc" style="color: #5E5E5E;
+<span id="cb23-30">  lbld[,spec<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span><span class="er" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.7</span>]</span>
-<span id="cb19-31">  lbld[,sens<span class="sc" style="color: #5E5E5E;
+<span id="cb23-31">  lbld[,sens<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span><span class="er" style="color: #AD0000;
 background-color: null;
@@ -6163,7 +6369,7 @@ background-color: null;
 font-style: inherit;">*</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.05</span>]</span>
-<span id="cb19-32">  rocplot_tcell_lbl <span class="ot" style="color: #003B4F;
+<span id="cb23-32">  rocplot_tcell_lbl <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> rocplot_tcell <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -6180,18 +6386,18 @@ background-color: null;
 font-style: inherit;">show.legend=</span><span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">FALSE</span>)</span>
-<span id="cb19-33">  </span>
-<span id="cb19-34">  <span class="fu" style="color: #4758AB;
+<span id="cb23-33">  </span>
+<span id="cb23-34">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">ggsave</span>(<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">plot=</span>rocplot_tcell_lbl</span>
-<span id="cb19-35">         ,<span class="at" style="color: #657422;
+<span id="cb23-35">         ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">filename =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"figures/rocplot_tcell_lbl.png"</span></span>
-<span id="cb19-36">         ,<span class="at" style="color: #657422;
+<span id="cb23-36">         ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">width=</span><span class="dv" style="color: #AD0000;
 background-color: null;
@@ -6202,7 +6408,7 @@ background-color: null;
 font-style: inherit;">sqrt</span>(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">9</span>)</span>
-<span id="cb19-37">         ,<span class="at" style="color: #657422;
+<span id="cb23-37">         ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">height=</span><span class="dv" style="color: #AD0000;
 background-color: null;
@@ -6213,23 +6419,23 @@ background-color: null;
 font-style: inherit;">sqrt</span>(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">9</span>)</span>
-<span id="cb19-38">         ,<span class="at" style="color: #657422;
+<span id="cb23-38">         ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">units =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'px'</span></span>
-<span id="cb19-39">  )</span></code></pre></div>
+<span id="cb23-39">  )</span></code></pre></div>
 </div>
 </section>
 <section id="auc-barplots" class="level4" data-number="7.0.0.3">
 <h4 data-number="7.0.0.3" class="anchored" data-anchor-id="auc-barplots"><span class="header-section-number">7.0.0.3</span> AUC barplots</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1">  mroc <span class="ot" style="color: #003B4F;
+<div class="sourceCode cell-code" id="cb24" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1">  mroc <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">melt</span>(aucroc</span>
-<span id="cb20-2">               ,<span class="at" style="color: #657422;
+<span id="cb24-2">               ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">id.vars=</span><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -6240,23 +6446,23 @@ background-color: null;
 font-style: inherit;">"marker"</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"typ"</span>)</span>
-<span id="cb20-3">               ,<span class="at" style="color: #657422;
+<span id="cb24-3">               ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">value.name=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"auc"</span></span>
-<span id="cb20-4">               ,<span class="at" style="color: #657422;
+<span id="cb24-4">               ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">variable.name=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"method"</span></span>
-<span id="cb20-5">               ,<span class="at" style="color: #657422;
+<span id="cb24-5">               ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">variable.factor =</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">FALSE</span></span>
-<span id="cb20-6">  )</span>
-<span id="cb20-7">  mroc[,celltype<span class="sc" style="color: #5E5E5E;
+<span id="cb24-6">  )</span>
+<span id="cb24-7">  mroc[,celltype<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span><span class="er" style="color: #AD0000;
 background-color: null;
@@ -6281,7 +6487,7 @@ background-color: null;
 font-style: inherit;">"nk"</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"mast"</span>))]</span>
-<span id="cb20-8">  mroc[,marker_label<span class="sc" style="color: #5E5E5E;
+<span id="cb24-8">  mroc[,marker_label<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span><span class="er" style="color: #AD0000;
 background-color: null;
@@ -6292,7 +6498,7 @@ background-color: null;
 font-style: inherit;">" ("</span>, typ, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">")"</span>)]</span>
-<span id="cb20-9">  mroc[,marker_label<span class="sc" style="color: #5E5E5E;
+<span id="cb24-9">  mroc[,marker_label<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span><span class="er" style="color: #AD0000;
 background-color: null;
@@ -6307,17 +6513,17 @@ background-color: null;
 font-style: inherit;">-</span>auc),<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">unique</span>(marker_label)])]</span>
-<span id="cb20-10">  aucbar <span class="ot" style="color: #003B4F;
+<span id="cb24-10">  aucbar <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> </span>
-<span id="cb20-11">    <span class="fu" style="color: #4758AB;
+<span id="cb24-11">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">ggplot</span>(mroc[celltype<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">!=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"mast"</span>]</span>
-<span id="cb20-12">           ,<span class="fu" style="color: #4758AB;
+<span id="cb24-12">           ,<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -6328,7 +6534,7 @@ background-color: null;
 font-style: inherit;">fill=</span>method)) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> </span>
-<span id="cb20-13">    <span class="fu" style="color: #4758AB;
+<span id="cb24-13">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">geom_bar</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -6341,12 +6547,12 @@ background-color: null;
 font-style: inherit;">position_dodge</span>()) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> </span>
-<span id="cb20-14">    <span class="fu" style="color: #4758AB;
+<span id="cb24-14">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">theme_bw</span>() <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> </span>
-<span id="cb20-15">    <span class="fu" style="color: #4758AB;
+<span id="cb24-15">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">scale_fill_manual</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -6359,7 +6565,7 @@ background-color: null;
 font-style: inherit;">"Set1"</span>)<span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#unname(pals::alphabet())</span></span>
-<span id="cb20-16">                      , <span class="at" style="color: #657422;
+<span id="cb24-16">                      , <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">guide=</span><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -6370,7 +6576,7 @@ background-color: null;
 font-style: inherit;">TRUE</span>)) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> </span>
-<span id="cb20-17">    <span class="fu" style="color: #4758AB;
+<span id="cb24-17">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">facet_wrap</span>(<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -6383,31 +6589,31 @@ background-color: null;
 font-style: inherit;">"free"</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> </span>
-<span id="cb20-18">    <span class="fu" style="color: #4758AB;
+<span id="cb24-18">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">title =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Agreement between celltype label and marker gene/protein as measured by area under the ROC curve"</span></span>
-<span id="cb20-19">        ,<span class="at" style="color: #657422;
+<span id="cb24-19">        ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"area under the ROC curve"</span>)</span>
-<span id="cb20-20">  </span>
-<span id="cb20-21">  </span>
-<span id="cb20-22">  <span class="fu" style="color: #4758AB;
+<span id="cb24-20">  </span>
+<span id="cb24-21">  </span>
+<span id="cb24-22">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">ggsave</span>(<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">plot=</span>aucbar</span>
-<span id="cb20-23">         ,<span class="at" style="color: #657422;
+<span id="cb24-23">         ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">filename =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"figures/aucbarplot.png"</span></span>
-<span id="cb20-24">         ,<span class="at" style="color: #657422;
+<span id="cb24-24">         ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">width=</span><span class="dv" style="color: #AD0000;
 background-color: null;
@@ -6418,7 +6624,7 @@ background-color: null;
 font-style: inherit;">sqrt</span>(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">9</span>)</span>
-<span id="cb20-25">         ,<span class="at" style="color: #657422;
+<span id="cb24-25">         ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">height=</span><span class="dv" style="color: #AD0000;
 background-color: null;
@@ -6429,17 +6635,17 @@ background-color: null;
 font-style: inherit;">sqrt</span>(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">9</span>)</span>
-<span id="cb20-26">         ,<span class="at" style="color: #657422;
+<span id="cb24-26">         ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">units =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'px'</span></span>
-<span id="cb20-27">  )</span>
-<span id="cb20-28"></span>
-<span id="cb20-29">  aucbar_with_text <span class="ot" style="color: #003B4F;
+<span id="cb24-27">  )</span>
+<span id="cb24-28"></span>
+<span id="cb24-29">  aucbar_with_text <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span>  </span>
-<span id="cb20-30">  aucbar <span class="sc" style="color: #5E5E5E;
+<span id="cb24-30">  aucbar <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -6464,25 +6670,25 @@ background-color: null;
 font-style: inherit;">0.8</span>))  <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> </span>
-<span id="cb20-31">    <span class="fu" style="color: #4758AB;
+<span id="cb24-31">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">coord_cartesian</span>(<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">clip =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"off"</span>)</span>
-<span id="cb20-32">  </span>
-<span id="cb20-33">  <span class="fu" style="color: #4758AB;
+<span id="cb24-32">  </span>
+<span id="cb24-33">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">ggsave</span>(<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">plot=</span>aucbar_with_text </span>
-<span id="cb20-34">         ,<span class="at" style="color: #657422;
+<span id="cb24-34">         ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">filename =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"figures/aucbarplot_wtext.png"</span></span>
-<span id="cb20-35">         ,<span class="at" style="color: #657422;
+<span id="cb24-35">         ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">width=</span><span class="dv" style="color: #AD0000;
 background-color: null;
@@ -6493,7 +6699,7 @@ background-color: null;
 font-style: inherit;">sqrt</span>(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">9</span>)</span>
-<span id="cb20-36">         ,<span class="at" style="color: #657422;
+<span id="cb24-36">         ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">height=</span><span class="dv" style="color: #AD0000;
 background-color: null;
@@ -6508,12 +6714,12 @@ background-color: null;
 font-style: inherit;">sqrt</span>(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">9</span>)</span>
-<span id="cb20-37">         ,<span class="at" style="color: #657422;
+<span id="cb24-37">         ,<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">units =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'px'</span></span>
-<span id="cb20-38">  )</span></code></pre></div>
+<span id="cb24-38">  )</span></code></pre></div>
 </div>
 
 
