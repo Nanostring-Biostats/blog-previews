@@ -3477,7 +3477,7 @@ font-style: inherit;">~</span> predictor)), Wl)</span></code></pre></div>
 </section>
 <section id="evidence-multiomics-can-improve-cell-typing" class="level1" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Evidence multiomics can improve cell typing</h1>
-<p>We used the Adjusted Rand Index (ARI) metric to quantify the agreement between protein-only, RNA-only, and multiomic cell type labels (code). ARI is a numerical measure of similarity between two data clusterings <span class="citation" data-cites="ariref">(<strong>ariref?</strong>)</span>. We found protein-only and RNA-only cell typing calls show more disagreement with each other than they do with with integrated multiomic cell type calls, with:</p>
+<p>We used the Adjusted Rand Index (ARI) metric to quantify the agreement between protein-only, RNA-only, and multiomic cell type labels (code). ARI is a numerical measure of similarity between two data clusterings <span class="citation" data-cites="ariref">(Rand 1971)</span>. We found protein-only and RNA-only cell typing calls show more disagreement with each other than they do with with integrated multiomic cell type calls, with:</p>
 <ul>
 <li>ARI(multiomic,RNA-only) = 0.679</li>
 <li>ARI(multiomic, protein-only) = 0.589</li>
@@ -3563,6 +3563,7 @@ $use_offclass_markers_as_negative_predictors
 <section id="protein-data-normalization-and-constructing-a-multiomic-adjacency_matrix" class="level5">
 <h5 class="anchored" data-anchor-id="protein-data-normalization-and-constructing-a-multiomic-adjacency_matrix">Protein data normalization and constructing a multiomic adjacency_matrix</h5>
 <p>Protein data should be normalized, then combined with a sparse un-normalized RNA counts matrix before passing to HieraType. Here we’ll use pearson residuals from a gamma regression model as a normalization method, although other reasonable methods might be considered and left to the user’s disgression. We then add the “_protein” suffix to the protein names, so they’ll align with the HieraType markerlists.</p>
+<p>Below, we make use of the <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/scPearsonPCA">scPearsonPCA package</a>. This R package provides convenience functions for getting the principal component embeddings for pearson-residual normalized data directly from a raw counts matrix. When normalized protein is also available, we can get the PC decomposition from both RNA and normalized protein using the functions below. For more detail on the package, please check out the <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/scPearsonPCA">README</a>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="do" style="color: #5E5E5E;
 background-color: null;
@@ -3999,7 +4000,7 @@ Overall, we found improved cell typing performance in the breast cancer sample a
 </section>
 <section id="endtoend" class="level1" data-number="7">
 <h1 data-number="7"><span class="header-section-number">7</span> End-to-end detailed analysis code</h1>
-<p>For completeness, here are a few end-to-end code blocks for each analysis step:</p>
+<p>For completeness, here are a few end-to-end code blocks for each analysis step.</p>
 <section id="reading-in-the-data" class="level5">
 <h5 class="anchored" data-anchor-id="reading-in-the-data">Reading in the data</h5>
 <div class="cell">
@@ -6518,10 +6519,15 @@ font-style: inherit;">'px'</span></span>
 
 <!-- -->
 
+
 </section>
 </section>
 
- ]]></description>
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0">
+<div id="ref-ariref" class="csl-entry">
+Rand, William M. 1971. <span>“Objective Criteria for the Evaluation of Clustering Methods.”</span> <em>Journal of the American Statistical Association</em> 66 (336): 846–50. <a href="https://doi.org/10.1080/01621459.1971.10482356">https://doi.org/10.1080/01621459.1971.10482356</a>.
+</div>
+</div></section></div> ]]></description>
   <category>cell typing</category>
   <guid>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-hieratype/</guid>
   <pubDate>Fri, 17 Oct 2025 00:00:00 GMT</pubDate>
