@@ -3666,7 +3666,7 @@ Important
   <media:content url="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/multiomics-alignment/figures/CosMx_Protein_RNA_Image.png" medium="image" type="image/png" height="46" width="144"/>
 </item>
 <item>
-  <title>scPearsonPCA: An R package for efficient Principal Components decomposition of pearson residual normalized single cell data.</title>
+  <title>scPearsonPCA: An R package for efficient Principal Components decomposition of pearson residual normalized single cell data</title>
   <dc:creator>Dan McGuire</dc:creator>
   <link>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/pearsonpca/</link>
   <description><![CDATA[ 
