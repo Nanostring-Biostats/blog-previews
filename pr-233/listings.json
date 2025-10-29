@@ -2,6 +2,8 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/DE-guide/index.html",
+      "/posts/multiomics-alignment/index.html",
       "/posts/pearsonpca/index.html",
       "/posts/spatial-plotting/index.html",
       "/posts/napari-alignment-tools/index.html",
