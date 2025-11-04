@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/pearsonpca/index.html",
       "/posts/DE-guide/index.html",
       "/posts/multiomics-hieratype/index.html",
       "/posts/multiomics-alignment/index.html",
