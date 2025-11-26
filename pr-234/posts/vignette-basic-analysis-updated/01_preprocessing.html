@@ -1585,8 +1585,17 @@ Note
 <section id="conclusion" class="level1" data-number="9">
 <h1 data-number="9"><span class="header-section-number">9</span> Conclusion</h1>
 <p>The code above provides a direct path through the basic preprocessing of CosMx data. With these results secured, you’re ready to proceed to the rewarding parts of data analysis: exploring your data and testing hypotheses. We will have posts on these subjects soon. For now, here are some reasonable next steps:</p>
-<p>Exploratory analysis: - If your experiment has baseline / control tissues, try <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/insitudiff/" target="_blank">InSituDiff</a>. - To explore genes’ spatial correlation in studies without control tissues (e.g.&nbsp;tumors), try <a href="https://github.com/Nanostring-Biostats/InSitucor" target="_blank">InSituCor</a>. - Calculate pathway scores using <a href="https://github.com/aertslab/AUCell" target="_blank">AUCell</a>.</p>
-<p>Hypothesis testing: - Use <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/smiDE/" target="_blank">smiDE</a> for differential expression testing. - Try Ligand-Receptor analysis (many packages exist; we have no recommendation yet).</p>
+<p>Exploratory analysis:</p>
+<ul>
+<li>If your experiment has baseline / control tissues, try <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/insitudiff/" target="_blank">InSituDiff</a>.</li>
+<li>To explore genes’ spatial correlation in studies without control tissues (e.g.&nbsp;tumors), try <a href="https://github.com/Nanostring-Biostats/InSitucor" target="_blank">InSituCor</a>.</li>
+<li>Calculate pathway scores using <a href="https://github.com/aertslab/AUCell" target="_blank">AUCell</a>.</li>
+</ul>
+<p>Hypothesis testing:</p>
+<ul>
+<li>Use <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/smiDE/" target="_blank">smiDE</a> for differential expression testing.</li>
+<li>Try Ligand-Receptor analysis (many packages exist; we have no recommendation yet).</li>
+</ul>
 <p>We recommend containing those analyses in standalone scripts, each beginning by loading the data we’ve prepared here:</p>
 <div class="cell">
 <details class="code-fold">
