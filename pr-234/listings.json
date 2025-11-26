@@ -2,8 +2,11 @@
   {
     "listing": "/index.html",
     "items": [
-      "/posts/vignette-basic-analysis-updated/index.html",
+      "/posts/multiomics-hieratype/index.html",
+      "/posts/pearsonpca/index.html",
+      "/posts/DE-guide/index.html",
       "/posts/vignette-basic-analysis-updated/01_preprocessing.html",
+      "/posts/vignette-basic-analysis-updated/03_DE.html",
       "/posts/multiomics-alignment/index.html",
       "/posts/spatial-plotting/index.html",
       "/posts/napari-alignment-tools/index.html",
