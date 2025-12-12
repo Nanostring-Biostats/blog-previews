@@ -9,7 +9,7 @@
 <meta name="author" content="Patrick Danaher">
 <meta name="dcterms.date" content="2025-12-11">
 
-<title>Basic Analysis Vignette: exploratory analysis – Blog</title>
+<title>Basic analysis vignette: exploratory analysis – Blog</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -134,35 +134,6 @@ cookieconsent.run({
 </script> 
   
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 </head>
 
@@ -227,7 +198,7 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Basic Analysis Vignette: exploratory analysis</h1>
+      <h1 class="title">Basic analysis vignette: exploratory analysis</h1>
                                 <div class="quarto-categories">
                 <div class="quarto-category">recommended</div>
                 <div class="quarto-category">quality control</div>
@@ -267,7 +238,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">December 3, 2025</p>
+        <p class="date-modified">December 12, 2025</p>
       </div>
     </div>
       
@@ -286,16 +257,12 @@ window.Quarto = {
   <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started"><span class="header-section-number">1.1</span> Getting started</a></li>
   </ul></li>
   <li><a href="#pathway" id="toc-pathway" class="nav-link" data-scroll-target="#pathway"><span class="header-section-number">2</span> Computing pathway scores</a></li>
-  <li><a href="#moran" id="toc-moran" class="nav-link" data-scroll-target="#moran"><span class="header-section-number">3</span> Looking for spatially variable genes</a></li>
+  <li><a href="#moran" id="toc-moran" class="nav-link" data-scroll-target="#moran"><span class="header-section-number">3</span> Looking for spatially variable genes</a>
+  <ul class="collapse">
+  <li><a href="#morans-by-cell-type" id="toc-morans-by-cell-type" class="nav-link" data-scroll-target="#morans-by-cell-type"><span class="header-section-number">3.1</span> Moran’s by cell type</a></li>
+  </ul></li>
   <li><a href="#insitucor" id="toc-insitucor" class="nav-link" data-scroll-target="#insitucor"><span class="header-section-number">4</span> Finding modules of spatially correlated genes with InSituCor</a></li>
   <li><a href="#insitudiff" id="toc-insitudiff" class="nav-link" data-scroll-target="#insitudiff"><span class="header-section-number">5</span> Studying perturbations from baseline using InSituDiff</a></li>
-  <li><a href="#get-the-necessary-data-to-run-analyses" id="toc-get-the-necessary-data-to-run-analyses" class="nav-link" data-scroll-target="#get-the-necessary-data-to-run-analyses"><span class="header-section-number">6</span> get the necessary data to run analyses:</a></li>
-  <li><a href="#score-perturbations-of-selected-genes-over-all-cells" id="toc-score-perturbations-of-selected-genes-over-all-cells" class="nav-link" data-scroll-target="#score-perturbations-of-selected-genes-over-all-cells"><span class="header-section-number">7</span> score perturbations of selected genes over all cells:</a></li>
-  <li><a href="#score-overall-perturbation-per-gene" id="toc-score-overall-perturbation-per-gene" class="nav-link" data-scroll-target="#score-overall-perturbation-per-gene"><span class="header-section-number">8</span> score overall perturbation per gene:</a></li>
-  <li><a href="#identify-highly-perturbed-genes" id="toc-identify-highly-perturbed-genes" class="nav-link" data-scroll-target="#identify-highly-perturbed-genes"><span class="header-section-number">9</span> identify highly perturbed genes:</a></li>
-  <li><a href="#get-modules-of-genes-whose-perturbations-are-spatially-correlated" id="toc-get-modules-of-genes-whose-perturbations-are-spatially-correlated" class="nav-link" data-scroll-target="#get-modules-of-genes-whose-perturbations-are-spatially-correlated"><span class="header-section-number">10</span> get modules of genes whose perturbations are spatially correlated:</a></li>
-  <li><a href="#score-perturbations-of-selected-modules-across-all-cells" id="toc-score-perturbations-of-selected-modules-across-all-cells" class="nav-link" data-scroll-target="#score-perturbations-of-selected-modules-across-all-cells"><span class="header-section-number">11</span> score perturbations of selected modules across all cells:</a></li>
-  <li><a href="#define-spatial-domains-of-perturbations-by-clustering-perturbation-values-across-space" id="toc-define-spatial-domains-of-perturbations-by-clustering-perturbation-values-across-space" class="nav-link" data-scroll-target="#define-spatial-domains-of-perturbations-by-clustering-perturbation-values-across-space"><span class="header-section-number">12</span> define spatial domains of perturbations by clustering perturbation values across space:</a></li>
   </ul>
 </nav>
 </nav>
@@ -341,7 +308,7 @@ window.Quarto = {
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>xy <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/xy.RDS"</span>))</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="do">## normalize counts matrix using efficent sparse matrix calls:</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>scale_row <span class="ot">&lt;-</span> <span class="fu">mean</span>(metadata<span class="sc">$</span>nCount_RNA)<span class="sc">/</span>metadata<span class="sc">$</span>nCount_RNA</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>scale_row <span class="ot">&lt;-</span> <span class="fu">mean</span>(metadata<span class="sc">$</span>nCount_RNA) <span class="sc">/</span> metadata<span class="sc">$</span>nCount_RNA</span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>norm <span class="ot">&lt;-</span> counts</span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>norm<span class="sc">@</span>x <span class="ot">&lt;-</span> norm<span class="sc">@</span>x <span class="sc">*</span> scale_row[norm<span class="sc">@</span>i <span class="sc">+</span> <span class="dv">1</span>L]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -356,58 +323,102 @@ window.Quarto = {
 <li>Pathway scores are often easier to interpret.</li>
 <li>Dimension reduction: it’s more convenient to analyze hundreds of pathways than thousands of genes.</li>
 </ol>
-<p>We have tried a variety of pathway scoring approaches, and <a href="https://github.com/aertslab/AUCell" target="_blank">AUCell</a> has emerged as our preferred approach. (That said, our benchmarking was not definitive, and we have no specific concerns about alternative methods.)</p>
+<p>We have tried a variety of pathway scoring approaches, and <a href="https://github.com/aertslab/AUCell" target="_blank">AUCell</a> with REACTOME gene sets has emerged as our preferred approach. (That said, our benchmarking was not definitive, and we have no specific concerns about alternative methods.)</p>
 <p>For full details on running AUCell, see the <a href="https://bioconductor.org/packages/release/bioc/vignettes/AUCell/inst/doc/AUCell.html" target="_blank">AUC package vignette</a>.</p>
-<p>For gene sets, we favor the REACTOME pathways.</p>
 <p>You can compute per-cell pathway scores as follows:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## get reactome gene sets:</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>gene.sets <span class="ot">&lt;-</span> <span class="fu">with</span>(</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">msigdbr</span>(<span class="at">species =</span> <span class="st">"Homo sapiens"</span>, <span class="at">category =</span> <span class="st">"C2"</span>, <span class="at">subcategory =</span> <span class="st">"CP:REACTOME"</span>),</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">split</span>(gene_symbol, gs_name)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="do">## get per-cell ranked expression:</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="do">## run AUCell. Process pathways in chunks to constrain memory usage. </span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>chunks <span class="ot">&lt;-</span> <span class="fu">data.table</span>(<span class="at">strt=</span><span class="fu">unique</span>(<span class="fu">c</span>(<span class="fu">seq</span>(<span class="dv">1</span>, <span class="fu">length</span>(gene.sets), <span class="dv">100</span>), <span class="fu">length</span>(gene.sets))))</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>chunks[,stp<span class="sc">:</span><span class="er">=</span>data.table<span class="sc">::</span><span class="fu">shift</span>(strt, <span class="dv">1</span>, <span class="at">type=</span><span class="st">"lead"</span>)]</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>chunks <span class="ot">&lt;-</span> chunks[<span class="sc">-</span><span class="fu">c</span>(.N)]</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>chunks[<span class="dv">1</span><span class="sc">:</span>(.N<span class="dv">-1</span>),stp<span class="sc">:</span><span class="er">=</span>stp<span class="dv">-1</span>]</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>pb <span class="ot">&lt;-</span> <span class="fu">txtProgressBar</span>(<span class="at">min =</span> <span class="dv">0</span>, <span class="at">max =</span> <span class="fu">nrow</span>(chunks), <span class="at">style=</span><span class="dv">3</span>) </span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(chunky <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(chunks)){</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  strt <span class="ot">&lt;-</span> chunks[chunky,strt]</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  stp <span class="ot">&lt;-</span> chunks[chunky,stp]</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="co">#run aucell for all gene sets </span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  reschunk <span class="ot">&lt;-</span> AUCell<span class="sc">::</span><span class="fu">AUCell_calcAUC</span>(</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">geneSets =</span> reactome[strt<span class="sc">:</span>stp], </span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    cells_rankings, </span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">aucMaxRank=</span><span class="fu">ceiling</span>(<span class="fu">nrow</span>(cells_rankings)<span class="sc">*</span>median_diversity_pctile), <span class="at">verbose =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">nCores =</span> <span class="dv">4</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># , BPPARAM = BiocParallel::MulticoreParam(workers = 8)</span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  reschunk <span class="ot">&lt;-</span> <span class="fu">as</span>(reschunk<span class="sc">@</span>assays<span class="sc">@</span>data<span class="sc">$</span>AUC, <span class="st">"sparseMatrix"</span>)</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">setTxtProgressBar</span>(pb, chunky)</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>  <span class="co">#  cells_AUC[[ii]][[chunky]] &lt;- reschunk</span></span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">saveRDS</span>(reschunk, <span class="at">file=</span><span class="fu">paste0</span>(<span class="st">"aucell_results/cellsAUC.smoothedct."</span></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>                                ,<span class="st">"sampleid__"</span>,sampl</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>                                ,<span class="st">".chunk__"</span>,chunky</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>                                ,<span class="st">".rds"</span>)</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>          )</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>  <span class="co">#names(cells_AUC[[ii]]) &lt;- paste0("AUC_", names(cells_AUC[[ii]]))</span></span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rm</span>(reschunk); <span class="fu">gc</span>()</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>} </span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="fu">gc</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## run AUCell:  # </span><span class="al">WARNING</span><span class="do">: below takes hours in a single flowcell dataset and creates a 3 Gb data object</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="cn">TRUE</span>) {</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tic</span>()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  pathscores <span class="ot">&lt;-</span> AUCell<span class="sc">::</span><span class="fu">AUCell_run</span>(<span class="at">exprMat =</span> Matrix<span class="sc">::</span><span class="fu">t</span>(counts), <span class="at">geneSets =</span> gene.sets) <span class="co"># , BPPARAM = BiocParallel::MulticoreParam(workers = 8)</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">toc</span>()</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">saveRDS</span>(pathscores, <span class="at">file =</span> <span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/pathscores.RDS"</span>))</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  pathscores <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/pathscores.RDS"</span>))</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
+<p>The pathway scores calculated above can now be used anywhere you’d use a gene expression matrix. Our favorite uses of pathway scores are:</p>
+<ul>
+<li>Simply look at spatial plots for pathways of interest.</li>
+<li>Look for spatially variable pathway scores, e.g.&nbsp;with the Moran’s I code below.</li>
+<li>Score cells for neighborhood pathway activity, e.g.&nbsp;“mean neighborhood IFNG pathway score”, and use this as a predictor in differential expression analyses.</li>
+<li>Compare mean pathway scores between cell types of interest, e.g.&nbsp;tumor subclusters.</li>
+<li>Compare pathway scores across niches.</li>
+<li>It’s also possible to run differential expression analysis on pathway scores, but we prefer to run DE on single genes, then run gene set enrichment analysis.</li>
+</ul>
+<p><strong>Note:</strong> the above code produces a dense matrix of cell x pathway scores. For larger datasets, this will take your memory. Above we round the scores to reduce memory usage. For bigger studies, you could compute them in chunks, e.g.&nbsp;separately for each tissue, or for each cell type.</p>
 </section>
 <section id="moran" class="level1" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Looking for spatially variable genes</h1>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Source the efficient Moran's function</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"https://raw.githubusercontent.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/Main/_code/vignette2/utils/moransMultiFast.R"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># compute neighbors matrix:</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>neighbors <span class="ot">&lt;-</span> InSituCor<span class="sc">:::</span><span class="fu">nearestNeighborGraph</span>(xy[, <span class="dv">1</span>], xy[, <span class="dv">2</span>], <span class="at">N =</span> <span class="dv">50</span>, <span class="at">subset =</span> metadata<span class="sc">$</span>slide_ID)  </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># for speed, subset to FOVs covering ~100k cells</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">0</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>ncells <span class="ot">&lt;-</span> <span class="fl">1e6</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>cellsperfov <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">table</span>(metadata<span class="sc">$</span>FOV))</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>nfovs <span class="ot">&lt;-</span> <span class="fu">ceiling</span>(ncells <span class="sc">/</span> cellsperfov)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (nfovs <span class="sc">&lt;</span> <span class="fu">length</span>(<span class="fu">unique</span>(metadata<span class="sc">$</span>FOV))) {</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  usefovs <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">unique</span>(metadata<span class="sc">$</span>FOV), nfovs, <span class="at">replace =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  usefovs <span class="ot">&lt;-</span> <span class="fu">unique</span>(metadata<span class="sc">$</span>FOV)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>inds <span class="ot">&lt;-</span> <span class="fu">is.element</span>(metadata<span class="sc">$</span>FOV, usefovs)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co"># compute moran's:</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># (very fast if not too many cells)</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>morans_all <span class="ot">&lt;-</span> <span class="fu">moransMultiFast</span>(<span class="at">X =</span> norm[inds, ], <span class="at">W =</span> neighbors[inds, inds], <span class="at">perm =</span> <span class="dv">10</span>, <span class="at">compute_sparse =</span> <span class="cn">TRUE</span>, <span class="at">compute_perm =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co"># plot moran's vs. mean expression</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>meanexpr <span class="ot">&lt;-</span> Matrix<span class="sc">::</span><span class="fu">colMeans</span>(counts)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">log2</span>(<span class="fl">1e-2</span> <span class="sc">+</span> meanexpr), morans_all<span class="sc">$</span>I[<span class="fu">match</span>(<span class="fu">names</span>(meanexpr), morans_all<span class="sc">$</span>gene)], <span class="at">col =</span> <span class="dv">0</span>, </span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Log2 mean counts"</span>, <span class="at">ylab =</span> <span class="st">"Moran's I"</span>)</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fu">log2</span>(<span class="fl">1e-2</span> <span class="sc">+</span> meanexpr), morans_all<span class="sc">$</span>I[<span class="fu">match</span>(<span class="fu">names</span>(meanexpr), morans_all<span class="sc">$</span>gene)], <span class="fu">names</span>(meanexpr), <span class="at">cex =</span> <span class="fl">0.5</span>)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="co"># save spatially variable genes:</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>svgs <span class="ot">&lt;-</span> morans_all<span class="sc">$</span>gene[morans_all<span class="sc">$</span>I <span class="sc">&gt;</span> <span class="fl">0.05</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Genes in the list generated above deserve closer scrutiny. Plotting them spatially one-by-one and examining the output is a good way to start.</p>
+<section id="morans-by-cell-type" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="morans-by-cell-type"><span class="header-section-number">3.1</span> Moran’s by cell type</h2>
+<p>Moran’s I and similar approaches have one disappointing feature: they often just highlight cell type marker genes. But we don’t need to look for spatial variability to learn that a cell type has spatial patterns; we can just look at the cell type’s spatial distribution.</p>
+<p>Perhaps more useful is to calculate Moran’s I within a cell type of interest. The top genes from such an analysis will suggest ways the cell type is changing over space.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">## calculate Moran's within a cell type:</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># select just the cell type's cells:</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>inds <span class="ot">&lt;-</span> celltype <span class="sc">==</span> <span class="st">"macrophage"</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the neighbor relationships within just the cell type:</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># (Here we'll use a radius-based approach to account for the fact that cells from a given cell type may fall quite far from their nearest neighbors from the same cell type.)</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>tempneighbors <span class="ot">&lt;-</span> InSituCor<span class="sc">:::</span><span class="fu">radiusBasedGraph</span>(xy[inds, <span class="dv">1</span>], xy[inds, <span class="dv">2</span>], <span class="at">R =</span> <span class="fl">0.25</span>, <span class="at">subset =</span> metadata<span class="sc">$</span>slide_ID)  </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># check there's a reasonable number of neighbors per cell:</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(Matrix<span class="sc">::</span><span class="fu">rowSums</span>(tempneighbors <span class="sc">&gt;</span> <span class="dv">0</span>))</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># compute moran's:</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>morans_mycelltype <span class="ot">&lt;-</span> <span class="fu">moransMultiFast</span>(<span class="at">X =</span> norm[inds, ], <span class="at">W =</span> neighbors[inds, inds], <span class="at">perm =</span> <span class="dv">10</span>, <span class="at">compute_sparse =</span> <span class="cn">TRUE</span>, <span class="at">compute_perm =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"># plot moran's vs. mean expression</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>meanexpr_mycelltype <span class="ot">&lt;-</span> Matrix<span class="sc">::</span><span class="fu">colMeans</span>(counts[inds, ])</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">log2</span>(<span class="fl">1e-2</span> <span class="sc">+</span> meanexpr_mycelltype), </span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>     morans_mycelltype<span class="sc">$</span>I[<span class="fu">match</span>(<span class="fu">names</span>(meanexpr_mycelltype), morans_mycelltype<span class="sc">$</span>gene)], <span class="at">col =</span> <span class="dv">0</span>, </span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Log2 mean counts"</span>, <span class="at">ylab =</span> <span class="st">"Moran's I"</span>)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fu">log2</span>(<span class="fl">1e-2</span> <span class="sc">+</span> meanexpr_mycelltype), </span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>     morans_mycelltype<span class="sc">$</span>I[<span class="fu">match</span>(<span class="fu">names</span>(meanexpr_mycelltype), morans_mycelltype<span class="sc">$</span>gene)], </span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>     <span class="fu">names</span>(meanexpr_mycelltype), <span class="at">cex =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
 </section>
 <section id="insitucor" class="level1" data-number="4">
 <h1 data-number="4"><span class="header-section-number">4</span> Finding modules of spatially correlated genes with InSituCor</h1>
@@ -416,65 +427,127 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="do">## key input: data to be conditioned on. Only cell type is necessary, though slide / tissue ID could be used as well .</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>conditionon <span class="ot">&lt;-</span> metadata[, <span class="st">"celltype"</span>, drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="do">## run InSituCor:</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">insitucor</span>(</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>         <span class="co"># fundamental input data:</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">counts =</span> norm, </span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">conditionon =</span> conditionon, </span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">celltype =</span> metadata<span class="sc">$</span>celltype,</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>         <span class="co"># args for neighbor definition:</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">neighbors =</span> <span class="cn">NULL</span>, <span class="at">xy =</span> xy, <span class="at">k =</span> <span class="dv">100</span>, <span class="at">radius =</span> <span class="cn">NULL</span>, <span class="at">tissue =</span> <span class="cn">NULL</span>,  </span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>         <span class="co"># args for module definition:</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">min_module_size =</span> <span class="dv">2</span>, <span class="at">max_module_size =</span> <span class="dv">25</span>, <span class="at">min_module_cor =</span> <span class="fl">0.1</span>,</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">gene_weighting_rule =</span> <span class="st">"inverse_sqrt"</span>,   </span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>         <span class="co"># args for controlling memory and compute</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">roundcortozero =</span> <span class="fl">0.1</span>, <span class="at">max_cells =</span> <span class="fl">1e5</span>,                               </span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>         <span class="co"># args for cell type attribution scoring</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">attribution_subset_size =</span> <span class="dv">1000</span>,                                      </span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">verbose =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(res)</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="do">## exploring InSituCor results: </span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co"># You'll want to look for modules that:</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co"># - have interesting genes (look at the module content)</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="co"># - involve your cell types of interest (look at the cell type involvement / attribution scores)</span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="co"># - have interesting spatial patterns (plot their scores in space)</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="co"># look at the spatial correlation network:</span></span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="fu">plotCorrelationNetwork</span>(res<span class="sc">$</span>condcor, <span class="at">modules =</span> res<span class="sc">$</span>modules, <span class="at">show_gene_names =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>                       <span class="at">corthresh =</span> <span class="fl">0.1</span>)</span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="co"># look at module content:</span></span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(res<span class="sc">$</span>modules)</span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="co"># plot a selected module over space:</span></span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="co"># ... at the single cell level:</span></span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>tempscore <span class="ot">&lt;-</span> res<span class="sc">$</span>scores_sc[, <span class="dv">1</span>]</span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">asp =</span> <span class="dv">1</span>, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.5</span>, <span class="at">cex.main =</span> <span class="fl">0.75</span>,</span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="fu">paste0</span>(<span class="fu">colnames</span>(res<span class="sc">$</span>scores_env)[<span class="dv">1</span>], <span class="st">" single cell score"</span>),</span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"x mm"</span>, <span class="at">ylab =</span> <span class="st">"y mm"</span>,</span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> viridis<span class="sc">::</span><span class="fu">viridis_pal</span>(<span class="at">option =</span> <span class="st">"B"</span>)(<span class="dv">101</span>)[</span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>       <span class="dv">1</span> <span class="sc">+</span> <span class="fu">pmin</span>(<span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> (tempscore <span class="sc">/</span> <span class="fu">quantile</span>(tempscore, <span class="fl">0.995</span>))), <span class="dv">100</span>)])</span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="co"># ... and at the level of cellular neighborhoods:</span></span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>tempscore <span class="ot">&lt;-</span> res<span class="sc">$</span>scores_env[, <span class="dv">1</span>]</span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">asp =</span> <span class="dv">1</span>, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.5</span>, <span class="at">cex.main =</span> <span class="fl">0.75</span>,</span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="fu">paste0</span>(<span class="fu">colnames</span>(res<span class="sc">$</span>scores_env)[<span class="dv">1</span>], <span class="st">" neighborhood score"</span>),</span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"x mm"</span>, <span class="at">ylab =</span> <span class="st">"y mm"</span>,</span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> viridis<span class="sc">::</span><span class="fu">viridis_pal</span>(<span class="at">option =</span> <span class="st">"B"</span>)(<span class="dv">101</span>)[</span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>       <span class="dv">1</span> <span class="sc">+</span> <span class="fu">pmin</span>(<span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> (tempscore <span class="sc">/</span> <span class="fu">quantile</span>(tempscore, <span class="fl">0.995</span>))), <span class="dv">100</span>)])</span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="co"># look at the involvement of each cell type in each module:</span></span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a><span class="fu">pheatmap</span>(res<span class="sc">$</span>celltypeinvolvement, <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"white"</span>, <span class="st">"darkblue"</span>))(<span class="dv">100</span>),</span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>         <span class="at">main =</span> <span class="st">"Contribution of cell types to module scores"</span>)</span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="co"># zoom in on the cell type involvement for a single module:</span></span>
-<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="fu">pheatmap</span>(res<span class="sc">$</span>attributionmats[[<span class="dv">1</span>]], <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"white"</span>, <span class="st">"darkblue"</span>))(<span class="dv">100</span>),</span>
-<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>         <span class="at">main =</span> <span class="st">"Contribution of cell types to module genes"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="do">## key input: data to be conditioned on. Only cell type is necessary, though slide / tissue ID could be used as well .</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>conditionon <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(metadata[, <span class="st">"celltype"</span>, <span class="at">drop =</span> <span class="cn">FALSE</span>])</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="do">## run InSituCor:</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># (&lt;10 mins)</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> InSituCor<span class="sc">::</span><span class="fu">insitucor</span>(</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>         <span class="co"># fundamental input data:</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">counts =</span> norm, </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">conditionon =</span> conditionon, </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">celltype =</span> metadata<span class="sc">$</span>celltype,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>         <span class="co"># args for neighbor definition:</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">neighbors =</span> <span class="cn">NULL</span>, <span class="at">xy =</span> xy, <span class="at">k =</span> <span class="dv">100</span>, <span class="at">radius =</span> <span class="cn">NULL</span>, <span class="at">tissue =</span> <span class="cn">NULL</span>,  </span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>         <span class="co"># args for module definition:</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">min_module_size =</span> <span class="dv">2</span>, <span class="at">max_module_size =</span> <span class="dv">25</span>, <span class="at">min_module_cor =</span> <span class="fl">0.1</span>,</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">gene_weighting_rule =</span> <span class="st">"inverse_sqrt"</span>,   </span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>         <span class="co"># args for controlling memory and compute</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">roundcortozero =</span> <span class="fl">0.1</span>, <span class="at">max_cells =</span> <span class="fl">1e5</span>,                               </span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>         <span class="co"># args for cell type attribution scoring</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">attribution_subset_size =</span> <span class="dv">1000</span>,                                      </span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">verbose =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(res)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="do">## exploring InSituCor results: </span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="co"># You'll want to look for modules that:</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="co"># - have interesting genes (look at the module content)</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="co"># - involve your cell types of interest (look at the cell type involvement / attribution scores)</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="co"># - have interesting spatial patterns (plot their scores in space)</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="co"># look at the spatial correlation network:</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="fu">plotCorrelationNetwork</span>(res<span class="sc">$</span>condcor, <span class="at">modules =</span> res<span class="sc">$</span>modules, <span class="at">show_gene_names =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>                       <span class="at">corthresh =</span> <span class="fl">0.1</span>)</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="co"># look at module content:</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(res<span class="sc">$</span>modules)</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a><span class="co"># plot a selected module over space:</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a><span class="co"># ... at the single cell level:</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>tempscore <span class="ot">&lt;-</span> res<span class="sc">$</span>scores_sc[, <span class="dv">1</span>]</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">asp =</span> <span class="dv">1</span>, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.5</span>, <span class="at">cex.main =</span> <span class="fl">0.75</span>,</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="fu">paste0</span>(<span class="fu">colnames</span>(res<span class="sc">$</span>scores_env)[<span class="dv">1</span>], <span class="st">" single cell score"</span>),</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"x mm"</span>, <span class="at">ylab =</span> <span class="st">"y mm"</span>,</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> viridis<span class="sc">::</span><span class="fu">viridis_pal</span>(<span class="at">option =</span> <span class="st">"B"</span>)(<span class="dv">101</span>)[</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>       <span class="dv">1</span> <span class="sc">+</span> <span class="fu">pmin</span>(<span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> (tempscore <span class="sc">/</span> <span class="fu">quantile</span>(tempscore, <span class="fl">0.995</span>))), <span class="dv">100</span>)])</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a><span class="co"># ... and at the level of cellular neighborhoods:</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>tempscore <span class="ot">&lt;-</span> res<span class="sc">$</span>scores_env[, <span class="dv">1</span>]</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">asp =</span> <span class="dv">1</span>, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.5</span>, <span class="at">cex.main =</span> <span class="fl">0.75</span>,</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="fu">paste0</span>(<span class="fu">colnames</span>(res<span class="sc">$</span>scores_env)[<span class="dv">1</span>], <span class="st">" neighborhood score"</span>),</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"x mm"</span>, <span class="at">ylab =</span> <span class="st">"y mm"</span>,</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> viridis<span class="sc">::</span><span class="fu">viridis_pal</span>(<span class="at">option =</span> <span class="st">"B"</span>)(<span class="dv">101</span>)[</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>       <span class="dv">1</span> <span class="sc">+</span> <span class="fu">pmin</span>(<span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> (tempscore <span class="sc">/</span> <span class="fu">quantile</span>(tempscore, <span class="fl">0.995</span>))), <span class="dv">100</span>)])</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a><span class="co"># look at the involvement of each cell type in each module:</span></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a><span class="fu">pheatmap</span>(res<span class="sc">$</span>celltypeinvolvement, <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"white"</span>, <span class="st">"darkblue"</span>))(<span class="dv">100</span>),</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>         <span class="at">main =</span> <span class="st">"Contribution of cell types to module scores"</span>)</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a><span class="co"># zoom in on the cell type involvement for a single module:</span></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a><span class="fu">pheatmap</span>(res<span class="sc">$</span>attributionmats[[<span class="dv">1</span>]], <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"white"</span>, <span class="st">"darkblue"</span>))(<span class="dv">100</span>),</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>         <span class="at">main =</span> <span class="st">"Contribution of cell types to module genes"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+</div>
+<p>Our results include:</p>
+<ul>
+<li>A list of gene modules:</li>
+</ul>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="figures/iscor_modules.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>The spatial correlation network:</li>
+</ul>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="figures/cornet.png" class="img-fluid figure-img" style="width:75.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>Module scores over space:</li>
+</ul>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="figures/iscorxy.png" class="img-fluid figure-img" style="width:75.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>“Cell type attribution scores” estimating how much each cell type is responsible for each module of correlated genes.</li>
+</ul>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="figures/attribmat.png" class="img-fluid figure-img" style="width:75.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>For each module, attribution scores estimating how much each cell type is responsible for each gene in the module.</li>
+</ul>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="figures/attribmat2.png" class="img-fluid figure-img" style="width:75.0%"></p>
+</figure>
+</div>
+</div>
 </div>
 </section>
 <section id="insitudiff" class="level1" data-number="5">
@@ -482,36 +555,118 @@ window.Quarto = {
 <p>The InSituDiff algorithm is a useful tool for exploring studies with both disease and baseline samples. It matches cellular neighborhoods in disease with the most similar baseline neighborhoods, then records the discrepancies as “perturbations”. These perturbations are then very useful fodder for downstream analysis. In practice, we find that InSituDiff quickly highlights the genes and spatial regions that are most worthy of attention. For a full writeup, see <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/insitudiff/" target="_blank">the blog post</a>; for code, see <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/InSituDiff" target="_blank">the package</a>.</p>
 <p>Note: InSituDiff is meant to reveal perturbations from baseline. If you have no reasonable baseline samples, say in most cancer studies, then you’re better off using InSituCor.</p>
 <p>A quick run-through of exploratory analysis using InSituDiff is below:</p>
-</section>
-<section id="get-the-necessary-data-to-run-analyses" class="level1" data-number="6">
-<h1 data-number="6"><span class="header-section-number">6</span> get the necessary data to run analyses:</h1>
-<p>obj &lt;- initializeISD( mat = norm, # matrix of normalized expression xy = xy, # matrix of xy coordinates tissue = metadata<span class="math inline">\(tissue, # vector of cells' tissue IDs
-  iscontrol = grepl("control", metadata\)</span>tissue), k = 50) # define cellular neighborhoods as a cell’s 50 nearest neighbors str(obj)</p>
-</section>
-<section id="score-perturbations-of-selected-genes-over-all-cells" class="level1" data-number="7">
-<h1 data-number="7"><span class="header-section-number">7</span> score perturbations of selected genes over all cells:</h1>
-<p>selectedperturbations &lt;- getPerturbations( x = norm, obj = obj, cells = rownames(counts)[metadata$tissue == “SP19_1139”], # only look at one tissue genes = c(“IGHA1”, “FGFR3”, “HIF1A”, “ACE2”, “SAT1”), # only look at a few genes of interest residtype = “log2ratio”, # look at perturbations on the scale of log fold-changes eps = 1)</p>
-</section>
-<section id="score-overall-perturbation-per-gene" class="level1" data-number="8">
-<h1 data-number="8"><span class="header-section-number">8</span> score overall perturbation per gene:</h1>
-<p>genescores &lt;- summarizeGenePerturbation( x = norm, obj = obj, residtype = “log2ratio”, plotresults = TRUE, eps = 0.1, subsetsize = 1e5)</p>
-</section>
-<section id="identify-highly-perturbed-genes" class="level1" data-number="9">
-<h1 data-number="9"><span class="header-section-number">9</span> identify highly perturbed genes:</h1>
-<p>hist(genescores[,1], breaks = 10) thresh = 3 abline(v = thresh, col = 2, lty = 2) hpgs &lt;- rownames(genescores)[genescores[, “broadness”] &gt; thresh] print(paste0(“Highly perturbed genes:”, paste0(hpgs, collapse = “,”)))</p>
-</section>
-<section id="get-modules-of-genes-whose-perturbations-are-spatially-correlated" class="level1" data-number="10">
-<h1 data-number="10"><span class="header-section-number">10</span> get modules of genes whose perturbations are spatially correlated:</h1>
-<p>modules &lt;- buildGeneModules( x = norm, obj = obj, genes = NULL, # subset of genes to use; enter NULL to use all, or “highlyperturbed” to take just the most perturbed genes (“highlyperturbed” is our default and our recommendation for full studies; here we use NULL because our mini dataset has only 30 genes.) resolution = 0.02, # control leiden clustering corthresh = 0.3, # control the adjacency network used by leiden clustering min_module_cor = 0.25, # throw out modules with average cor below this subsetsize = 1e5, eps = 0.5, residtype = “log2ratio”) modules</p>
-</section>
-<section id="score-perturbations-of-selected-modules-across-all-cells" class="level1" data-number="11">
-<h1 data-number="11"><span class="header-section-number">11</span> score perturbations of selected modules across all cells:</h1>
-<p>moduleperturbations &lt;- getPerturbations( x = norm, obj = obj, cells = NULL, # only look at one tissue genes = modules[1:2], # arbitrarily plotting the first and second modules residtype = “log2ratio”, # look at perturbations on the scale of log fold-changes eps = 0.2) plot(xy, pch = 16, cex = 0.1, asp = 1, main = paste0(“Perturbation of module”, colnames(moduleperturbations)[1]), col = colorZeroCentered(moduleperturbations[, 1], maxquant = 0.999))</p>
-</section>
-<section id="define-spatial-domains-of-perturbations-by-clustering-perturbation-values-across-space" class="level1" data-number="12">
-<h1 data-number="12"><span class="header-section-number">12</span> define spatial domains of perturbations by clustering perturbation values across space:</h1>
-<p>set.seed(0) res &lt;- clusterPerturbations(x = norm, obj = obj, cells = NULL, genes = hpgs, # using the highly perturbed genes we defined earlier residtype = “log2ratio”, nclust = 6) plot(xy, pch = 16, cex = 0.1, col = c(“grey”, “cornflowerblue”, “darkviolet”, “orange”, “red”, “forestgreen”)[ as.numeric(as.factor(res<span class="math inline">\(clust))])
-pheatmap(res\)</span>means, breaks = seq(-3,3,length.out = 101), col = colorRampPalette(c(“darkblue”, “white”, “darkred”))(100)) ``</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get the necessary data to run analyses:</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (a few minutes)</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> InSituDiff<span class="sc">::</span><span class="fu">initializeISD</span>(</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">mat =</span> norm, <span class="co"># matrix of normalized expression</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">xy =</span> xy, <span class="co"># matrix of xy coordinates</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">tissue =</span> metadata<span class="sc">$</span>tissue, <span class="co"># vector of cells' tissue IDs</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">iscontrol =</span> <span class="fu">grepl</span>(<span class="st">"control"</span>, metadata<span class="sc">$</span>tissue), </span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">k =</span> <span class="dv">50</span>) <span class="co"># define cellular neighborhoods as a cell's 50 nearest neighbors</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(obj)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co"># score perturbations of selected genes over all cells:</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>selectedperturbations <span class="ot">&lt;-</span> InSituDiff<span class="sc">::</span><span class="fu">getPerturbations</span>(</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> norm, </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">obj =</span> obj, </span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">cells =</span> <span class="fu">rownames</span>(counts)[metadata<span class="sc">$</span>tissue <span class="sc">==</span> <span class="st">"tissue1"</span>], <span class="co"># only look at one tissue</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">genes =</span> <span class="fu">c</span>(<span class="st">"IGHA1"</span>, <span class="st">"FGFR3"</span>, <span class="st">"HIF1A"</span>, <span class="st">"ACE2"</span>, <span class="st">"SAT1"</span>),  <span class="co"># only look at a few genes of interest</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">residtype =</span> <span class="st">"log2ratio"</span>,  <span class="co"># look at perturbations on the scale of log fold-changes</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">eps =</span> <span class="dv">1</span>)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co"># score overall perturbation per gene:</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>genescores <span class="ot">&lt;-</span> InSituDiff<span class="sc">::</span><span class="fu">summarizeGenePerturbation</span>(</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> norm, <span class="at">obj =</span> obj, </span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">residtype =</span> <span class="st">"log2ratio"</span>, <span class="at">plotresults =</span> <span class="cn">TRUE</span>, <span class="at">eps =</span> <span class="fl">0.1</span>, <span class="at">subsetsize =</span> <span class="fl">1e5</span>) </span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="co"># identify highly perturbed genes:</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(genescores[,<span class="dv">1</span>], <span class="at">breaks =</span> <span class="dv">10</span>)</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>thresh <span class="ot">=</span> <span class="dv">3</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> thresh, <span class="at">col =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>hpgs <span class="ot">&lt;-</span> <span class="fu">rownames</span>(genescores)[genescores[, <span class="st">"broadness"</span>] <span class="sc">&gt;</span> thresh]</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">"Highly perturbed genes: "</span>, <span class="fu">paste0</span>(hpgs, <span class="at">collapse =</span> <span class="st">", "</span>)))</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="co"># get modules of genes whose perturbations are spatially correlated:</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>modules <span class="ot">&lt;-</span> InSituDiff<span class="sc">::</span><span class="fu">buildGeneModules</span>(</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> norm, <span class="at">obj =</span> obj, </span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">genes =</span> <span class="cn">NULL</span>,  <span class="co"># subset of genes to use; enter NULL to use all, or "highlyperturbed" to take just the most perturbed genes ("highlyperturbed" is our default and our recommendation for full studies; here we use NULL because our mini dataset has only 30 genes.)</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">resolution =</span> <span class="fl">0.02</span>, <span class="co"># control leiden clustering</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>  <span class="at">corthresh =</span> <span class="fl">0.3</span>, <span class="co"># control the adjacency network used by leiden clustering</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">min_module_cor =</span> <span class="fl">0.25</span>, <span class="co"># throw out modules with average cor below this</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>  <span class="at">subsetsize =</span> <span class="fl">1e5</span>, </span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>  <span class="at">eps =</span> <span class="fl">0.5</span>, </span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>  <span class="at">residtype =</span> <span class="st">"log2ratio"</span>) </span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>modules</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="co"># score perturbations of selected modules across all cells:</span></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>moduleperturbations <span class="ot">&lt;-</span> InSituDiff<span class="sc">::</span><span class="fu">getPerturbations</span>(</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> norm, </span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>  <span class="at">obj =</span> obj, </span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>  <span class="at">cells =</span> <span class="cn">NULL</span>, <span class="co"># only look at one tissue</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>  <span class="at">genes =</span> modules[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>], <span class="co"># arbitrarily plotting the first and second modules</span></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>  <span class="at">residtype =</span> <span class="st">"log2ratio"</span>,  <span class="co"># look at perturbations on the scale of log fold-changes</span></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>  <span class="at">eps =</span> <span class="fl">0.2</span>)</span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.1</span>, <span class="at">asp =</span> <span class="dv">1</span>, </span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="fu">paste0</span>(<span class="st">"Perturbation of module "</span>, <span class="fu">colnames</span>(moduleperturbations)[<span class="dv">1</span>]),</span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">colorZeroCentered</span>(moduleperturbations[, <span class="dv">1</span>], <span class="at">maxquant =</span> <span class="fl">0.999</span>))</span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a><span class="co"># define spatial domains of perturbations by clustering perturbation values across space:</span></span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">0</span>)</span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> InSituDiff<span class="sc">::</span><span class="fu">clusterPerturbations</span>(<span class="at">x =</span> norm, <span class="at">obj =</span> obj, </span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>                            <span class="at">cells =</span> <span class="cn">NULL</span>, </span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>                            <span class="at">genes =</span> hpgs, <span class="co"># using the highly perturbed genes we defined earlier </span></span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>                            <span class="at">residtype =</span> <span class="st">"log2ratio"</span>, </span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>                            <span class="at">nclust =</span> <span class="dv">6</span>)</span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.1</span>, </span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"grey"</span>, <span class="st">"cornflowerblue"</span>, <span class="st">"darkviolet"</span>, <span class="st">"orange"</span>, <span class="st">"red"</span>, <span class="st">"forestgreen"</span>)[</span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>       <span class="fu">as.numeric</span>(<span class="fu">as.factor</span>(res<span class="sc">$</span>clust))])  </span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a><span class="fu">pheatmap</span>(res<span class="sc">$</span>means, </span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>         <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">3</span>,<span class="dv">3</span>,<span class="at">length.out =</span> <span class="dv">101</span>), </span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"darkblue"</span>, <span class="st">"white"</span>, <span class="st">"darkred"</span>))(<span class="dv">100</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>The above produces:</p>
+<ul>
+<li>Scores for how broadly and how intensely each gene is perturbed</li>
+<li>A list of highly perturbed genes - this is very useful for beginning exploratory analyses</li>
+<li>Modules of genes whose perturbations are spatially correlated:</li>
+</ul>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="figures/isdiff_modules.png" class="img-fluid figure-img" style="width:75.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>Spatial clustering results based on perturbations, not expression. This is useful for partitioning tissues by domains of disease process rather than by tissue architecture.</li>
+</ul>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="figures/isdiff_domains.png" class="img-fluid figure-img" style="width:75.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>“Perturbation profiles” of those domains:</li>
+</ul>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="figures/hpg_domain_heatmap.png" class="img-fluid figure-img" style="width:75.0%"></p>
+</figure>
+</div>
+</div>
+</div>
 
 
 </section>

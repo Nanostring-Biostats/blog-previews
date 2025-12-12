@@ -9,7 +9,7 @@
 <meta name="author" content="Patrick Danaher">
 <meta name="dcterms.date" content="2025-12-11">
 
-<title>Basic Analysis Vignette: current best practices for QC, normalization, dimension reduction and cell typing – Blog</title>
+<title>Basic analysis vignette: QC, normalization, dimension reduction and cell typing – Blog</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -198,7 +198,7 @@ cookieconsent.run({
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Basic Analysis Vignette: current best practices for QC, normalization, dimension reduction and cell typing</h1>
+      <h1 class="title">Basic analysis vignette: QC, normalization, dimension reduction and cell typing</h1>
                                 <div class="quarto-categories">
                 <div class="quarto-category">recommended</div>
                 <div class="quarto-category">quality control</div>
@@ -238,7 +238,7 @@ cookieconsent.run({
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">December 3, 2025</p>
+        <p class="date-modified">December 12, 2025</p>
       </div>
     </div>
       
@@ -252,12 +252,7 @@ cookieconsent.run({
     <h2 id="toc-title">Contents</h2>
    
   <ul>
-  <li><a href="#new-best-practices-for-cosmx-analysis" id="toc-new-best-practices-for-cosmx-analysis" class="nav-link active" data-scroll-target="#new-best-practices-for-cosmx-analysis"><span class="header-section-number">1</span> New best practices for CosMx analysis</a>
-  <ul class="collapse">
-  <li><a href="#basic-analysis-strategy" id="toc-basic-analysis-strategy" class="nav-link" data-scroll-target="#basic-analysis-strategy"><span class="header-section-number">1.1</span> Basic analysis strategy</a></li>
-  <li><a href="#basic-analysis-strategy-large-studies" id="toc-basic-analysis-strategy-large-studies" class="nav-link" data-scroll-target="#basic-analysis-strategy-large-studies"><span class="header-section-number">1.2</span> Basic analysis strategy: large studies</a></li>
-  <li><a href="#outline" id="toc-outline" class="nav-link" data-scroll-target="#outline"><span class="header-section-number">1.3</span> Outline</a></li>
-  </ul></li>
+  <li><a href="#outline" id="toc-outline" class="nav-link active" data-scroll-target="#outline"><span class="header-section-number">1</span> Outline</a></li>
   <li><a href="#loading" id="toc-loading" class="nav-link" data-scroll-target="#loading"><span class="header-section-number">2</span> Loading flat files</a></li>
   <li><a href="#xy" id="toc-xy" class="nav-link" data-scroll-target="#xy"><span class="header-section-number">3</span> Customizing the tissues’ spatial arrangements</a></li>
   <li><a href="#qc" id="toc-qc" class="nav-link" data-scroll-target="#qc"><span class="header-section-number">4</span> QC</a>
@@ -265,7 +260,8 @@ cookieconsent.run({
   <li><a href="#per-cell-qc" id="toc-per-cell-qc" class="nav-link" data-scroll-target="#per-cell-qc"><span class="header-section-number">4.1</span> Per-cell QC:</a></li>
   <li><a href="#fov-qc" id="toc-fov-qc" class="nav-link" data-scroll-target="#fov-qc"><span class="header-section-number">4.2</span> FOV QC</a></li>
   <li><a href="#descriptive-qc-plots" id="toc-descriptive-qc-plots" class="nav-link" data-scroll-target="#descriptive-qc-plots"><span class="header-section-number">4.3</span> Descriptive QC plots</a></li>
-  <li><a href="#normalization" id="toc-normalization" class="nav-link" data-scroll-target="#normalization"><span class="header-section-number">4.4</span> Normalization</a></li>
+  <li><a href="#removing-flagged-cells" id="toc-removing-flagged-cells" class="nav-link" data-scroll-target="#removing-flagged-cells"><span class="header-section-number">4.4</span> Removing flagged cells</a></li>
+  <li><a href="#normalization" id="toc-normalization" class="nav-link" data-scroll-target="#normalization"><span class="header-section-number">4.5</span> Normalization</a></li>
   </ul></li>
   <li><a href="#dimred" id="toc-dimred" class="nav-link" data-scroll-target="#dimred"><span class="header-section-number">5</span> Dimension reduction</a></li>
   <li><a href="#clust" id="toc-clust" class="nav-link" data-scroll-target="#clust"><span class="header-section-number">6</span> Cell typing</a>
@@ -292,33 +288,8 @@ cookieconsent.run({
 
 
 
-<section id="new-best-practices-for-cosmx-analysis" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> New best practices for CosMx analysis</h1>
-<p>Here we propose an updated pipeline for basic CosMx<sup>®</sup> analysis in R, from data loading through cell typing. This post is the first in a series; coming soon will be posts on exploratory analysis, on differential expression analysis, and on pipelines for large studies. This workflow assumes a whole study can be fit into your compute environment’s memory. For very large studies, see our upcoming vignette on the topic, or the summary below.</p>
-<p>This post is exclusively in R. Many steps have easy python analogs, but some, like the hieraType immune cell typing algorithm and the FOV QC functions, only have R implementations.</p>
-<section id="basic-analysis-strategy" class="level2" data-number="1.1">
-<h2 data-number="1.1" class="anchored" data-anchor-id="basic-analysis-strategy"><span class="header-section-number">1.1</span> Basic analysis strategy</h2>
-<p>Analyses can meander and sprawl, but often enough they are reducible to 3 phases:</p>
-<ol type="1">
-<li><strong>Basic pre-processing</strong>: Prepare your data for deeper analysis: perform QC, normalize your data, perform dimension reduction, and finalize your cell typing. This vignette covers this workflow.</li>
-<li><strong>Exploratory analysis</strong>: See what unexpected trends your data holds. Ideally, these trends can be phrased as formal hypotheses to be tested. (Post coming soon.)</li>
-<li><strong>Hypothesis testing</strong>: In our experience, most analyses culminate here, mainly taking the form of differential expression (DE) testing. DE is a flexible tool to interrogate both the hypotheses you designed the study around and new hypotheses discovered in exploratory analysis. We see DE as the workhorse of spatial analyses, but there are other useful tools: e.g., you might calculate changes in cell type abundance or co-localization across space, or compute various metrics of ligand-receptor interactions. (Post coming soon.)</li>
-</ol>
-</section>
-<section id="basic-analysis-strategy-large-studies" class="level2" data-number="1.2">
-<h2 data-number="1.2" class="anchored" data-anchor-id="basic-analysis-strategy-large-studies"><span class="header-section-number">1.2</span> Basic analysis strategy: large studies</h2>
-<p>When your data is too large to fit into memory – and this can happen with just a few slides of WTX data – you need to modify the above strategy. We propose the below approach, which we will demonstrate in a separate vignette in late 2025:</p>
-<ol type="1">
-<li>Obtain a subsample of the larger study. This could be FOVs chosen at random from all the tissues in the study, or just the first couple slides to come off the instrument.</li>
-<li>Use this subsample to fix a basic pre-processing pipeline. Importantly, this pipeline has to be applicable to new samples: their data has to be projected onto the same dimension-reduced embedding, and their cell typing has to map to the cell typing of the subsample.</li>
-<li>Apply the above pre-processing pipeline separately to each tissue/slide in the study.</li>
-<li>Define an additional “hypothesis testing” pipeline, also to be applied separately to each tissue. This pipeline will compute whatever summary statistics you’re interested in, e.g.&nbsp;DE results, cell type abundance, LR interaction scores.</li>
-<li>Perform meta-analysis of every tissues’ summary statistics together. E.g. contrast DE results or cell type abundances across responders and non-responders.</li>
-<li>Custom subset analyses: you may also have to load in custom subsets of the data for analysis, e.g.&nbsp;just the macrophages from every tissue.</li>
-</ol>
-</section>
-<section id="outline" class="level2" data-number="1.3">
-<h2 data-number="1.3" class="anchored" data-anchor-id="outline"><span class="header-section-number">1.3</span> Outline</h2>
+<section id="outline" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Outline</h1>
 <p>Here we’ll walk through a full pipeline for getting your data ready to explore and analyze. We will:</p>
 <ol type="1">
 <li><a href="#loading">Load in flat files exported by AtoMx<sup>®</sup> SIP</a></li>
@@ -328,7 +299,6 @@ cookieconsent.run({
 <li><a href="#clust">Cluster our data and name the clusters we discover</a></li>
 <li><a href="#hieratype">Perform immune cell typing using the HieraType algorithm</a></li>
 </ol>
-</section>
 </section>
 <section id="loading" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> Loading flat files</h1>
@@ -340,7 +310,10 @@ cookieconsent.run({
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># necessary libraries</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table) <span class="co"># for more memory efficient data frames</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Matrix) <span class="co"># for sparse matrices like our counts matrix</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(InSituCor) <span class="co"># devtools::install_github("https://github.com/Nanostring-Biostats/InSituCor")</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(HieraType) <span class="co"># remotes::install_github("Nanostring-Biostats/CosMx-Analysis-Scratch-Space", subdir = "_code/HieraType", ref = "Main")</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Seurat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p><a href="../../posts/flat-file-exports/flat-files-compare.html" target="_blank">AtoMx flat file exports</a> come with each slide packaged in its own directory. Our example here has one slide, titled “BreastCancer”; its contents look like this:</p>
@@ -437,10 +410,8 @@ Important
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># save data in R-friendly form:</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(counts, <span class="at">file =</span> <span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/counts_unfiltered.RDS"</span>))</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(negcounts, <span class="at">file =</span> <span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/negcounts_unfiltered.RDS"</span>))</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(falsecounts, <span class="at">file =</span> <span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/falsecounts_unfiltered.RDS"</span>))</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(metadata, <span class="at">file =</span> <span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/metadata_unfiltered.RDS"</span>))</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(xy, <span class="at">file =</span> <span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/xy_unfiltered.RDS"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(metadata, <span class="at">file =</span> <span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/metadata_unfiltered.RDS"</span>))</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(xy, <span class="at">file =</span> <span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/xy_unfiltered.RDS"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Now we have data in 3 locations:</p>
@@ -655,21 +626,6 @@ Note
 </div>
 </div>
 <p>We don’t have any flagged FOVs in this study. For examples of studies with more flagged FOVs, see <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/fov-qc/" target="_blank">the FOV QC post</a> and <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis/assets/2.-QC-and-normalization.html" target="_blank">this older vignette</a>.</p>
-<p>Finally, we’ll remove flagged cells and save the filtered data for downstream analysis:</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># save data with flagged cells removed</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>counts <span class="ot">&lt;-</span> counts[<span class="sc">!</span>flag, ]</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>metadata <span class="ot">&lt;-</span> metadata[<span class="sc">!</span>flag, ]</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>xy <span class="ot">&lt;-</span> xy[<span class="sc">!</span>flag, ]</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co"># save filtered data objects, to be used in the remainder of the analysis</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(counts, <span class="at">file =</span> <span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/counts.RDS"</span>))</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(metadata, <span class="at">file =</span> <span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/metadata.RDS"</span>))</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(xy, <span class="at">file =</span> <span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/xy.RDS"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
 </section>
 <section id="descriptive-qc-plots" class="level2" data-number="4.3">
 <h2 data-number="4.3" class="anchored" data-anchor-id="descriptive-qc-plots"><span class="header-section-number">4.3</span> Descriptive QC plots</h2>
@@ -678,16 +634,16 @@ Note
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="do">## plot total counts over space:</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.1</span>, <span class="at">asp =</span> <span class="dv">1</span>, </span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">viridis_pal</span>(<span class="at">option =</span> <span class="st">"B"</span>)(<span class="dv">101</span>)[</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>       <span class="fu">round</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="fu">log2</span>(<span class="fu">pmin</span>(<span class="fu">pmax</span>(metadata<span class="sc">$</span>nCount_RNA, <span class="dv">10</span>), <span class="dv">5000</span>)) <span class="sc">-</span> <span class="fu">log2</span>(<span class="dv">10</span>)) <span class="sc">/</span> <span class="fu">log2</span>(<span class="dv">5000</span>))</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>     ])</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>legendvals <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">100</span>, <span class="dv">1000</span>, <span class="dv">5000</span>)</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"bottomright"</span>, <span class="at">pch =</span> <span class="dv">16</span>, </span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"white"</span>, <span class="fu">viridis_pal</span>(<span class="at">option =</span> <span class="st">"B"</span>)(<span class="dv">101</span>)[<span class="fu">round</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="fu">log2</span>(legendvals) <span class="sc">-</span> <span class="fu">log2</span>(<span class="dv">10</span>)) <span class="sc">/</span> <span class="fu">log2</span>(<span class="dv">5000</span>))]),</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Total counts:"</span>, legendvals))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="do">## plot total counts over space:</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.1</span>, <span class="at">asp =</span> <span class="dv">1</span>, </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">viridis_pal</span>(<span class="at">option =</span> <span class="st">"B"</span>)(<span class="dv">101</span>)[</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>       <span class="fu">round</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="fu">log2</span>(<span class="fu">pmin</span>(<span class="fu">pmax</span>(metadata<span class="sc">$</span>nCount_RNA, <span class="dv">10</span>), <span class="dv">5000</span>)) <span class="sc">-</span> <span class="fu">log2</span>(<span class="dv">10</span>)) <span class="sc">/</span> <span class="fu">log2</span>(<span class="dv">5000</span>))</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>     ])</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>legendvals <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">100</span>, <span class="dv">1000</span>, <span class="dv">5000</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"bottomright"</span>, <span class="at">pch =</span> <span class="dv">16</span>, </span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"white"</span>, <span class="fu">viridis_pal</span>(<span class="at">option =</span> <span class="st">"B"</span>)(<span class="dv">101</span>)[<span class="fu">round</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="fu">log2</span>(legendvals) <span class="sc">-</span> <span class="fu">log2</span>(<span class="dv">10</span>)) <span class="sc">/</span> <span class="fu">log2</span>(<span class="dv">5000</span>))]),</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Total counts:"</span>, legendvals))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
@@ -704,26 +660,26 @@ Note
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install insitucor:</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="cn">FALSE</span>) {</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"https://github.com/Nanostring-Biostats/InSituCor"</span>)</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="do">## plot smoothed background over space:</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># get spatial neighbors:</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>neighbors <span class="ot">&lt;-</span> InSituCor<span class="sc">:::</span><span class="fu">nearestNeighborGraph</span>(xy[, <span class="dv">1</span>], xy[, <span class="dv">2</span>], <span class="at">N =</span> <span class="dv">50</span>, <span class="at">subset =</span> metadata<span class="sc">$</span>slide_ID)  </span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate spatially-smoothed and totalcount-normalized background:</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>smoothedgbrate <span class="ot">&lt;-</span> InSituCor<span class="sc">:::</span><span class="fu">neighbor_mean</span>(<span class="at">x =</span> metadata<span class="sc">$</span>nCount_negprobes <span class="sc">/</span> metadata<span class="sc">$</span>nCount_RNA, <span class="at">neighbors =</span> neighbors)</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="co"># plot:</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy[, <span class="dv">2</span><span class="sc">:</span><span class="dv">1</span>], <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.1</span>, <span class="at">asp =</span> <span class="dv">1</span>, </span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">viridis_pal</span>(<span class="at">option =</span> <span class="st">"B"</span>)(<span class="dv">101</span>)[</span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>       <span class="fu">round</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">pmin</span>(smoothedgbrate <span class="sc">/</span> <span class="fu">quantile</span>(smoothedgbrate, <span class="fl">0.9995</span>), <span class="dv">1</span>))</span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>     ])</span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>legendvals <span class="ot">&lt;-</span> <span class="fu">signif</span>(<span class="fu">median</span>(smoothedgbrate) <span class="sc">*</span> <span class="fu">c</span>(<span class="fl">0.5</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">5</span>,<span class="dv">10</span>), <span class="dv">2</span>)</span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"bottomright"</span>, <span class="at">pch =</span> <span class="dv">16</span>, </span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"white"</span>, <span class="fu">viridis_pal</span>(<span class="at">option =</span> <span class="st">"B"</span>)(<span class="dv">101</span>)[<span class="fu">signif</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">pmin</span>(legendvals <span class="sc">/</span> <span class="fu">quantile</span>(smoothedgbrate, <span class="fl">0.9995</span>), <span class="dv">1</span>), <span class="dv">2</span>)]),</span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Spatially smoothed totalcounts-normalized background:"</span>, <span class="fu">paste0</span>(<span class="fu">c</span>(<span class="fl">0.5</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">5</span>,<span class="dv">10</span>), <span class="st">"x median"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install insitucor:</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="cn">FALSE</span>) {</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"https://github.com/Nanostring-Biostats/InSituCor"</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="do">## plot smoothed background over space:</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co"># get spatial neighbors:</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>neighbors <span class="ot">&lt;-</span> InSituCor<span class="sc">:::</span><span class="fu">nearestNeighborGraph</span>(xy[, <span class="dv">1</span>], xy[, <span class="dv">2</span>], <span class="at">N =</span> <span class="dv">50</span>, <span class="at">subset =</span> metadata<span class="sc">$</span>slide_ID)  </span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate spatially-smoothed and totalcount-normalized background:</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>smoothedgbrate <span class="ot">&lt;-</span> InSituCor<span class="sc">:::</span><span class="fu">neighbor_mean</span>(<span class="at">x =</span> metadata<span class="sc">$</span>nCount_negprobes <span class="sc">/</span> metadata<span class="sc">$</span>nCount_RNA, <span class="at">neighbors =</span> neighbors)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co"># plot:</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy[, <span class="dv">2</span><span class="sc">:</span><span class="dv">1</span>], <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.1</span>, <span class="at">asp =</span> <span class="dv">1</span>, </span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">viridis_pal</span>(<span class="at">option =</span> <span class="st">"B"</span>)(<span class="dv">101</span>)[</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>       <span class="fu">round</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">pmin</span>(smoothedgbrate <span class="sc">/</span> <span class="fu">quantile</span>(smoothedgbrate, <span class="fl">0.9995</span>), <span class="dv">1</span>))</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>     ])</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>legendvals <span class="ot">&lt;-</span> <span class="fu">signif</span>(<span class="fu">median</span>(smoothedgbrate) <span class="sc">*</span> <span class="fu">c</span>(<span class="fl">0.5</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">5</span>,<span class="dv">10</span>), <span class="dv">2</span>)</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"bottomright"</span>, <span class="at">pch =</span> <span class="dv">16</span>, </span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"white"</span>, <span class="fu">viridis_pal</span>(<span class="at">option =</span> <span class="st">"B"</span>)(<span class="dv">101</span>)[<span class="fu">signif</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">pmin</span>(legendvals <span class="sc">/</span> <span class="fu">quantile</span>(smoothedgbrate, <span class="fl">0.9995</span>), <span class="dv">1</span>), <span class="dv">2</span>)]),</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Spatially smoothed totalcounts-normalized background:"</span>, <span class="fu">paste0</span>(<span class="fu">c</span>(<span class="fl">0.5</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">5</span>,<span class="dv">10</span>), <span class="st">"x median"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
@@ -740,14 +696,14 @@ Note
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot flagged cells in space:</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy[, <span class="dv">2</span><span class="sc">:</span><span class="dv">1</span>], <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.1</span>, <span class="at">asp =</span> <span class="dv">1</span>, </span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"grey80"</span>, <span class="st">"red"</span>)[<span class="dv">1</span> <span class="sc">+</span> flag])</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>legendvals <span class="ot">&lt;-</span> <span class="fu">signif</span>(<span class="fu">median</span>(smoothedgbrate) <span class="sc">*</span> <span class="fu">c</span>(<span class="fl">0.5</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">5</span>,<span class="dv">10</span>), <span class="dv">2</span>)</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"bottomright"</span>, <span class="at">pch =</span> <span class="dv">16</span>, </span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"white"</span>, <span class="fu">viridis_pal</span>(<span class="at">option =</span> <span class="st">"B"</span>)(<span class="dv">101</span>)[<span class="fu">signif</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">pmin</span>(legendvals <span class="sc">/</span> <span class="fu">quantile</span>(smoothedgbrate, <span class="fl">0.9995</span>), <span class="dv">1</span>), <span class="dv">2</span>)]),</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Spatially smoothed totalcounts-normalized background:"</span>, <span class="fu">paste0</span>(<span class="fu">c</span>(<span class="fl">0.5</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">5</span>,<span class="dv">10</span>), <span class="st">"x median"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot flagged cells in space:</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy[, <span class="dv">2</span><span class="sc">:</span><span class="dv">1</span>], <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.1</span>, <span class="at">asp =</span> <span class="dv">1</span>, </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"grey80"</span>, <span class="st">"red"</span>)[<span class="dv">1</span> <span class="sc">+</span> flag])</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>legendvals <span class="ot">&lt;-</span> <span class="fu">signif</span>(<span class="fu">median</span>(smoothedgbrate) <span class="sc">*</span> <span class="fu">c</span>(<span class="fl">0.5</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">5</span>,<span class="dv">10</span>), <span class="dv">2</span>)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"bottomright"</span>, <span class="at">pch =</span> <span class="dv">16</span>, </span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"white"</span>, <span class="fu">viridis_pal</span>(<span class="at">option =</span> <span class="st">"B"</span>)(<span class="dv">101</span>)[<span class="fu">signif</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">pmin</span>(legendvals <span class="sc">/</span> <span class="fu">quantile</span>(smoothedgbrate, <span class="fl">0.9995</span>), <span class="dv">1</span>), <span class="dv">2</span>)]),</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Spatially smoothed totalcounts-normalized background:"</span>, <span class="fu">paste0</span>(<span class="fu">c</span>(<span class="fl">0.5</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">5</span>,<span class="dv">10</span>), <span class="st">"x median"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
@@ -761,15 +717,33 @@ Note
 </div>
 <p>We can see flagged cells clustered in ducts/vessels/gaps in the tissue. Again, no action is needed, but we should keep this in mind while we interpret results.</p>
 </section>
-<section id="normalization" class="level2" data-number="4.4">
-<h2 data-number="4.4" class="anchored" data-anchor-id="normalization"><span class="header-section-number">4.4</span> Normalization</h2>
+<section id="removing-flagged-cells" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="removing-flagged-cells"><span class="header-section-number">4.4</span> Removing flagged cells</h2>
+<p>As our final QC step, we remove flagged cells and save the filtered data for downstream analysis:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># save data with flagged cells removed</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>counts <span class="ot">&lt;-</span> counts[<span class="sc">!</span>flag, ]</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>metadata <span class="ot">&lt;-</span> metadata[<span class="sc">!</span>flag, ]</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>xy <span class="ot">&lt;-</span> xy[<span class="sc">!</span>flag, ]</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># save filtered data objects, to be used in the remainder of the analysis</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(counts, <span class="at">file =</span> <span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/counts.RDS"</span>))</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(metadata, <span class="at">file =</span> <span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/metadata.RDS"</span>))</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(xy, <span class="at">file =</span> <span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/xy.RDS"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="normalization" class="level2" data-number="4.5">
+<h2 data-number="4.5" class="anchored" data-anchor-id="normalization"><span class="header-section-number">4.5</span> Normalization</h2>
 <p>We typically normalize each cell’s expression profile to its total counts. The below code does this efficiently. In fact, given the size of the matrix and the speed of this calculation, there is no need to save a normalized data object; it’s usually cheaper to re-compute it that to store it.</p>
 <p>Note that no steps in this workflow actually use the normalized data, although the dimension reduction step performs its own normalization under the hood. Normalized data will be useful in later analyses, e.g.&nbsp;for plotting expression over space or running differential expression.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># normalize counts matrix using efficent sparse matrix calls:</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>scale_row <span class="ot">&lt;-</span> <span class="fu">mean</span>(metadata<span class="sc">$</span>nCount_RNA)<span class="sc">/</span>metadata<span class="sc">$</span>nCount_RNA</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>scale_row <span class="ot">&lt;-</span> <span class="fu">mean</span>(metadata<span class="sc">$</span>nCount_RNA) <span class="sc">/</span> metadata<span class="sc">$</span>nCount_RNA</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>norm <span class="ot">&lt;-</span> counts</span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>norm<span class="sc">@</span>x <span class="ot">&lt;-</span> norm<span class="sc">@</span>x <span class="sc">*</span> scale_row[norm<span class="sc">@</span>i <span class="sc">+</span> <span class="dv">1</span>L]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -799,7 +773,7 @@ Note
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install the sparse pearson PCA package:</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"Nanostring-Biostats/CosMx-Analysis-Scratch-Space"</span>,</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"Nanostring-Biostats/CosMx-Analysis-Scratch-Space"</span>,</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">subdir =</span> <span class="st">"_code/scPearsonPCA"</span>, <span class="at">ref =</span> <span class="st">"Main"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
@@ -1180,24 +1154,27 @@ Note
 <span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="co"># umap positions</span></span>
 <span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="fu">png</span>(<span class="st">"results/umap_by_cluster.png"</span>, <span class="at">width =</span> <span class="dv">16</span>, <span class="at">height =</span> <span class="dv">16</span>, <span class="at">units =</span> <span class="st">"in"</span>, <span class="at">res =</span> <span class="dv">400</span>)</span>
-<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>()</span>
-<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="fu">dev.off</span>()</span>
-<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a><span class="co"># xy positions:</span></span>
-<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (name <span class="cf">in</span> <span class="fu">unique</span>(clust)) {</span>
-<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">png</span>(<span class="fu">paste0</span>(<span class="st">"results/cluster xy - "</span>, <span class="fu">make.names</span>(name), <span class="st">".png"</span>), </span>
-<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">width =</span> <span class="fu">diff</span>(<span class="fu">range</span>(xy[, <span class="dv">1</span>])) <span class="sc">*</span> <span class="fl">0.5</span>, </span>
-<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">height =</span> <span class="fu">diff</span>(<span class="fu">range</span>(xy[, <span class="dv">2</span>])) <span class="sc">*</span> <span class="fl">0.5</span>,</span>
-<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">unit =</span> <span class="st">"in"</span>, <span class="at">res =</span> <span class="dv">350</span>)</span>
-<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))</span>
-<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(xy, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.1</span>, </span>
-<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> scales<span class="sc">::</span><span class="fu">alpha</span>(cellcols, <span class="fl">0.3</span>)[<span class="fu">as.numeric</span>(<span class="fu">as.factor</span>(clust))], </span>
-<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">ylab =</span> <span class="st">""</span>, <span class="at">xaxt =</span> <span class="st">"n"</span>, <span class="at">yaxt =</span> <span class="st">"n"</span>)</span>
-<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">points</span>(xy[clust <span class="sc">==</span> name, ], <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.1</span>, </span>
-<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">col =</span> <span class="st">"black"</span>)</span>
-<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">legend</span>(<span class="st">"top"</span>, <span class="at">legend =</span> name, <span class="at">bty =</span> <span class="st">"n"</span>)</span>
-<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dev.off</span>()</span>
-<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(umapobj<span class="sc">$</span>ump<span class="sc">@</span>cell.embeddings, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">asp =</span> <span class="dv">1</span>, <span class="at">cex =</span> <span class="fl">0.1</span>, </span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> scales<span class="sc">::</span><span class="fu">alpha</span>(cellcols[<span class="fu">as.numeric</span>(<span class="fu">as.factor</span>(clust))], <span class="fl">0.05</span>))</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topleft"</span>, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">legend =</span> <span class="fu">levels</span>(<span class="fu">as.factor</span>(clust)), <span class="at">col =</span> cellcols[<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(<span class="fu">levels</span>(<span class="fu">as.factor</span>(clust)))])</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a><span class="fu">dev.off</span>()</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a><span class="co"># xy positions:</span></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (name <span class="cf">in</span> <span class="fu">unique</span>(clust)) {</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">png</span>(<span class="fu">paste0</span>(<span class="st">"results/cluster xy - "</span>, <span class="fu">make.names</span>(name), <span class="st">".png"</span>), </span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">width =</span> <span class="fu">diff</span>(<span class="fu">range</span>(xy[, <span class="dv">1</span>])) <span class="sc">*</span> <span class="fl">0.5</span>, </span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">height =</span> <span class="fu">diff</span>(<span class="fu">range</span>(xy[, <span class="dv">2</span>])) <span class="sc">*</span> <span class="fl">0.5</span>,</span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">unit =</span> <span class="st">"in"</span>, <span class="at">res =</span> <span class="dv">350</span>)</span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))</span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(xy, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.1</span>, </span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> scales<span class="sc">::</span><span class="fu">alpha</span>(cellcols, <span class="fl">0.3</span>)[<span class="fu">as.numeric</span>(<span class="fu">as.factor</span>(clust))], </span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">ylab =</span> <span class="st">""</span>, <span class="at">xaxt =</span> <span class="st">"n"</span>, <span class="at">yaxt =</span> <span class="st">"n"</span>)</span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">points</span>(xy[clust <span class="sc">==</span> name, ], <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.1</span>, </span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>         <span class="at">col =</span> <span class="st">"black"</span>)</span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">legend</span>(<span class="st">"top"</span>, <span class="at">legend =</span> name, <span class="at">bty =</span> <span class="st">"n"</span>)</span>
+<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dev.off</span>()</span>
+<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>We obtain:</p>
@@ -1303,7 +1280,8 @@ Note
 <span id="cb30-42"><a href="#cb30-42" aria-hidden="true" tabindex="-1"></a>htclust <span class="ot">&lt;-</span> hieratyperes<span class="sc">$</span>post_probs<span class="sc">$</span>l1<span class="sc">$</span>celltype_granular</span>
 <span id="cb30-43"><a href="#cb30-43" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(htclust) <span class="ot">&lt;-</span> hieratyperes<span class="sc">$</span>post_probs<span class="sc">$</span>l1<span class="sc">$</span>cell_ID</span>
 <span id="cb30-44"><a href="#cb30-44" aria-hidden="true" tabindex="-1"></a>htclust[tcell_typing<span class="sc">$</span>post_probs<span class="sc">$</span>tmajor<span class="sc">$</span>cell_ID] <span class="ot">&lt;-</span> tcell_typing<span class="sc">$</span>post_probs<span class="sc">$</span>tmajor<span class="sc">$</span>celltype_granular</span>
-<span id="cb30-45"><a href="#cb30-45" aria-hidden="true" tabindex="-1"></a>htclust <span class="ot">&lt;-</span> htclust[<span class="fu">match</span>(metadata<span class="sc">$</span>cell_id, <span class="fu">names</span>(htclust))]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb30-45"><a href="#cb30-45" aria-hidden="true" tabindex="-1"></a>htclust <span class="ot">&lt;-</span> htclust[<span class="fu">match</span>(metadata<span class="sc">$</span>cell_id, <span class="fu">names</span>(htclust))]</span>
+<span id="cb30-46"><a href="#cb30-46" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>hieratype_call <span class="ot">&lt;-</span> htclust</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Now we’ll use a simple marker heatmap to confirm HieraType worked as hoped:</p>
@@ -1363,63 +1341,77 @@ Note
 </div>
 <section id="merging-clustering-and-hieratype-results" class="level3" data-number="8.0.1">
 <h3 data-number="8.0.1" class="anchored" data-anchor-id="merging-clustering-and-hieratype-results"><span class="header-section-number">8.0.1</span> Merging clustering and HieraType results</h3>
-<p>To finish our cell typing exercise, we now merge the Louvain and HieraType results. All cells called immune by HieraType will get HieraType labels. All other cells will retain their old labels, with one important exception: any cells in an immune Louvain cluster but not called immune by HieraType will be reclassified as “unknown”:</p>
+<p>To finish our cell typing exercise, we now merge the Louvain and HieraType results. All cells called immune by HieraType will get HieraType labels. All other cells will retain their old labels, with one important exception: clusters that were overwhelmingly called immune by HieraType will be removed, and their cells will be assigned to whatever consensus cell type is most abundant in its nearest neighbors in expression space.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># combine hieratype and clustering:</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>immune.ids <span class="ot">&lt;-</span> hieratyperes<span class="sc">$</span>post_probs<span class="sc">$</span>l1<span class="sc">$</span>cell_ID[</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">!</span><span class="fu">is.element</span>(hieratyperes<span class="sc">$</span>post_probs<span class="sc">$</span>l1<span class="sc">$</span>celltype_thresh, <span class="fu">c</span>(<span class="st">"epithelial"</span>, <span class="st">"fibroblast"</span>, <span class="st">"endothelial"</span>, <span class="st">"smooth_muscle"</span>))]</span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>celltype <span class="ot">&lt;-</span> clust</span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(celltype) <span class="ot">&lt;-</span> metadata<span class="sc">$</span>cell_id</span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>celltype[immune.ids] <span class="ot">&lt;-</span> htclust[immune.ids]</span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a><span class="co"># which clusters to reassign: &gt;90% taken by hieratype, and &lt; 5% of total cells left.</span></span>
-<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>propoverwritten <span class="ot">&lt;-</span> <span class="fu">by</span>(clust <span class="sc">!=</span> celltype, clust, mean)</span>
-<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>proppercluster <span class="ot">&lt;-</span> <span class="fu">table</span>(celltype) <span class="sc">/</span> <span class="fu">length</span>(celltype)</span>
-<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>clusterstodrop <span class="ot">&lt;-</span> <span class="fu">union</span>(</span>
-<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">intersect</span>(</span>
-<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">names</span>(<span class="fu">which</span>(propoverwritten <span class="sc">&gt;</span> <span class="fl">0.9</span>)),</span>
-<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">names</span>(<span class="fu">which</span>(proppercluster <span class="sc">&lt;</span> <span class="fl">0.05</span>))),</span>
-<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">intersect</span>(</span>
-<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">names</span>(<span class="fu">which</span>(propoverwritten <span class="sc">&gt;</span> <span class="fl">0.5</span>)),</span>
-<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">names</span>(<span class="fu">which</span>(proppercluster <span class="sc">&lt;</span> <span class="fl">0.01</span>)))</span>
-<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a><span class="co"># find nearest neighbors (in valid clusters) for cells in target clusters:</span></span>
-<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a>cellstoreclassify <span class="ot">&lt;-</span> <span class="fu">names</span>(celltype)[<span class="fu">is.element</span>(celltype, clusterstodrop)]</span>
-<span id="cb33-23"><a href="#cb33-23" aria-hidden="true" tabindex="-1"></a>neighborclusts <span class="ot">&lt;-</span> InSituCor<span class="sc">:::</span><span class="fu">neighbor_tabulate</span>(celltype, <span class="at">neighbors =</span> umapobj<span class="sc">$</span>grph)</span>
-<span id="cb33-24"><a href="#cb33-24" aria-hidden="true" tabindex="-1"></a>neighborclusts <span class="ot">&lt;-</span> neighborclusts[, <span class="sc">!</span><span class="fu">is.element</span>(<span class="fu">colnames</span>(neighborclusts), clusterstodrop)]</span>
-<span id="cb33-25"><a href="#cb33-25" aria-hidden="true" tabindex="-1"></a><span class="co"># reclassify by most common nearest neighbor among valid clusters:</span></span>
-<span id="cb33-26"><a href="#cb33-26" aria-hidden="true" tabindex="-1"></a>celltype[cellstoreclassify] <span class="ot">&lt;-</span> <span class="fu">colnames</span>(neighborclusts)[<span class="fu">apply</span>(neighborclusts[cellstoreclassify, ], <span class="dv">1</span>, which.max)]</span>
-<span id="cb33-27"><a href="#cb33-27" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb33-28"><a href="#cb33-28" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(celltype)[<span class="fu">order</span>(<span class="fu">table</span>(celltype))]</span>
-<span id="cb33-29"><a href="#cb33-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-30"><a href="#cb33-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-31"><a href="#cb33-31" aria-hidden="true" tabindex="-1"></a><span class="co"># # what to do with the leftover immune cells from clustering?</span></span>
-<span id="cb33-32"><a href="#cb33-32" aria-hidden="true" tabindex="-1"></a><span class="co"># setdiff(unique(celltype), unique(htclust))</span></span>
-<span id="cb33-33"><a href="#cb33-33" aria-hidden="true" tabindex="-1"></a><span class="co"># louvain_immune_names &lt;- c("Macrophages (APOE+/C1QA+ TAMs)",</span></span>
-<span id="cb33-34"><a href="#cb33-34" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "Neutrophils (state A; S100A8/A9-max)",</span></span>
-<span id="cb33-35"><a href="#cb33-35" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "Neutrophils (state C, degranulating/secretory-high)",</span></span>
-<span id="cb33-36"><a href="#cb33-36" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "T cells (CD4-like, resting)",</span></span>
-<span id="cb33-37"><a href="#cb33-37" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "Antigen-presenting myeloid (cDC2 / moDC)",</span></span>
-<span id="cb33-38"><a href="#cb33-38" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "Neutrophils (state B)",</span></span>
-<span id="cb33-39"><a href="#cb33-39" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "Plasma cells",</span></span>
-<span id="cb33-40"><a href="#cb33-40" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "Antigen-presenting cells (B/cDC; cycling, uncertain)",</span></span>
-<span id="cb33-41"><a href="#cb33-41" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "Cytotoxic T / NK cells")</span></span>
-<span id="cb33-42"><a href="#cb33-42" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb33-43"><a href="#cb33-43" aria-hidden="true" tabindex="-1"></a><span class="co"># # check overlaps, making sure there aren't huge numbers of cells called immune by Louvain but not HieraType:</span></span>
-<span id="cb33-44"><a href="#cb33-44" aria-hidden="true" tabindex="-1"></a><span class="co"># par(mar = c(22,4,2,1))</span></span>
-<span id="cb33-45"><a href="#cb33-45" aria-hidden="true" tabindex="-1"></a><span class="co"># barplot(table(celltype), las = 2, </span></span>
-<span id="cb33-46"><a href="#cb33-46" aria-hidden="true" tabindex="-1"></a><span class="co">#         col = c("grey", "orange", "cornflowerblue")[1 + is.element(names(table(celltype)), louvain_immune_names) + 2 * is.element(names(table(celltype)), unique(htclust))])</span></span>
-<span id="cb33-47"><a href="#cb33-47" aria-hidden="true" tabindex="-1"></a><span class="co"># legend("topleft", fill = c("grey", "orange", "cornflowerblue"), legend = c("Louvain non-immune", "Louvain immune", "HieraType immune"))</span></span>
-<span id="cb33-48"><a href="#cb33-48" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb33-49"><a href="#cb33-49" aria-hidden="true" tabindex="-1"></a><span class="co"># # overwrite left-behind louvain immune clusters:</span></span>
-<span id="cb33-50"><a href="#cb33-50" aria-hidden="true" tabindex="-1"></a><span class="co"># celltype[is.element(celltype, louvain_immune_names)] &lt;- "immune_unspecified"</span></span>
-<span id="cb33-51"><a href="#cb33-51" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>celltype <span class="ot">&lt;-</span> celltype</span>
-<span id="cb33-52"><a href="#cb33-52" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(celltype, <span class="at">file =</span> <span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/celltype.RDS"</span>))</span>
-<span id="cb33-53"><a href="#cb33-53" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(metadata, <span class="at">file =</span> <span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/metadata.RDS"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="do">## merge w existing clusters:</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>merged <span class="ot">&lt;-</span> HieraType<span class="sc">::</span><span class="fu">celltype_label_integration</span>(</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">metadata =</span> metadata,</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">adjacency_mat =</span> umapobj<span class="sc">$</span>grph,</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cellid_colname =</span> <span class="st">"cell_id"</span>,</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">unsupervised_colname =</span> <span class="st">"clust"</span>,</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">supervised_colname =</span> <span class="st">"hieratype_call"</span>,</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">supervised_labels_keep =</span> <span class="fu">unique</span>(<span class="fu">c</span>(<span class="fu">names</span>(HieraType<span class="sc">::</span>markerslist_immune)</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>                                   ,<span class="fu">names</span>(HieraType<span class="sc">::</span>markerslist_tcellmajor)</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>                                   ,<span class="fu">names</span>(HieraType<span class="sc">::</span>markerslist_cd4tminor)</span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>                                   ,<span class="fu">names</span>(HieraType<span class="sc">::</span>markerslist_cd8tminor))</span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">dissolve_smallcluster_if_overwritten_prop_greaterthan =</span> <span class="fu">c</span>(<span class="fl">0.9</span>, <span class="fl">0.5</span>),</span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">and_dissolve_smallcluster_if_finalcluster_prop_lessthan =</span> <span class="fu">c</span>(<span class="fl">0.05</span>, <span class="fl">0.01</span>)</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>celltype <span class="ot">&lt;-</span> metadata<span class="sc">$</span>celltype <span class="ot">&lt;-</span> merged<span class="sc">$</span>celltype[<span class="fu">match</span>(metadata<span class="sc">$</span>cell_id, merged<span class="sc">$</span>cell_id)]</span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a><span class="co"># # combine hieratype and clustering:</span></span>
+<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a><span class="co"># immune.ids &lt;- hieratyperes$post_probs$l1$cell_ID[</span></span>
+<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a><span class="co">#   !is.element(hieratyperes$post_probs$l1$celltype_thresh, c("epithelial", "fibroblast", "endothelial", "smooth_muscle"))]</span></span>
+<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a><span class="co"># celltype &lt;- clust</span></span>
+<span id="cb33-23"><a href="#cb33-23" aria-hidden="true" tabindex="-1"></a><span class="co"># names(celltype) &lt;- metadata$cell_id</span></span>
+<span id="cb33-24"><a href="#cb33-24" aria-hidden="true" tabindex="-1"></a><span class="co"># celltype[immune.ids] &lt;- htclust[immune.ids]</span></span>
+<span id="cb33-25"><a href="#cb33-25" aria-hidden="true" tabindex="-1"></a><span class="co"># # which clusters to reassign: &gt;90% taken by hieratype, and &lt; 5% of total cells left.</span></span>
+<span id="cb33-26"><a href="#cb33-26" aria-hidden="true" tabindex="-1"></a><span class="co"># propoverwritten &lt;- by(clust != celltype, clust, mean)</span></span>
+<span id="cb33-27"><a href="#cb33-27" aria-hidden="true" tabindex="-1"></a><span class="co"># proppercluster &lt;- table(celltype) / length(celltype)</span></span>
+<span id="cb33-28"><a href="#cb33-28" aria-hidden="true" tabindex="-1"></a><span class="co"># clusterstodrop &lt;- union(</span></span>
+<span id="cb33-29"><a href="#cb33-29" aria-hidden="true" tabindex="-1"></a><span class="co">#   intersect(</span></span>
+<span id="cb33-30"><a href="#cb33-30" aria-hidden="true" tabindex="-1"></a><span class="co">#     names(which(propoverwritten &gt; 0.9)),</span></span>
+<span id="cb33-31"><a href="#cb33-31" aria-hidden="true" tabindex="-1"></a><span class="co">#     names(which(proppercluster &lt; 0.05))),</span></span>
+<span id="cb33-32"><a href="#cb33-32" aria-hidden="true" tabindex="-1"></a><span class="co">#   intersect(</span></span>
+<span id="cb33-33"><a href="#cb33-33" aria-hidden="true" tabindex="-1"></a><span class="co">#     names(which(propoverwritten &gt; 0.5)),</span></span>
+<span id="cb33-34"><a href="#cb33-34" aria-hidden="true" tabindex="-1"></a><span class="co">#     names(which(proppercluster &lt; 0.01)))</span></span>
+<span id="cb33-35"><a href="#cb33-35" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
+<span id="cb33-36"><a href="#cb33-36" aria-hidden="true" tabindex="-1"></a><span class="co"># # find nearest neighbors (in valid clusters) for cells in target clusters:</span></span>
+<span id="cb33-37"><a href="#cb33-37" aria-hidden="true" tabindex="-1"></a><span class="co"># cellstoreclassify &lt;- names(celltype)[is.element(celltype, clusterstodrop)]</span></span>
+<span id="cb33-38"><a href="#cb33-38" aria-hidden="true" tabindex="-1"></a><span class="co"># neighborclusts &lt;- InSituCor:::neighbor_tabulate(celltype, neighbors = umapobj$grph)</span></span>
+<span id="cb33-39"><a href="#cb33-39" aria-hidden="true" tabindex="-1"></a><span class="co"># neighborclusts &lt;- neighborclusts[, !is.element(colnames(neighborclusts), clusterstodrop)]</span></span>
+<span id="cb33-40"><a href="#cb33-40" aria-hidden="true" tabindex="-1"></a><span class="co"># # reclassify by most common nearest neighbor among valid clusters:</span></span>
+<span id="cb33-41"><a href="#cb33-41" aria-hidden="true" tabindex="-1"></a><span class="co"># celltype[cellstoreclassify] &lt;- colnames(neighborclusts)[apply(neighborclusts[cellstoreclassify, ], 1, which.max)]</span></span>
+<span id="cb33-42"><a href="#cb33-42" aria-hidden="true" tabindex="-1"></a><span class="co">#   </span></span>
+<span id="cb33-43"><a href="#cb33-43" aria-hidden="true" tabindex="-1"></a><span class="co"># table(celltype)[order(table(celltype))]</span></span>
+<span id="cb33-44"><a href="#cb33-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-45"><a href="#cb33-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-46"><a href="#cb33-46" aria-hidden="true" tabindex="-1"></a><span class="co"># # what to do with the leftover immune cells from clustering?</span></span>
+<span id="cb33-47"><a href="#cb33-47" aria-hidden="true" tabindex="-1"></a><span class="co"># setdiff(unique(celltype), unique(htclust))</span></span>
+<span id="cb33-48"><a href="#cb33-48" aria-hidden="true" tabindex="-1"></a><span class="co"># louvain_immune_names &lt;- c("Macrophages (APOE+/C1QA+ TAMs)",</span></span>
+<span id="cb33-49"><a href="#cb33-49" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "Neutrophils (state A; S100A8/A9-max)",</span></span>
+<span id="cb33-50"><a href="#cb33-50" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "Neutrophils (state C, degranulating/secretory-high)",</span></span>
+<span id="cb33-51"><a href="#cb33-51" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "T cells (CD4-like, resting)",</span></span>
+<span id="cb33-52"><a href="#cb33-52" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "Antigen-presenting myeloid (cDC2 / moDC)",</span></span>
+<span id="cb33-53"><a href="#cb33-53" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "Neutrophils (state B)",</span></span>
+<span id="cb33-54"><a href="#cb33-54" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "Plasma cells",</span></span>
+<span id="cb33-55"><a href="#cb33-55" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "Antigen-presenting cells (B/cDC; cycling, uncertain)",</span></span>
+<span id="cb33-56"><a href="#cb33-56" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "Cytotoxic T / NK cells")</span></span>
+<span id="cb33-57"><a href="#cb33-57" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb33-58"><a href="#cb33-58" aria-hidden="true" tabindex="-1"></a><span class="co"># # check overlaps, making sure there aren't huge numbers of cells called immune by Louvain but not HieraType:</span></span>
+<span id="cb33-59"><a href="#cb33-59" aria-hidden="true" tabindex="-1"></a><span class="co"># par(mar = c(22,4,2,1))</span></span>
+<span id="cb33-60"><a href="#cb33-60" aria-hidden="true" tabindex="-1"></a><span class="co"># barplot(table(celltype), las = 2, </span></span>
+<span id="cb33-61"><a href="#cb33-61" aria-hidden="true" tabindex="-1"></a><span class="co">#         col = c("grey", "orange", "cornflowerblue")[1 + is.element(names(table(celltype)), louvain_immune_names) + 2 * is.element(names(table(celltype)), unique(htclust))])</span></span>
+<span id="cb33-62"><a href="#cb33-62" aria-hidden="true" tabindex="-1"></a><span class="co"># legend("topleft", fill = c("grey", "orange", "cornflowerblue"), legend = c("Louvain non-immune", "Louvain immune", "HieraType immune"))</span></span>
+<span id="cb33-63"><a href="#cb33-63" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb33-64"><a href="#cb33-64" aria-hidden="true" tabindex="-1"></a><span class="co"># # overwrite left-behind louvain immune clusters:</span></span>
+<span id="cb33-65"><a href="#cb33-65" aria-hidden="true" tabindex="-1"></a><span class="co"># celltype[is.element(celltype, louvain_immune_names)] &lt;- "immune_unspecified"</span></span>
+<span id="cb33-66"><a href="#cb33-66" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(celltype, <span class="at">file =</span> <span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/celltype.RDS"</span>))</span>
+<span id="cb33-67"><a href="#cb33-67" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(metadata, <span class="at">file =</span> <span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/metadata.RDS"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">

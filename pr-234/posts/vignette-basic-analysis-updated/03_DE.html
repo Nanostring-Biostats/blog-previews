@@ -9,7 +9,7 @@
 <meta name="author" content="Patrick Danaher">
 <meta name="dcterms.date" content="2025-12-11">
 
-<title>Basic Analysis Vignette: Differential expression – Blog</title>
+<title>Basic analysis vignette: differential expression – Blog</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -198,7 +198,7 @@ cookieconsent.run({
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Basic Analysis Vignette: Differential expression</h1>
+      <h1 class="title">Basic analysis vignette: differential expression</h1>
                                 <div class="quarto-categories">
                 <div class="quarto-category">recommended</div>
                 <div class="quarto-category">differential expression</div>
@@ -236,7 +236,7 @@ cookieconsent.run({
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">December 3, 2025</p>
+        <p class="date-modified">December 12, 2025</p>
       </div>
     </div>
       
@@ -268,7 +268,7 @@ cookieconsent.run({
   </ul></li>
   <li><a href="#analyzing-de-results" id="toc-analyzing-de-results" class="nav-link" data-scroll-target="#analyzing-de-results"><span class="header-section-number">4</span> Analyzing DE results</a>
   <ul class="collapse">
-  <li><a href="#priotitizing-genes" id="toc-priotitizing-genes" class="nav-link" data-scroll-target="#priotitizing-genes"><span class="header-section-number">4.1</span> Priotitizing genes</a></li>
+  <li><a href="#prioritizing-genes" id="toc-prioritizing-genes" class="nav-link" data-scroll-target="#prioritizing-genes"><span class="header-section-number">4.1</span> Prioritizing genes</a></li>
   <li><a href="#exploring-results" id="toc-exploring-results" class="nav-link" data-scroll-target="#exploring-results"><span class="header-section-number">4.2</span> Exploring results</a></li>
   </ul></li>
   </ul>
@@ -599,7 +599,9 @@ cookieconsent.run({
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">eps =</span> <span class="fl">0.05</span>, <span class="co"># very small radius</span></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">minPts =</span> <span class="dv">5</span>  <span class="co"># throw out clusters of less than 5 cells</span></span>
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                     )<span class="sc">$</span>cluster</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>selectedcells <span class="ot">&lt;-</span> dbscancluster <span class="sc">!=</span> <span class="dv">0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>selectedcells <span class="ot">&lt;-</span> dbscancluster <span class="sc">!=</span> <span class="dv">0</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>selected <span class="ot">&lt;-</span> <span class="cn">FALSE</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>selected[tempcells][selectedcells] <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </div>
@@ -624,7 +626,7 @@ cookieconsent.run({
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># collection of cells we want to take a distance to:</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>istargetcell <span class="ot">&lt;-</span> meta_data<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">"Tcell"</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>istargetcell <span class="ot">&lt;-</span> metadata<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">"Tcell"</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># record all cells' distances to k-th nearest target cell</span></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="dv">1</span></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>dist2target <span class="ot">&lt;-</span> FNN<span class="sc">::</span><span class="fu">get.knnx</span>(</span>
@@ -641,7 +643,7 @@ cookieconsent.run({
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># collection of cells we want to take a distance to:</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>istargetcell <span class="ot">&lt;-</span> meta_data<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">"Tcell"</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>istargetcell <span class="ot">&lt;-</span> metadata<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">"Tcell"</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># count the target cells among cells' neighbors:</span></span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>neighboring.targetcells <span class="ot">&lt;-</span> InSituCor<span class="sc">:::</span><span class="fu">neighbor_sum</span>(<span class="at">x =</span> <span class="dv">1</span> <span class="sc">*</span> (istargetcell),</span>
@@ -658,12 +660,11 @@ cookieconsent.run({
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># raw counts of a gene:</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> counts[, <span class="st">"CXCL14"</span>] </span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># normalized expression of a gene:</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> counts[, <span class="st">"CXCL14"</span>] <span class="sc">/</span> meta_data<span class="sc">$</span>nCount_RNA</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> counts[, <span class="st">"CXCL14"</span>] <span class="sc">/</span> metadata<span class="sc">$</span>nCount_RNA</span>
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co"># or you could use a pathway score, or protein expression (if measured)</span></span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="do">## get average expression in each cell's neighborhood:</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>neighbormean <span class="ot">&lt;-</span> InSituCor<span class="sc">:::</span><span class="fu">neighbor_sum</span>(<span class="at">x =</span> x,</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">neighbors =</span> neighbors)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>neighbormean <span class="ot">&lt;-</span> InSituCor<span class="sc">:::</span><span class="fu">neighbor_sum</span>(<span class="at">x =</span> x, <span class="at">neighbors =</span> neighbors)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </div>
@@ -682,9 +683,9 @@ cookieconsent.run({
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># inverse:</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> x</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">pmax</span>(x, <span class="fu">min</span>(x[x <span class="sc">&gt;</span> <span class="dv">0</span>]))</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># log2-transform:</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">log2</span>(x)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">log2</span>(x <span class="sc">+</span> <span class="fl">1e-3</span>)</span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"># scale from 0-1:</span></span>
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> (x <span class="sc">-</span> <span class="fu">min</span>(x)) <span class="sc">/</span> (<span class="fu">max</span>(x) <span class="sc">-</span> <span class="fu">min</span>(x))</span>
 <span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co"># scale to have unit SD:</span></span>
@@ -709,7 +710,7 @@ cookieconsent.run({
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">cut</span>(x, <span class="at">breaks =</span> <span class="dv">20</span>)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># break a variable into bins of equal cell numbers:</span></span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>quants <span class="ot">&lt;-</span> <span class="fu">quantile</span>(x, <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">length.out =</span> <span class="dv">21</span>))</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">cut</span>(x, <span class="at">breaks =</span> quants)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">cut</span>(x, <span class="at">breaks =</span> <span class="fu">unique</span>(quants))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>After the above, <code>x</code> is now a factor with 20 levels.</p>
@@ -799,7 +800,7 @@ cookieconsent.run({
 <span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="co"># extract the genes to analyze for your cell type (in this example, "macrophage"):</span></span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>genes_to_analyze <span class="ot">&lt;-</span> overlap_metrics[celltype<span class="sc">==</span><span class="st">"macrophage"</span>][ratio <span class="sc">&lt;</span> <span class="dv">1</span>][[<span class="st">"target"</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>genes_to_analyze <span class="ot">&lt;-</span> overlapres[celltype<span class="sc">==</span><span class="st">"macrophage"</span>][ratio <span class="sc">&lt;</span> <span class="dv">1</span>][[<span class="st">"target"</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p><strong>Second, we record cells’ spatial neighbors</strong>, which smiDE uses to adjust for any lingering bias from segmentation errors:</p>
@@ -811,15 +812,16 @@ cookieconsent.run({
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  pre_de_obj <span class="ot">&lt;-</span> </span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pre_de</span>(<span class="at">metadata =</span> <span class="fu">cbind</span>(xy, metadata),</span>
 <span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">cell_type_metadata_colname =</span> <span class="st">"celltype"</span>,</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">split_neighbors_by_colname =</span> <span class="st">"tissue"</span>,</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">mm_radius =</span> <span class="fl">0.05</span>,</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">sdimx_colname =</span> <span class="fu">colnames</span>(xy)[<span class="dv">1</span>],</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">sdimy_colname =</span> <span class="fu">colnames</span>(xy)[<span class="dv">2</span>],</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">verbose=</span><span class="cn">TRUE</span>)</span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">saveRDS</span>(pre_de_obj, <span class="at">file =</span> <span class="st">"processed_data/pre_de_obj.RDS"</span>)</span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  pre_de_obj <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"processed_data/pre_de_obj.RDS"</span>)</span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">cellid_colname =</span> <span class="st">"cell_id"</span>,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">split_neighbors_by_colname =</span> <span class="st">"tissue"</span>,</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">mm_radius =</span> <span class="fl">0.05</span>,</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">sdimx_colname =</span> <span class="fu">colnames</span>(xy)[<span class="dv">1</span>],</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">sdimy_colname =</span> <span class="fu">colnames</span>(xy)[<span class="dv">2</span>],</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">verbose=</span><span class="cn">TRUE</span>)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">saveRDS</span>(pre_de_obj, <span class="at">file =</span> <span class="st">"processed_data/pre_de_obj.RDS"</span>)</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  pre_de_obj <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"processed_data/pre_de_obj.RDS"</span>)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
@@ -881,24 +883,26 @@ cookieconsent.run({
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="do">## define the problem:</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># which cells to analyze: (a logical vector over all cells)</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>inds <span class="ot">&lt;-</span> clust <span class="sc">==</span> <span class="st">"macrophage"</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="do">## run smiDE with a Negative Binomial model and no spatial correlation modeling:</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>de_obj <span class="ot">&lt;-</span> </span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>   <span class="fu">smi_de</span>(<span class="at">assay_matrix =</span> Matrix<span class="sc">::</span><span class="fu">t</span>(counts[inds, ]),</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>          <span class="at">metadata =</span> metadata[inds, ],</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>          <span class="at">formula =</span> <span class="sc">~</span><span class="fu">RankNorm</span>(otherct_expr) <span class="sc">+</span> <span class="fu">offset</span>(<span class="fu">log</span>(totalcounts)) <span class="sc">+</span> distance_to_tumor,   <span class="co"># &lt;----- first two terms adjust for segmentation errors and per-cell signal strength, final term is the variable to be analyzed, must be a column in metadata</span></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>          <span class="at">pre_de_obj =</span> pre_de_obj,  <span class="co"># depends on pre_de_obj calculated earlier</span></span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_cell_type_metadata_colname =</span> <span class="st">"cell_type"</span>,</span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_overlap_weight_colname =</span> <span class="cn">NULL</span>,</span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_overlap_agg =</span><span class="st">"sum"</span>,</span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_totalcount_normalize =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_totalcount_scalefactor =</span> totalcount_scalefactors,</span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>          <span class="at">family=</span><span class="st">"nbinom2"</span>,</span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>          <span class="at">targets=</span>genes_to_analyze     <span class="co"># calculated in earlier code block</span></span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>   ) </span>
-<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">results</span>(de_obj)</span>
-<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(res) <span class="co"># use res$pairwise for most cases. res$one.vs.rest can also be useful. </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>inds <span class="ot">&lt;-</span> metadata<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">"macrophage"</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>totalcounts <span class="ot">&lt;-</span> metadata<span class="sc">$</span>nCount_RNA</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(totalcounts) <span class="ot">&lt;-</span> metadata<span class="sc">$</span>cell_id</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="do">## run smiDE with a Negative Binomial model and no spatial correlation modeling:</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>de_obj <span class="ot">&lt;-</span> </span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>   <span class="fu">smi_de</span>(<span class="at">assay_matrix =</span> Matrix<span class="sc">::</span><span class="fu">t</span>(counts),</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>          <span class="at">metadata =</span> metadata[inds, ],</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>          <span class="at">formula =</span> <span class="sc">~</span><span class="fu">RankNorm</span>(otherct_expr) <span class="sc">+</span> <span class="fu">offset</span>(<span class="fu">log</span>(nCount_RNA)) <span class="sc">+</span> distance_to_tumor,   <span class="co"># &lt;----- first two terms adjust for segmentation errors and per-cell signal strength, final term is the variable to be analyzed, must be a column in metadata</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>          <span class="at">pre_de_obj =</span> pre_de_obj,  <span class="co"># depends on pre_de_obj calculated earlier</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>          <span class="at">cellid_colname =</span> <span class="st">"cell_id"</span>,</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_cell_type_metadata_colname =</span> <span class="st">"celltype"</span>,</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_overlap_weight_colname =</span> <span class="cn">NULL</span>,</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_overlap_agg =</span><span class="st">"sum"</span>,</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_totalcount_normalize =</span> <span class="cn">FALSE</span>,    <span class="co">#&lt;--------- @Dan: correct, since I have that offset term above?</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_totalcount_scalefactor =</span> <span class="cn">NULL</span>,</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>          <span class="at">family=</span><span class="st">"nbinom2"</span>,</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>          <span class="at">targets=</span>genes_to_analyze     <span class="co"># calculated in earlier code block</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>   ) </span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> smiDE<span class="sc">::</span><span class="fu">results</span>(de_obj)  <span class="co"># use res$pairwise for most cases. res$one.vs.rest can also be useful. </span></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(res) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </div>
@@ -908,31 +912,37 @@ cookieconsent.run({
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="do">## define the problem:</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co"># which cells to analyze: (a logical vector over all cells)</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>inds <span class="ot">&lt;-</span> clust <span class="sc">==</span> <span class="st">"macrophage"</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>inds <span class="ot">&lt;-</span> metadata<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">"macrophage"</span></span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>sdimx <span class="ot">&lt;-</span> xy[, <span class="dv">1</span>]</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>sdim2 <span class="ot">&lt;-</span> xy[, <span class="dv">2</span>]</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="do">## run smiDE with a Negative Binomial model and no spatial correlation modeling:</span></span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>de_obj <span class="ot">&lt;-</span> </span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>   <span class="fu">smi_de</span>(<span class="at">assay_matrix =</span> Matrix<span class="sc">::</span><span class="fu">t</span>(counts[inds, ]),</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>          <span class="at">metadata =</span> metadata[inds, ],</span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>          <span class="at">formula =</span> <span class="sc">~</span><span class="fu">RankNorm</span>(otherct_expr) <span class="sc">+</span> <span class="fu">offset</span>(<span class="fu">log</span>(totalcounts)) <span class="sc">+</span> distance_to_tumor,   <span class="co"># &lt;----- first two terms adjust for segmentation errors and per-cell signal strength, final term is the variable to be analyzed, must be a column in metadata</span></span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>          <span class="at">pre_de_obj =</span> pre_de_obj,  <span class="co"># depends on pre_de_obj calculated earlier</span></span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_cell_type_metadata_colname =</span> <span class="st">"cell_type"</span>,</span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_overlap_weight_colname =</span> <span class="cn">NULL</span>,</span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_overlap_agg =</span><span class="st">"sum"</span>,</span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_totalcount_normalize =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_totalcount_scalefactor =</span> totalcount_scalefactors,</span>
-<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>          <span class="at">family=</span><span class="st">"nbinom2"</span>,</span>
-<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>          <span class="at">targets=</span>genes_to_analyze,     <span class="co"># calculated in earlier code block</span></span>
-<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>          <span class="at">spatial_model =</span> <span class="fu">list</span>(<span class="at">name=</span><span class="st">"GP_INLA"</span>,</span>
-<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>                               <span class="at">x_coord_col =</span> <span class="st">"sdimx"</span>,  </span>
-<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>                               <span class="at">y_coord_col =</span> <span class="st">"sdimy"</span>,</span>
-<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>                               <span class="at">quantiles =</span> <span class="fu">c</span>(<span class="fl">0.025</span><span class="sc">/</span><span class="fu">nrow</span>(targs), <span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>, <span class="dv">1</span><span class="fl">-0.025</span><span class="sc">/</span><span class="fu">nrow</span>(targs)),</span>
-<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>                               <span class="at">num.threads=</span><span class="dv">1</span>)          </span>
-<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>   ) </span>
-<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">results</span>(de_obj)<span class="sc">$</span>pairwise   </span>
-<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(res) <span class="co"># use res$pairwise for most cases. res$one.vs.rest can also be useful. </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>sdimy <span class="ot">&lt;-</span> xy[, <span class="dv">2</span>]</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>totalcounts <span class="ot">&lt;-</span> metadata<span class="sc">$</span>nCount_RNA</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(totalcounts) <span class="ot">&lt;-</span> metadata<span class="sc">$</span>cell_id</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="co"># which genes: (this method is SLOW, so don't just test everything)</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>selected_genes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"KRT16"</span>, <span class="st">"EPCAM"</span>)</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="do">## run smiDE with a Negative Binomial model and no spatial correlation modeling:</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>de_obj <span class="ot">&lt;-</span> </span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>   <span class="fu">smi_de</span>(<span class="at">assay_matrix =</span> Matrix<span class="sc">::</span><span class="fu">t</span>(counts),</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">metadata =</span> metadata[inds, ],</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>          <span class="at">formula =</span> <span class="sc">~</span><span class="fu">RankNorm</span>(otherct_expr) <span class="sc">+</span> <span class="fu">offset</span>(<span class="fu">log</span>(nCount_RNA)) <span class="sc">+</span> distance_to_tumor,   <span class="co"># &lt;----- first two terms adjust for segmentation errors and per-cell signal strength, final term is the variable to be analyzed, must be a column in metadata</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>          <span class="at">pre_de_obj =</span> pre_de_obj,  <span class="co"># depends on pre_de_obj calculated earlier</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>          <span class="at">cellid_colname =</span> <span class="st">"cell_id"</span>,</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_cell_type_metadata_colname =</span> <span class="st">"celltype"</span>,</span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_overlap_weight_colname =</span> <span class="cn">NULL</span>,</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_overlap_agg =</span><span class="st">"sum"</span>,</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_totalcount_normalize =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_totalcount_scalefactor =</span> totalcounts,</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>          <span class="at">family=</span><span class="st">"nbinom2"</span>,</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>          <span class="at">targets=</span>selected_genes,    </span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>          <span class="at">spatial_model =</span> <span class="fu">list</span>(<span class="at">name=</span><span class="st">"GP_INLA"</span>,</span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>                               <span class="at">x_coord_col =</span> <span class="st">"sdimx"</span>,  </span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>                               <span class="at">y_coord_col =</span> <span class="st">"sdimy"</span>,</span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>                               <span class="at">quantiles =</span> <span class="fu">c</span>(<span class="fl">0.025</span><span class="sc">/</span><span class="fu">nrow</span>(targs), <span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>, <span class="dv">1</span><span class="fl">-0.025</span><span class="sc">/</span><span class="fu">nrow</span>(targs)),</span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a>                               <span class="at">num.threads=</span><span class="dv">1</span>)          </span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>   ) </span>
+<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> smiDE<span class="sc">::</span><span class="fu">results</span>(de_obj)<span class="sc">$</span>pairwise    <span class="co"># use res$pairwise for most cases. res$one.vs.rest can also be useful. </span></span>
+<span id="cb19-33"><a href="#cb19-33" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(res) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </div>
@@ -942,26 +952,27 @@ cookieconsent.run({
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="do">## define the problem:</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># which cells to analyze: (a logical vector over all cells)</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>inds <span class="ot">&lt;-</span> clust <span class="sc">==</span> <span class="st">"macrophage"</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>inds <span class="ot">&lt;-</span> metadata<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">"macrophage"</span></span>
 <span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"># variable to analyze (defined over all cells):</span></span>
 <span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> distance_to_tumor</span>
 <span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co"># normalized data:</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>normfactor <span class="ot">&lt;-</span> metadata<span class="sc">$</span>nCount_RNA <span class="sc">/</span> <span class="fu">mean</span>(metadata<span class="sc">$</span>nCount_RNA) <span class="sc">*</span> <span class="dv">1000</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>normfactor <span class="ot">&lt;-</span> <span class="fu">mean</span>(metadata<span class="sc">$</span>nCount_RNA) <span class="sc">/</span> metadata<span class="sc">$</span>nCount_RNA </span>
 <span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>norm <span class="ot">&lt;-</span> counts</span>
 <span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>norm<span class="sc">@</span>x <span class="ot">&lt;-</span> counts<span class="sc">@</span>x <span class="sc">*</span> normfactor[ counts<span class="sc">@</span>i <span class="sc">+</span> <span class="dv">1</span>L ]</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="co"># to put genes on similar scales, scale the columns of norm:</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="do">## to put genes on similar scales, scale the columns of norm:</span></span>
 <span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>genefactors <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">pmax</span>(<span class="fl">0.05</span>, Matrix<span class="sc">::</span><span class="fu">colMeans</span>(norm))  </span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>normscaled <span class="ot">&lt;-</span> norm <span class="sc">%*%</span> Matrix<span class="sc">::</span><span class="fu">Diagonal</span>(genefactors)</span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="do">## source the fast DE function:</span></span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"https://raw.githubusercontent.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/refs/heads/Main/_code/PatchDE/DEutils.R"</span>)</span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a><span class="do">## run fast DE:</span></span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>fastres <span class="ot">&lt;-</span> <span class="fu">hastyDE</span>(<span class="at">y =</span> normscaled[, genes_to_analyze], <span class="at">df =</span> <span class="fu">data.frame</span>(<span class="at">distance2tumor =</span> x))</span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a><span class="do">## extract estimates and p-values:</span></span>
-<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>ests <span class="ot">&lt;-</span> fastres<span class="sc">$</span>effect</span>
-<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>ps <span class="ot">&lt;-</span> fastres<span class="sc">$</span>p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>normscaled <span class="ot">&lt;-</span> norm <span class="sc">%*%</span> Matrix<span class="sc">::</span><span class="fu">Diagonal</span>(<span class="at">x =</span> genefactors)</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(normscaled) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(norm)</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="do">## source the fast DE function:</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"https://raw.githubusercontent.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/refs/heads/Main/_code/PatchDE/DEutils.R"</span>)</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a><span class="do">## run fast DE:</span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>fastres <span class="ot">&lt;-</span> <span class="fu">hastyDE</span>(<span class="at">y =</span> normscaled[, genes_to_analyze], <span class="at">df =</span> <span class="fu">data.frame</span>(<span class="at">distance2tumor =</span> x))</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a><span class="do">## extract estimates and p-values:</span></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>ests <span class="ot">&lt;-</span> fastres<span class="sc">$</span>effect</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>ps <span class="ot">&lt;-</span> fastres<span class="sc">$</span>p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </div>
@@ -979,62 +990,64 @@ cookieconsent.run({
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="do">## define the problem:</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co"># which cells to analyze: (a logical vector over all cells)</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>inds <span class="ot">&lt;-</span> clust <span class="sc">==</span> <span class="st">"macrophage"</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>inds <span class="ot">&lt;-</span> metadata<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">"macrophage"</span></span>
 <span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># variable to analyze (defined over all cells):</span></span>
 <span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> distance_to_tumor</span>
 <span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co"># normalized data:</span></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>normfactor <span class="ot">&lt;-</span> metadata<span class="sc">$</span>nCount_RNA <span class="sc">/</span> <span class="fu">mean</span>(metadata<span class="sc">$</span>nCount_RNA) <span class="sc">*</span> <span class="dv">1000</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>normfactor <span class="ot">&lt;-</span> <span class="fu">mean</span>(metadata<span class="sc">$</span>nCount_RNA) <span class="sc">/</span> metadata<span class="sc">$</span>nCount_RNA </span>
 <span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>norm <span class="ot">&lt;-</span> counts</span>
 <span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>norm<span class="sc">@</span>x <span class="ot">&lt;-</span> counts<span class="sc">@</span>x <span class="sc">*</span> normfactor[ counts<span class="sc">@</span>i <span class="sc">+</span> <span class="dv">1</span>L ]</span>
 <span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="co"># to put genes on similar scales, scale the columns of norm:</span></span>
 <span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>genefactors <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">pmax</span>(<span class="fl">0.05</span>, Matrix<span class="sc">::</span><span class="fu">colMeans</span>(norm))  </span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>normscaled <span class="ot">&lt;-</span> norm <span class="sc">%*%</span> Matrix<span class="sc">::</span><span class="fu">Diagonal</span>(genefactors)</span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="do">## source the fast DE function:</span></span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"https://raw.githubusercontent.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/refs/heads/Main/_code/PatchDE/DEutils.R"</span>)</span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a><span class="do">## run fast DE:</span></span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>fastres <span class="ot">&lt;-</span> <span class="fu">hastyDE</span>(<span class="at">y =</span> normscaled[, genes_to_analyze], <span class="at">df =</span> <span class="fu">data.frame</span>(<span class="at">distance2tumor =</span> x))</span>
-<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract top genes:</span></span>
-<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a><span class="co"># This example takes the top 10 genes by effect size from the top 1% of p-values.</span></span>
-<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a><span class="co"># We recommend extracting top genes with some human oversight. </span></span>
-<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>topgenes <span class="ot">&lt;-</span> <span class="fu">names</span>(fastres<span class="sc">$</span>p)[<span class="fu">order</span>(<span class="fu">abs</span>(fastres<span class="sc">$</span>effect) <span class="sc">*</span> (fastres<span class="sc">$</span>p <span class="sc">&lt;</span> <span class="fu">quantile</span>(fastres<span class="sc">$</span>p, <span class="fl">0.01</span>)), <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)]  </span>
-<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Run smiDE on the top genes with the optimal / spatial-aware call to smiDE:</span></span>
-<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a><span class="do">## define the problem:</span></span>
-<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a><span class="co"># which cells to analyze: (a logical vector over all cells)</span></span>
-<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>inds <span class="ot">&lt;-</span> clust <span class="sc">==</span> <span class="st">"macrophage"</span></span>
-<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>sdimx <span class="ot">&lt;-</span> xy[, <span class="dv">1</span>]</span>
-<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>sdim2 <span class="ot">&lt;-</span> xy[, <span class="dv">2</span>]</span>
-<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a><span class="do">## run smiDE with a Negative Binomial model and no spatial correlation modeling:</span></span>
-<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a>de_obj <span class="ot">&lt;-</span> </span>
-<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>   <span class="fu">smi_de</span>(<span class="at">assay_matrix =</span> Matrix<span class="sc">::</span><span class="fu">t</span>(counts[inds, ]),</span>
-<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a>          <span class="at">metadata =</span> metadata[inds, ],</span>
-<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a>          <span class="at">formula =</span> <span class="sc">~</span><span class="fu">RankNorm</span>(otherct_expr) <span class="sc">+</span> <span class="fu">offset</span>(<span class="fu">log</span>(totalcounts)) <span class="sc">+</span> distance_to_tumor,   <span class="co"># &lt;----- first two terms adjust for segmentation errors and per-cell signal strength, final term is the variable to be analyzed, must be a column in metadata</span></span>
-<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a>          <span class="at">pre_de_obj =</span> pre_de_obj,  <span class="co"># depends on pre_de_obj calculated earlier</span></span>
-<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_cell_type_metadata_colname =</span> <span class="st">"cell_type"</span>,</span>
-<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_overlap_weight_colname =</span> <span class="cn">NULL</span>,</span>
-<span id="cb21-40"><a href="#cb21-40" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_overlap_agg =</span><span class="st">"sum"</span>,</span>
-<span id="cb21-41"><a href="#cb21-41" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_totalcount_normalize =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb21-42"><a href="#cb21-42" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_totalcount_scalefactor =</span> totalcount_scalefactors,</span>
-<span id="cb21-43"><a href="#cb21-43" aria-hidden="true" tabindex="-1"></a>          <span class="at">family=</span><span class="st">"nbinom2"</span>,</span>
-<span id="cb21-44"><a href="#cb21-44" aria-hidden="true" tabindex="-1"></a>          <span class="at">targets=</span>topgenes,     <span class="co"># only analyze the genes of greatest interest</span></span>
-<span id="cb21-45"><a href="#cb21-45" aria-hidden="true" tabindex="-1"></a>          <span class="at">spatial_model =</span> <span class="fu">list</span>(<span class="at">name=</span><span class="st">"GP_INLA"</span>,</span>
-<span id="cb21-46"><a href="#cb21-46" aria-hidden="true" tabindex="-1"></a>                               <span class="at">x_coord_col =</span> <span class="st">"sdimx"</span>,  </span>
-<span id="cb21-47"><a href="#cb21-47" aria-hidden="true" tabindex="-1"></a>                               <span class="at">y_coord_col =</span> <span class="st">"sdimy"</span>,</span>
-<span id="cb21-48"><a href="#cb21-48" aria-hidden="true" tabindex="-1"></a>                               <span class="at">quantiles =</span> <span class="fu">c</span>(<span class="fl">0.025</span><span class="sc">/</span><span class="fu">nrow</span>(targs), <span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>, <span class="dv">1</span><span class="fl">-0.025</span><span class="sc">/</span><span class="fu">nrow</span>(targs)),</span>
-<span id="cb21-49"><a href="#cb21-49" aria-hidden="true" tabindex="-1"></a>                               <span class="at">num.threads=</span><span class="dv">1</span>)          </span>
-<span id="cb21-50"><a href="#cb21-50" aria-hidden="true" tabindex="-1"></a>   ) </span>
-<span id="cb21-51"><a href="#cb21-51" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">results</span>(de_obj)<span class="sc">$</span>pairwise   </span>
-<span id="cb21-52"><a href="#cb21-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-53"><a href="#cb21-53" aria-hidden="true" tabindex="-1"></a><span class="co"># get conservative adjusted p-values for the top genes, replacing hasty p-values with the null distribution:</span></span>
-<span id="cb21-54"><a href="#cb21-54" aria-hidden="true" tabindex="-1"></a>ps.spatial <span class="ot">&lt;-</span> res<span class="sc">$</span>pairwise<span class="sc">$</span>p.value[<span class="fu">grepl</span>(<span class="st">"distance_to_tumor"</span>, res<span class="sc">$</span>pairwise<span class="sc">$</span>contrast)]</span>
-<span id="cb21-55"><a href="#cb21-55" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(ps.spatial) <span class="ot">&lt;-</span> res<span class="sc">$</span>pairwise<span class="sc">$</span>target[<span class="fu">grepl</span>(<span class="st">"distance_to_tumor"</span>, res<span class="sc">$</span>pairwise<span class="sc">$</span>contrast)]</span>
-<span id="cb21-56"><a href="#cb21-56" aria-hidden="true" tabindex="-1"></a>ps.null <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">length.out =</span> <span class="fu">length</span>(genes_to_analyze) <span class="sc">-</span> <span class="fu">length</span>(topgenes))</span>
-<span id="cb21-57"><a href="#cb21-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-58"><a href="#cb21-58" aria-hidden="true" tabindex="-1"></a>ps.spatial.adjusted <span class="ot">&lt;-</span> <span class="fu">p.adjust</span>(<span class="fu">c</span>(ps.spatial, ps.null), <span class="at">method =</span> <span class="st">"BH"</span>)[<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(ps.spatial)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>normscaled <span class="ot">&lt;-</span> norm <span class="sc">%*%</span> Matrix<span class="sc">::</span><span class="fu">Diagonal</span>(<span class="at">x =</span> genefactors)</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(normscaled) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(norm)</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a><span class="do">## source the fast DE function:</span></span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"https://raw.githubusercontent.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/refs/heads/Main/_code/PatchDE/DEutils.R"</span>)</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a><span class="do">## run fast DE:</span></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>fastres <span class="ot">&lt;-</span> <span class="fu">hastyDE</span>(<span class="at">y =</span> normscaled[, genes_to_analyze], <span class="at">df =</span> <span class="fu">data.frame</span>(<span class="at">distance2tumor =</span> x))</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract top genes:</span></span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a><span class="co"># This example takes the top 10 genes by effect size from the top 1% of p-values.</span></span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a><span class="co"># We recommend extracting top genes with some human oversight. </span></span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>topgenes <span class="ot">&lt;-</span> <span class="fu">names</span>(fastres<span class="sc">$</span>p)[<span class="fu">order</span>(<span class="fu">abs</span>(fastres<span class="sc">$</span>effect) <span class="sc">*</span> (fastres<span class="sc">$</span>p <span class="sc">&lt;=</span> <span class="fu">quantile</span>(fastres<span class="sc">$</span>p, <span class="fl">0.01</span>)), <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)]  </span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Run smiDE on the top genes with the optimal / spatial-aware call to smiDE:</span></span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a><span class="do">## define the problem:</span></span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>sdimx <span class="ot">&lt;-</span> xy[, <span class="dv">1</span>]</span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>sdim2 <span class="ot">&lt;-</span> xy[, <span class="dv">2</span>]</span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>totalcounts <span class="ot">&lt;-</span> metadata<span class="sc">$</span>nCount_RNA</span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(totalcounts) <span class="ot">&lt;-</span> metadata<span class="sc">$</span>cell_id</span>
+<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a><span class="do">## run smiDE with a Negative Binomial model and with spatial correlation modeling:</span></span>
+<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>de_obj <span class="ot">&lt;-</span> </span>
+<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a>   <span class="fu">smi_de</span>(<span class="at">assay_matrix =</span> Matrix<span class="sc">::</span><span class="fu">t</span>(counts),</span>
+<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a>          <span class="at">metadata =</span> metadata[inds, ],</span>
+<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a>          <span class="at">formula =</span> <span class="sc">~</span><span class="fu">RankNorm</span>(otherct_expr) <span class="sc">+</span> <span class="fu">offset</span>(<span class="fu">log</span>(nCount_RNA)) <span class="sc">+</span> distance_to_tumor,   <span class="co"># &lt;----- first two terms adjust for segmentation errors and per-cell signal strength, final term is the variable to be analyzed, must be a column in metadata</span></span>
+<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a>          <span class="at">pre_de_obj =</span> pre_de_obj,  <span class="co"># depends on pre_de_obj calculated earlier</span></span>
+<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a>          <span class="at">cellid_colname =</span> <span class="st">"cell_id"</span>,</span>
+<span id="cb21-40"><a href="#cb21-40" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_cell_type_metadata_colname =</span> <span class="st">"celltype"</span>,</span>
+<span id="cb21-41"><a href="#cb21-41" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_overlap_weight_colname =</span> <span class="cn">NULL</span>,</span>
+<span id="cb21-42"><a href="#cb21-42" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_overlap_agg =</span><span class="st">"sum"</span>,</span>
+<span id="cb21-43"><a href="#cb21-43" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_totalcount_normalize =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb21-44"><a href="#cb21-44" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_totalcount_scalefactor =</span> totalcounts,</span>
+<span id="cb21-45"><a href="#cb21-45" aria-hidden="true" tabindex="-1"></a>          <span class="at">family=</span><span class="st">"nbinom2"</span>,</span>
+<span id="cb21-46"><a href="#cb21-46" aria-hidden="true" tabindex="-1"></a>          <span class="at">targets=</span>topgenes,     <span class="co"># only analyze the genes of greatest interest</span></span>
+<span id="cb21-47"><a href="#cb21-47" aria-hidden="true" tabindex="-1"></a>          <span class="at">spatial_model =</span> <span class="fu">list</span>(<span class="at">name=</span><span class="st">"GP_INLA"</span>,</span>
+<span id="cb21-48"><a href="#cb21-48" aria-hidden="true" tabindex="-1"></a>                               <span class="at">x_coord_col =</span> <span class="st">"sdimx"</span>,  </span>
+<span id="cb21-49"><a href="#cb21-49" aria-hidden="true" tabindex="-1"></a>                               <span class="at">y_coord_col =</span> <span class="st">"sdimy"</span>,</span>
+<span id="cb21-50"><a href="#cb21-50" aria-hidden="true" tabindex="-1"></a>                               <span class="at">quantiles =</span> <span class="fu">c</span>(<span class="fl">0.025</span><span class="sc">/</span><span class="fu">nrow</span>(targs), <span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>, <span class="dv">1</span><span class="fl">-0.025</span><span class="sc">/</span><span class="fu">nrow</span>(targs)),</span>
+<span id="cb21-51"><a href="#cb21-51" aria-hidden="true" tabindex="-1"></a>                               <span class="at">num.threads=</span><span class="dv">1</span>)          </span>
+<span id="cb21-52"><a href="#cb21-52" aria-hidden="true" tabindex="-1"></a>   ) </span>
+<span id="cb21-53"><a href="#cb21-53" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">results</span>(de_obj)<span class="sc">$</span>pairwise   </span>
+<span id="cb21-54"><a href="#cb21-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-55"><a href="#cb21-55" aria-hidden="true" tabindex="-1"></a><span class="co"># get conservative adjusted p-values for the top genes, replacing hasty p-values with the null distribution:</span></span>
+<span id="cb21-56"><a href="#cb21-56" aria-hidden="true" tabindex="-1"></a>ps.spatial <span class="ot">&lt;-</span> res<span class="sc">$</span>pairwise<span class="sc">$</span>p.value[<span class="fu">grepl</span>(<span class="st">"distance_to_tumor"</span>, res<span class="sc">$</span>pairwise<span class="sc">$</span>contrast)]</span>
+<span id="cb21-57"><a href="#cb21-57" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(ps.spatial) <span class="ot">&lt;-</span> res<span class="sc">$</span>pairwise<span class="sc">$</span>target[<span class="fu">grepl</span>(<span class="st">"distance_to_tumor"</span>, res<span class="sc">$</span>pairwise<span class="sc">$</span>contrast)]</span>
+<span id="cb21-58"><a href="#cb21-58" aria-hidden="true" tabindex="-1"></a>ps.null <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">length.out =</span> <span class="fu">length</span>(genes_to_analyze) <span class="sc">-</span> <span class="fu">length</span>(topgenes))</span>
+<span id="cb21-59"><a href="#cb21-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-60"><a href="#cb21-60" aria-hidden="true" tabindex="-1"></a>ps.spatial.adjusted <span class="ot">&lt;-</span> <span class="fu">p.adjust</span>(<span class="fu">c</span>(ps.spatial, ps.null), <span class="at">method =</span> <span class="st">"BH"</span>)[<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(ps.spatial)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </div>
@@ -1045,8 +1058,8 @@ cookieconsent.run({
 <section id="analyzing-de-results" class="level1" data-number="4">
 <h1 data-number="4"><span class="header-section-number">4</span> Analyzing DE results</h1>
 <p>When your models have finished, it remains to prioritize the most promising genes for reporting and further analysis, then validate and explore their results.</p>
-<section id="priotitizing-genes" class="level2" data-number="4.1">
-<h2 data-number="4.1" class="anchored" data-anchor-id="priotitizing-genes"><span class="header-section-number">4.1</span> Priotitizing genes</h2>
+<section id="prioritizing-genes" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="prioritizing-genes"><span class="header-section-number">4.1</span> Prioritizing genes</h2>
 <p>How you prioritize genes depends on your setting. There are two basic cases:</p>
 <p><strong>High power settings</strong>: when your model has high N (e.g.&nbsp;&gt;10000 cells) and no adjusting for spatial correlation, it’s common to get very tiny p-values, e.g.&nbsp;&lt; 10^-50. In these cases, apply a reasonable p-value cutoff, say the top 20% of genes, then rank genes by effect size.</p>
 <p><strong>Low power settings</strong>: when p-values aren’t infinitesimal, rank genes as you would in other DE settings, i.e.&nbsp;considering both p-value and effect size.</p>

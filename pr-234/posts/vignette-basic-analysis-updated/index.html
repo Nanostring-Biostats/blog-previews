@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Patrick Danaher">
+<meta name="dcterms.date" content="2025-12-11">
 
-<title>index – Blog</title>
+<title>Basic Analysis Vignette: current best practice workflow – Blog</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -101,7 +103,7 @@ cookieconsent.run({
 
 </head>
 
-<body class="nav-fixed fullcontent">
+<body class="floating nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
@@ -159,27 +161,109 @@ cookieconsent.run({
     </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
-<!-- sidebar -->
-<!-- margin-sidebar -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Basic Analysis Vignette: current best practice workflow</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">recommended</div>
+                <div class="quarto-category">quality control</div>
+                <div class="quarto-category">cell typing</div>
+                <div class="quarto-category">normalization</div>
+              </div>
+                  </div>
+  </div>
     
+  <div class="quarto-title-meta-author">
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-heading">Affiliations</div>
+    
+      <div class="quarto-title-meta-contents">
+      <p class="author">Patrick Danaher <a href="https://orcid.org/0000-0002-2844-5883" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+    </div>
+    <div class="quarto-title-meta-contents">
+          <p class="affiliation">
+              Bruker Spatial Biology
+            </p>
+          <p class="affiliation">
+              Github: <a href="https://github.com/patrickjdanaher" target="_blank">patrickjdanaher</a>
+            </p>
+        </div>
+    </div>
+
+  <div class="quarto-title-meta">
+
+        
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">December 11, 2025</p>
+      </div>
+    </div>
+    
+      <div>
+      <div class="quarto-title-meta-heading">Modified</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date-modified">December 12, 2025</p>
+      </div>
+    </div>
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="1">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul>
+  <li><a href="#new-best-practices-for-cosmx-analysis" id="toc-new-best-practices-for-cosmx-analysis" class="nav-link active" data-scroll-target="#new-best-practices-for-cosmx-analysis"><span class="header-section-number">1</span> New best practices for CosMx analysis</a>
+  <ul class="collapse">
+  <li><a href="#basic-analysis-strategy" id="toc-basic-analysis-strategy" class="nav-link" data-scroll-target="#basic-analysis-strategy"><span class="header-section-number">1.1</span> Basic analysis strategy</a></li>
+  <li><a href="#basic-analysis-strategy-large-studies" id="toc-basic-analysis-strategy-large-studies" class="nav-link" data-scroll-target="#basic-analysis-strategy-large-studies"><span class="header-section-number">1.2</span> Basic analysis strategy: large studies</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
 
 
 
 
-<section id="cosmx-basis-analysis-vignette-new-best-practices" class="level1 unnumbered">
-<h1 class="unnumbered">CosMx basis analysis vignette: new best practices</h1>
-<p>Here we demonstrate end-to-end analysis of a breast tumor profiled with the CosMx WTX assay, using current best practices.</p>
-<p>Our analysis is broken into 3 sections:</p>
+
+<section id="new-best-practices-for-cosmx-analysis" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> New best practices for CosMx analysis</h1>
+<p>Here we propose an updated pipeline for basic CosMx<sup>®</sup> analysis in R, from data loading through cell typing, to exploratory data analysis, to confirmatory analysis with differential expression testing. This workflow assumes a whole study can be fit into your compute environment’s memory. For very large studies, see our upcoming vignette on the topic, or the summary below.</p>
+<p>This post is exclusively in R. Many steps have easy python analogs, but some, like the hieraType immune cell typing algorithm and the FOV QC functions, only have R implementations.</p>
+<section id="basic-analysis-strategy" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="basic-analysis-strategy"><span class="header-section-number">1.1</span> Basic analysis strategy</h2>
+<p>Analyses can meander and sprawl, but often enough they are reducible to 3 phases:</p>
 <ol type="1">
-<li><strong>Basic pre-processing pipeline</strong>: here we run the preliminaries of every analysis: QC, normalization, dimension reduction, and cell typing. Once you have solidified this workflow, it can be easily applied to future samples.</li>
-<li><strong>Exploratory data analysis</strong>: once the preliminaries are done, analyses can take a great many directions. Here we demonstrate a few tools for exploring your data and discovering biology beyond what you knew to go looking for.</li>
-<li><strong>Differential expression</strong>: Here we show how to frame your biological hypotheses as differential expression problems, and demonstrate recommended DE workflows.</li>
+<li><strong>Basic pre-processing</strong>: Prepare your data for deeper analysis: perform QC, normalize your data, perform dimension reduction, and finalize your cell typing. This vignette covers this workflow.</li>
+<li><strong>Exploratory analysis</strong>: See what unexpected trends your data holds. Ideally, these trends can be phrased as formal hypotheses to be tested. (Post coming soon.)</li>
+<li><strong>Hypothesis testing</strong>: In our experience, most analyses culminate here, mainly taking the form of differential expression (DE) testing. DE is a flexible tool to interrogate both the hypotheses you designed the study around and new hypotheses discovered in exploratory analysis. We see DE as the workhorse of spatial analyses, but there are other useful tools: e.g., you might calculate changes in cell type abundance or co-localization across space, or compute various metrics of ligand-receptor interactions. (Post coming soon.)</li>
+</ol>
+</section>
+<section id="basic-analysis-strategy-large-studies" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="basic-analysis-strategy-large-studies"><span class="header-section-number">1.2</span> Basic analysis strategy: large studies</h2>
+<p>When your data is too large to fit into memory – and this can happen with just a few slides of WTX data – you need to modify the above strategy. We propose the below approach, which we will demonstrate in a separate vignette in early 2026:</p>
+<ol type="1">
+<li>Obtain a subsample of the larger study. This could be FOVs chosen at random from all the tissues in the study, or just the first couple slides to come off the instrument.</li>
+<li>Use this subsample to fix a basic pre-processing pipeline. Importantly, this pipeline has to be applicable to new samples: their data has to be projected onto the same dimension-reduced embedding, and their cell typing has to map to the cell typing of the subsample.</li>
+<li>Apply the above pre-processing pipeline separately to each tissue/slide in the study.</li>
+<li>Define an additional “hypothesis testing” pipeline, also to be applied separately to each tissue. This pipeline will compute whatever summary statistics you’re interested in, e.g.&nbsp;DE results, cell type abundance, LR interaction scores.</li>
+<li>Perform meta-analysis of every tissues’ summary statistics together. E.g. contrast DE results or cell type abundances across responders and non-responders.</li>
+<li>Custom subset analyses: you may also have to load in custom subsets of the data for analysis, e.g.&nbsp;just the macrophages from every tissue.</li>
 </ol>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
