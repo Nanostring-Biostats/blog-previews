@@ -238,7 +238,7 @@ cookieconsent.run({
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">December 12, 2025</p>
+        <p class="date-modified">December 13, 2025</p>
       </div>
     </div>
       
@@ -263,6 +263,7 @@ cookieconsent.run({
   </ul></li>
   <li><a href="#insitucor" id="toc-insitucor" class="nav-link" data-scroll-target="#insitucor"><span class="header-section-number">4</span> Finding modules of spatially correlated genes with InSituCor</a></li>
   <li><a href="#insitudiff" id="toc-insitudiff" class="nav-link" data-scroll-target="#insitudiff"><span class="header-section-number">5</span> Studying perturbations from baseline using InSituDiff</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">6</span> Conclusion</a></li>
   </ul>
 </nav>
 </nav>
@@ -349,10 +350,11 @@ cookieconsent.run({
 <li>Compare pathway scores across niches.</li>
 <li>It’s also possible to run differential expression analysis on pathway scores, but we prefer to run DE on single genes, then run gene set enrichment analysis.</li>
 </ul>
-<p><strong>Note:</strong> the above code produces a dense matrix of cell x pathway scores. For larger datasets, this will take your memory. Above we round the scores to reduce memory usage. For bigger studies, you could compute them in chunks, e.g.&nbsp;separately for each tissue, or for each cell type.</p>
+<p><strong>Note:</strong> the above code produces a dense matrix of cell x pathway scores. For larger datasets, this will tax your memory. For bigger studies, you could compute them in chunks, e.g.&nbsp;separately for each tissue, or for each cell type.</p>
 </section>
 <section id="moran" class="level1" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Looking for spatially variable genes</h1>
+<p>Many methods have been developed for this task. We use Moran’s I, a very old approach from the world of spatial statistics.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -388,11 +390,10 @@ cookieconsent.run({
 <span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>svgs <span class="ot">&lt;-</span> morans_all<span class="sc">$</span>gene[morans_all<span class="sc">$</span>I <span class="sc">&gt;</span> <span class="fl">0.05</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>Genes in the list generated above deserve closer scrutiny. Plotting them spatially one-by-one and examining the output is a good way to start.</p>
+<p>Genes in the list generated above have strong spatial correlation and therefore are more likely to hold biological interest. Plotting them spatially one-by-one and examining the output is a good way to start.</p>
 <section id="morans-by-cell-type" class="level2" data-number="3.1">
 <h2 data-number="3.1" class="anchored" data-anchor-id="morans-by-cell-type"><span class="header-section-number">3.1</span> Moran’s by cell type</h2>
-<p>Moran’s I and similar approaches have one disappointing feature: they often just highlight cell type marker genes. But we don’t need to look for spatial variability to learn that a cell type has spatial patterns; we can just look at the cell type’s spatial distribution.</p>
-<p>Perhaps more useful is to calculate Moran’s I within a cell type of interest. The top genes from such an analysis will suggest ways the cell type is changing over space.</p>
+<p>Moran’s I and similar approaches have one disappointing feature: they often just highlight cell type marker genes. We don’t need to look for spatial variability to learn that a cell type has spatial patterns; we can just look at the cell type’s spatial distribution. One way to avoid wasting time on trivial discoveries like marker genes is to calculate Moran’s I within a cell type of interest. The top genes from such an analysis will suggest ways the cell type is changing over space.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -496,7 +497,7 @@ cookieconsent.run({
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="figures/iscor_modules.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<p><img src="figures/iscor_modules.png" class="img-fluid figure-img" style="width:75.0%"></p>
 </figure>
 </div>
 </div>
@@ -538,7 +539,7 @@ cookieconsent.run({
 </div>
 </div>
 <ul>
-<li>For each module, attribution scores estimating how much each cell type is responsible for each gene in the module.</li>
+<li>And for each module, attribution scores estimating how much each cell type is responsible for each gene in the module.</li>
 </ul>
 <div class="cell">
 <div class="cell-output-display">
@@ -662,11 +663,15 @@ cookieconsent.run({
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="figures/hpg_domain_heatmap.png" class="img-fluid figure-img" style="width:75.0%"></p>
+<p><img src="figures/hpg_domain_heatmap.png" class="img-fluid figure-img" style="width:60.0%"></p>
 </figure>
 </div>
 </div>
 </div>
+</section>
+<section id="conclusion" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Conclusion</h1>
+<p>The above methods are best for hypothesis generation, not as final results in themselves. Trends discovered with these tools very often suggest a specific hypothesis which can be tested with differential expression or with a custom hypothesis test.</p>
 
 
 </section>

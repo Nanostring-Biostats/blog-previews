@@ -225,10 +225,11 @@ font-style: inherit;">"/processed_data/pathscores.RDS"</span>))</span>
 <li>Compare pathway scores across niches.</li>
 <li>It’s also possible to run differential expression analysis on pathway scores, but we prefer to run DE on single genes, then run gene set enrichment analysis.</li>
 </ul>
-<p><strong>Note:</strong> the above code produces a dense matrix of cell x pathway scores. For larger datasets, this will take your memory. Above we round the scores to reduce memory usage. For bigger studies, you could compute them in chunks, e.g.&nbsp;separately for each tissue, or for each cell type.</p>
+<p><strong>Note:</strong> the above code produces a dense matrix of cell x pathway scores. For larger datasets, this will tax your memory. For bigger studies, you could compute them in chunks, e.g.&nbsp;separately for each tissue, or for each cell type.</p>
 </section>
 <section id="moran" class="level1" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Looking for spatially variable genes</h1>
+<p>Many methods have been developed for this task. We use Moran’s I, a very old approach from the world of spatial statistics.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -446,11 +447,10 @@ background-color: null;
 font-style: inherit;">0.05</span>]</span></code></pre></div>
 </details>
 </div>
-<p>Genes in the list generated above deserve closer scrutiny. Plotting them spatially one-by-one and examining the output is a good way to start.</p>
+<p>Genes in the list generated above have strong spatial correlation and therefore are more likely to hold biological interest. Plotting them spatially one-by-one and examining the output is a good way to start.</p>
 <section id="morans-by-cell-type" class="level2" data-number="3.1">
 <h2 data-number="3.1" class="anchored" data-anchor-id="morans-by-cell-type"><span class="header-section-number">3.1</span> Moran’s by cell type</h2>
-<p>Moran’s I and similar approaches have one disappointing feature: they often just highlight cell type marker genes. But we don’t need to look for spatial variability to learn that a cell type has spatial patterns; we can just look at the cell type’s spatial distribution.</p>
-<p>Perhaps more useful is to calculate Moran’s I within a cell type of interest. The top genes from such an analysis will suggest ways the cell type is changing over space.</p>
+<p>Moran’s I and similar approaches have one disappointing feature: they often just highlight cell type marker genes. We don’t need to look for spatial variability to learn that a cell type has spatial patterns; we can just look at the cell type’s spatial distribution. One way to avoid wasting time on trivial discoveries like marker genes is to calculate Moran’s I within a cell type of interest. The top genes from such an analysis will suggest ways the cell type is changing over space.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1018,7 +1018,7 @@ font-style: inherit;">"Contribution of cell types to module genes"</span>)</span
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/figures/iscor_modules.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/figures/iscor_modules.png" class="img-fluid figure-img" style="width:75.0%"></p>
 </figure>
 </div>
 </div>
@@ -1060,7 +1060,7 @@ font-style: inherit;">"Contribution of cell types to module genes"</span>)</span
 </div>
 </div>
 <ul>
-<li>For each module, attribution scores estimating how much each cell type is responsible for each gene in the module.</li>
+<li>And for each module, attribution scores estimating how much each cell type is responsible for each gene in the module.</li>
 </ul>
 <div class="cell">
 <div class="cell-output-display">
@@ -1564,11 +1564,15 @@ font-style: inherit;">100</span>))</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/figures/hpg_domain_heatmap.png" class="img-fluid figure-img" style="width:75.0%"></p>
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/figures/hpg_domain_heatmap.png" class="img-fluid figure-img" style="width:60.0%"></p>
 </figure>
 </div>
 </div>
 </div>
+</section>
+<section id="conclusion" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Conclusion</h1>
+<p>The above methods are best for hypothesis generation, not as final results in themselves. Trends discovered with these tools very often suggest a specific hypothesis which can be tested with differential expression or with a custom hypothesis test.</p>
 
 
 </section>
@@ -1600,9 +1604,9 @@ font-style: inherit;">100</span>))</span></code></pre></div>
 <h2 data-number="1.1" class="anchored" data-anchor-id="basic-analysis-strategy"><span class="header-section-number">1.1</span> Basic analysis strategy</h2>
 <p>Analyses can meander and sprawl, but often enough they are reducible to 3 phases:</p>
 <ol type="1">
-<li><strong>Basic pre-processing</strong>: Prepare your data for deeper analysis: perform QC, normalize your data, perform dimension reduction, and finalize your cell typing. This vignette covers this workflow.</li>
-<li><strong>Exploratory analysis</strong>: See what unexpected trends your data holds. Ideally, these trends can be phrased as formal hypotheses to be tested. (Post coming soon.)</li>
-<li><strong>Hypothesis testing</strong>: In our experience, most analyses culminate here, mainly taking the form of differential expression (DE) testing. DE is a flexible tool to interrogate both the hypotheses you designed the study around and new hypotheses discovered in exploratory analysis. We see DE as the workhorse of spatial analyses, but there are other useful tools: e.g., you might calculate changes in cell type abundance or co-localization across space, or compute various metrics of ligand-receptor interactions. (Post coming soon.)</li>
+<li><strong>Basic pre-processing</strong>: Prepare your data for deeper analysis: perform QC, normalize your data, perform dimension reduction, and finalize your cell typing.</li>
+<li><strong>Exploratory analysis</strong>: See what unexpected trends your data holds. Ideally, these trends can be phrased as formal hypotheses to be tested.</li>
+<li><strong>Hypothesis testing</strong>: In our experience, most analyses culminate here, mainly taking the form of differential expression (DE) testing. DE is a flexible tool to interrogate both the hypotheses you designed the study around and new hypotheses discovered in exploratory analysis. We see DE as the workhorse of spatial analyses, but there are other useful tools: e.g., you might calculate changes in cell type abundance or co-localization across space, or compute various metrics of ligand-receptor interactions.</li>
 </ol>
 </section>
 <section id="basic-analysis-strategy-large-studies" class="level2" data-number="1.2">
@@ -1655,7 +1659,6 @@ font-style: inherit;">100</span>))</span></code></pre></div>
 <section id="loading" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> Loading flat files</h1>
 <p>First we’ll load the packages we need. Importantly, we’ll load “Matrix”, which handles <em>sparse matrices</em>. When a matrix has mainly zeroes, which is generally the case for single cell data, storing it in sparse matrix format has huge memory savings. Given the size of CosMx data, it is vital to be memory-efficient.</p>
-<p>Note: we’ll store our count matrices with cells in rows and genes in columns. Many protocols arrange their count matrix the other way around, but our approach here will be more performant for most operations.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1707,6 +1710,7 @@ In the code below, we load the counts matrices in chunks.<br>
 * First, we’ll use <code>data.table::fread</code> function which can directly read gzipped files, and determine how many rows and columns we’re working with.<br>
 * Then, we’ll read each chunk of data in, and convert it to a low-memory sparse matrix format before moving onto the next chunk.<br>
 * At the end, we’ll combine our sparse matrices to create the full data matrix.</p>
+<p>Note: we’ll store our count matrices with cells in rows and genes in columns. Many protocols arrange their count matrix the other way around, but our approach here will be more performant for most operations.</p>
 <p>To begin, tell your script where to operate:</p>
 <div class="cell">
 <details class="code-fold">
@@ -1994,9 +1998,9 @@ Note
 </section>
 <section id="xy" class="level1" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Customizing the tissues’ spatial arrangements</h1>
-<p>To show multiple slides in the same spatial plot, or just to produce spatial plots without a lot of extraneous white space, we often have to shift around tissues’ and/or FOVs’ xy positions. (We if course will preserve the relative xy positions of any cells we plan to analyze together spatially.) Only a small number of operations are required to do so; below are some tools and code chunks for facilitating these operations, some borrowed from <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/visuals-reduce-whitespace/" target="_blank">this post</a>.</p>
+<p>To show multiple slides in the same spatial plot, or just to produce spatial plots without a lot of extraneous white space, we often have to shift around tissues’ and/or FOVs’ xy positions. (We of course will preserve the relative xy positions of any cells we plan to analyze together spatially.) Below are some tools and code chunks for facilitating these operations, some borrowed from <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/visuals-reduce-whitespace/" target="_blank">this post</a>.</p>
 <p>The basic operations of customized xy layouts are as follows:</p>
-<p><strong>First</strong>, for multi-slide studies, adjust the slides’ xy positions do they don’t overlap. This function is called within our flat file reader, but you will often want to customize how slides are tiled.</p>
+<p><strong>First</strong>, for multi-slide studies, adjust the slides’ xy positions do they don’t overlap. This function is called within our flat file reader, but you can call it again to customize how slides are tiled.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2055,7 +2059,7 @@ background-color: null;
 font-style: inherit;"># desired shape of final xy locations </span></span></code></pre></div>
 </details>
 </div>
-<p><strong>Second</strong>, break your cells into spatially contiguous groups (which may be separate tissues from one slide, or merely discontinuous FOV blocks from the same tissue). This can be done manually, e.g.&nbsp;below where we select cells in a selected xy range:</p>
+<p><strong>Second</strong>, break your cells into spatially contiguous groups (which may be separate tissues from one slide, or merely discontinuous FOV blocks from the same tissue). This can be done manually, as in the below chunk where we select cells in a selected xy range:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2270,7 +2274,7 @@ font-style: inherit;"># desired shape of final xy locations </span></span></code
 <p>Our workflow will create then add to <code>flag</code>, a vector marking cells flagged for one reason or another. When we’re done, we’ll delete everything we’ve flagged. (The full original data will remain on AtoMx, so this step is not as drastic as it seems. For smaller studies it could still be reasonable to hold on to the pre-QC .RDS files.)</p>
 <section id="per-cell-qc" class="level2" data-number="4.1">
 <h2 data-number="4.1" class="anchored" data-anchor-id="per-cell-qc"><span class="header-section-number">4.1</span> Per-cell QC:</h2>
-<p>First, we’ll apply a threshold on cells’ total counts. Our defaults are fairly permissive; it would be reasonable double them in datasets where you can do so without throwing out too many cells.</p>
+<p>First, we’ll apply a threshold on cells’ total counts. Our defaults are fairly permissive; it would be reasonable to double them in datasets where you can do so without throwing out too many cells.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2330,9 +2334,9 @@ font-style: inherit;">quantile</span>(metadata<span class="sc" style="color: #5E
 background-color: null;
 font-style: inherit;">$</span>nCount_RNA, <span class="fl" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">0.05</span>)) <span class="co" style="color: #5E5E5E;
+font-style: inherit;">0.10</span>)) <span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;"># apply threshold, but don't flag &gt;5% of cells</span></span>
+font-style: inherit;"># apply threshold, but don't flag &gt;10% of cells</span></span>
 <span id="cb10-10"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">abline</span>(<span class="at" style="color: #657422;
@@ -2480,7 +2484,7 @@ font-style: inherit;">mean</span>(flag)</span></code></pre></div>
 </div>
 </div>
 </div>
-<p>Note: some tissues do have very large cells, e.g.&nbsp;purkinje cells in the brain or cardiomyocytes in the heart.</p>
+<p>Note: some tissues do have very large cells, e.g.&nbsp;purkinje cells in the brain or cardiomyocytes in the heart. You’ll want to skip the area filter in those studies.</p>
 <p>To check for segmentation errors, consider our R package <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/segmentation-error-evaluation/" target="_blank">FastReseg</a>, which uses transcript positions to flag cells with likely segmentation errors, then remove or reassign transcripts assigned to the wrong cells. We also advise examining the segmentation results in AtoMx’s tissue viewer; studies will occasionally need to be re-segmented under a different set of parameters.</p>
 </section>
 <section id="fov-qc" class="level2" data-number="4.2">
@@ -3017,13 +3021,13 @@ font-style: inherit;">"x median"</span>)))</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/figures/spatial_bgoversignal.png" class="img-fluid figure-img" width="464"></p>
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/figures/spatial_bgoversignal.png" class="img-fluid figure-img" style="width:115.0%"></p>
 </figure>
 </div>
 </div>
 </div>
 <p>FOV edge effects are also notable here, presumably downstream from suppressed signal in those locations. Of greater note is a band of higher-background FOVs towards the lower left of the tissue. No immediate action is needed, but by becoming aware of this small technical effect we’ll be armed to interpret any strange results driven by it.</p>
-<p>Finally, we just flagged cells in space:</p>
+<p>Finally, we plot flagged cells in space:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -3244,7 +3248,7 @@ font-style: inherit;">"/processed_data/xy.RDS"</span>))</span></code></pre></div
 </section>
 <section id="normalization" class="level2" data-number="4.5">
 <h2 data-number="4.5" class="anchored" data-anchor-id="normalization"><span class="header-section-number">4.5</span> Normalization</h2>
-<p>We typically normalize each cell’s expression profile to its total counts. The below code does this efficiently. In fact, given the size of the matrix and the speed of this calculation, there is no need to save a normalized data object; it’s usually cheaper to re-compute it that to store it.</p>
+<p>We typically normalize each cell’s expression profile to its total counts. The below code does this efficiently. In fact, given the size of the matrix and the speed of this calculation, there is no need to save a normalized data object; it’s cheaper to re-compute it that to store it.</p>
 <p>Note that no steps in this workflow actually use the normalized data, although the dimension reduction step performs its own normalization under the hood. Normalized data will be useful in later analyses, e.g.&nbsp;for plotting expression over space or running differential expression.</p>
 <div class="cell">
 <details class="code-fold">
@@ -3287,7 +3291,7 @@ font-style: inherit;">1</span>L]</span></code></pre></div>
 </section>
 <section id="dimred" class="level1" data-number="5">
 <h1 data-number="5"><span class="header-section-number">5</span> Dimension reduction</h1>
-<p>Here we demonstrate an important improvement in dimension reduction for large studies. The single cell analysis world has long used Pearson residuals to normalize &amp; transform their data prior to running PCA; these residuals scale count data to better balance the information available in each cell / gene. However, Pearson residuals are dense, meaning we cannot encode them with a sparse matrix, making them computationally intractable for larger datasets. To benefit from Pearson residuals without taxing our compute instances, we have developed a method of calculating the principal components of a Pearson residual matrix without ever having to store the entire matrix. We demonstrate this function below. (Scratch Space post on the subject coming soon.)</p>
+<p>Here we demonstrate an important improvement in dimension reduction for large studies. The single cell analysis world has long used Pearson residuals to normalize &amp; transform their data prior to running PCA; these residuals scale count data to better balance the information available in each cell / gene. However, Pearson residuals are dense, meaning we cannot encode them with a sparse matrix, making them computationally intractable for larger datasets. To benefit from Pearson residuals without taxing our compute instances, we have developed a method of calculating the principal components of a Pearson residual matrix without ever having to store the entire matrix. A full description is <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/pearsonpca/" target="_blank">here</a>. We demonstrate this function below.</p>
 <p>We’ll start by identifying highly variable genes. In this section we’ll take advantage of some of the functions in the Seurat ecosystem.</p>
 <div class="cell">
 <details class="code-fold">
@@ -3822,7 +3826,7 @@ font-style: inherit;">"Total counts:"</span>, legendvals))</span></code></pre></
 </section>
 <section id="clust" class="level1" data-number="6">
 <h1 data-number="6"><span class="header-section-number">6</span> Cell typing</h1>
-<p>Here we demo the most consistently-successful approach to cell typing we have found. First, we perform unsupervised clustering using a set of a few thousand highly variable genes (hvg’s). This approach is robust, and requires minimal configuration and re-running. Naming clusters used to be time-consuming, but we have found that the right prompts to a large language model (LLM), <strong>combined with rigorous oversight</strong>, minimize the burden of cluster naming. We will demonstrate two approaches to unsupervised clustering:</p>
+<p>Here we demonstrate the most consistently-successful approach to cell typing we have found. First, we perform unsupervised clustering using a set of a few thousand highly variable genes (hvg’s). This approach is robust, and requires minimal configuration and re-running. Naming clusters used to be time-consuming, but we have found that the right prompts to a large language model (LLM), <em>combined with rigorous oversight</em>, minimize the burden of cluster naming. We will demonstrate two approaches to unsupervised clustering:</p>
 <ul>
 <li>Louvain clustering, using PC’s derived from Pearson residuals of hvg’s.</li>
 <li>InSituType’s unsupervised mode, run on hvg’s.</li>
@@ -4199,7 +4203,65 @@ font-style: inherit;">&lt;-</span> clust <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> unsup<span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">$</span>clust</span></code></pre></div>
+font-style: inherit;">$</span>clust</span>
+<span id="cb24-19"></span>
+<span id="cb24-20"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Quick xy and umap plots of clusters to confirm resolution looks right:</span></span>
+<span id="cb24-21"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(umapobj<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>ump<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">@</span>cell.embeddings, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pch =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">16</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">asp =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">cex =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1</span>, </span>
+<span id="cb24-22">     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">col =</span> scales<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">alpha</span>(cellcols[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.numeric</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.factor</span>(clust))], <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span>))</span>
+<span id="cb24-23"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(xy, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pch =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">16</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">asp =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">cex =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1</span>, </span>
+<span id="cb24-24">     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">col =</span> cellcols[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.numeric</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.factor</span>(clust))])</span></code></pre></div>
 </details>
 </div>
 </div>
@@ -5320,7 +5382,7 @@ Note
 <ol type="1">
 <li>Cancer cells tend to be extremely transcriptionally active. Clusters with high total counts per cell are usually cancer.</li>
 <li>The <a href="https://github.com/Jonyyqn/scMalignantFinder" target="_blank">scMalignantFinder algorithm</a> promises to call cells as cancer vs.&nbsp;non-cancer. We have not tried it, but it seems promising.</li>
-<li>For WTX studies, it’s possible to estimate cells’ copy number variants. We have used <a href="https://github.com/Moldia/InSituCNV" target="_blank">insituCNV</a> successfully. A newer method, <a href="https://github.com/seasoncloud/Clonalscope" target="_blank">ClonalScope</a>, also looks promising.</li>
+<li>For WTX studies, it’s possible to estimate cells’ copy number variants. Cells with clear CNV’s will usually be cancer. We have used <a href="https://github.com/Moldia/InSituCNV" target="_blank">insituCNV</a> successfully. A newer method, <a href="https://github.com/seasoncloud/Clonalscope" target="_blank">ClonalScope</a>, also looks promising.</li>
 </ol>
 </div>
 </div>
@@ -5849,142 +5911,8 @@ font-style: inherit;">$</span>cell_id)]</span>
 <span id="cb33-18"></span>
 <span id="cb33-19"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;"># # combine hieratype and clustering:</span></span>
-<span id="cb33-20"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># immune.ids &lt;- hieratyperes$post_probs$l1$cell_ID[</span></span>
-<span id="cb33-21"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#   !is.element(hieratyperes$post_probs$l1$celltype_thresh, c("epithelial", "fibroblast", "endothelial", "smooth_muscle"))]</span></span>
-<span id="cb33-22"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># celltype &lt;- clust</span></span>
-<span id="cb33-23"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># names(celltype) &lt;- metadata$cell_id</span></span>
-<span id="cb33-24"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># celltype[immune.ids] &lt;- htclust[immune.ids]</span></span>
-<span id="cb33-25"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># # which clusters to reassign: &gt;90% taken by hieratype, and &lt; 5% of total cells left.</span></span>
-<span id="cb33-26"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># propoverwritten &lt;- by(clust != celltype, clust, mean)</span></span>
-<span id="cb33-27"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># proppercluster &lt;- table(celltype) / length(celltype)</span></span>
-<span id="cb33-28"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># clusterstodrop &lt;- union(</span></span>
-<span id="cb33-29"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#   intersect(</span></span>
-<span id="cb33-30"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#     names(which(propoverwritten &gt; 0.9)),</span></span>
-<span id="cb33-31"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#     names(which(proppercluster &lt; 0.05))),</span></span>
-<span id="cb33-32"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#   intersect(</span></span>
-<span id="cb33-33"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#     names(which(propoverwritten &gt; 0.5)),</span></span>
-<span id="cb33-34"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#     names(which(proppercluster &lt; 0.01)))</span></span>
-<span id="cb33-35"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># )</span></span>
-<span id="cb33-36"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># # find nearest neighbors (in valid clusters) for cells in target clusters:</span></span>
-<span id="cb33-37"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># cellstoreclassify &lt;- names(celltype)[is.element(celltype, clusterstodrop)]</span></span>
-<span id="cb33-38"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># neighborclusts &lt;- InSituCor:::neighbor_tabulate(celltype, neighbors = umapobj$grph)</span></span>
-<span id="cb33-39"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># neighborclusts &lt;- neighborclusts[, !is.element(colnames(neighborclusts), clusterstodrop)]</span></span>
-<span id="cb33-40"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># # reclassify by most common nearest neighbor among valid clusters:</span></span>
-<span id="cb33-41"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># celltype[cellstoreclassify] &lt;- colnames(neighborclusts)[apply(neighborclusts[cellstoreclassify, ], 1, which.max)]</span></span>
-<span id="cb33-42"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#   </span></span>
-<span id="cb33-43"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># table(celltype)[order(table(celltype))]</span></span>
-<span id="cb33-44"></span>
-<span id="cb33-45"></span>
-<span id="cb33-46"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># # what to do with the leftover immune cells from clustering?</span></span>
-<span id="cb33-47"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># setdiff(unique(celltype), unique(htclust))</span></span>
-<span id="cb33-48"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># louvain_immune_names &lt;- c("Macrophages (APOE+/C1QA+ TAMs)",</span></span>
-<span id="cb33-49"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#                           "Neutrophils (state A; S100A8/A9-max)",</span></span>
-<span id="cb33-50"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#                           "Neutrophils (state C, degranulating/secretory-high)",</span></span>
-<span id="cb33-51"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#                           "T cells (CD4-like, resting)",</span></span>
-<span id="cb33-52"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#                           "Antigen-presenting myeloid (cDC2 / moDC)",</span></span>
-<span id="cb33-53"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#                           "Neutrophils (state B)",</span></span>
-<span id="cb33-54"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#                           "Plasma cells",</span></span>
-<span id="cb33-55"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#                           "Antigen-presenting cells (B/cDC; cycling, uncertain)",</span></span>
-<span id="cb33-56"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#                           "Cytotoxic T / NK cells")</span></span>
-<span id="cb33-57"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># </span></span>
-<span id="cb33-58"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># # check overlaps, making sure there aren't huge numbers of cells called immune by Louvain but not HieraType:</span></span>
-<span id="cb33-59"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># par(mar = c(22,4,2,1))</span></span>
-<span id="cb33-60"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># barplot(table(celltype), las = 2, </span></span>
-<span id="cb33-61"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#         col = c("grey", "orange", "cornflowerblue")[1 + is.element(names(table(celltype)), louvain_immune_names) + 2 * is.element(names(table(celltype)), unique(htclust))])</span></span>
-<span id="cb33-62"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># legend("topleft", fill = c("grey", "orange", "cornflowerblue"), legend = c("Louvain non-immune", "Louvain immune", "HieraType immune"))</span></span>
-<span id="cb33-63"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># </span></span>
-<span id="cb33-64"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># # overwrite left-behind louvain immune clusters:</span></span>
-<span id="cb33-65"><span class="co" style="color: #5E5E5E;
-background-color: null;
 font-style: inherit;"># celltype[is.element(celltype, louvain_immune_names)] &lt;- "immune_unspecified"</span></span>
-<span id="cb33-66"><span class="fu" style="color: #4758AB;
+<span id="cb33-20"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">saveRDS</span>(celltype, <span class="at" style="color: #657422;
 background-color: null;
@@ -5993,7 +5921,7 @@ background-color: null;
 font-style: inherit;">paste0</span>(outdir, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"/processed_data/celltype.RDS"</span>))</span>
-<span id="cb33-67"><span class="fu" style="color: #4758AB;
+<span id="cb33-21"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">saveRDS</span>(metadata, <span class="at" style="color: #657422;
 background-color: null;
@@ -6004,16 +5932,6 @@ background-color: null;
 font-style: inherit;">"/processed_data/metadata.RDS"</span>))</span></code></pre></div>
 </details>
 </div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/figures/celltype_merge_barplot.png" class="img-fluid figure-img" style="width:75.0%"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Note that in the above plot, we have 3 tall bars from neutrophil clusters called by Louvain. This result would be concerning for a merge of HieraType and Louvain, implying many immune cells were getting left behind. In our case, these are the 3 clusters that the LLM misclassified; we renamed them to “cancer” for our analysis.</p>
 <p>Once our cell types are complete, we re-generate the spatial plots:</p>
 <div class="cell">
 <details class="code-fold">
@@ -6171,19 +6089,7 @@ font-style: inherit;">dev.off</span>()</span>
 </section>
 <section id="conclusion" class="level1" data-number="9">
 <h1 data-number="9"><span class="header-section-number">9</span> Conclusion</h1>
-<p>The code above provides a direct path through the basic preprocessing of CosMx data. With these results secured, you’re ready to proceed to the rewarding parts of data analysis: exploring your data and testing hypotheses. We will have posts on these subjects soon. For now, here are some reasonable next steps:</p>
-<p>Exploratory analysis:</p>
-<ul>
-<li>If your experiment has baseline / control tissues, try <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/insitudiff/" target="_blank">InSituDiff</a>.</li>
-<li>To explore genes’ spatial correlation in studies without control tissues (e.g.&nbsp;tumors), try <a href="https://github.com/Nanostring-Biostats/InSitucor" target="_blank">InSituCor</a>.</li>
-<li>Calculate pathway scores using <a href="https://github.com/aertslab/AUCell" target="_blank">AUCell</a>.</li>
-</ul>
-<p>Hypothesis testing:</p>
-<ul>
-<li>Use <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/smiDE/" target="_blank">smiDE</a> for differential expression testing.</li>
-<li>Try Ligand-Receptor analysis (many packages exist; we have no recommendation yet).</li>
-</ul>
-<p>We recommend containing those analyses in standalone scripts, each beginning by loading the data we’ve prepared here:</p>
+<p>The code above provides a direct path through the basic preprocessing of CosMx data. With these results secured, you’re ready to proceed to the rewarding parts of data analysis: exploring your data and testing hypotheses. The next pages of this vignette discuss those topics. For exploratory analysis, differential expression, or any other further analysis, we recommend containing distinct analyses in standalone scripts, each beginning by loading the data we’ve prepared here:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -6301,7 +6207,12 @@ font-style: inherit;">$</span>slide_ID)  </span></code></pre></div>
 <section id="introduction" class="level1" data-number="1">
 <h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
 <p>Whether you crafted your study with specific hypotheses in mind or discovered interesting trends while exploring your data, most CosMx<sup>®</sup> analyses will culminate in differential expression (DE) analyses. DE is a remarkably versatile tool for posing biological questions about how cells’ behavior changes in response to exposures like spatial context or patient-level attributes. Here we provide a convenient framework for posing your biological questions as DE tests.</p>
-<p>Code is organized into the following sections: 1. A collection of code chunks that can be edited and recombined to produce exactly the DE question you want. 2. A collection of code chunks for run DE under different conditions 3. Recommended code for exploring DE results</p>
+<p>Code is organized into the following sections:</p>
+<ol type="1">
+<li>A collection of code chunks that can be edited and recombined to produce exactly the DE question you want.</li>
+<li>A collection of code chunks for run DE under different conditions</li>
+<li>Recommended code for exploring DE results</li>
+</ol>
 <p>This document exists to facilitate the coding of DE analyses, not as a literature review or an unveiling of new methods. For an extensive discussion of DE in spatial data, see <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/" target="_blank">this ealier post</a>. We’ll be relying on the <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/smiDE" target="_blank">smiDE package</a>, described in <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/smiDE/" target="_blank">this post</a> and <a href="https://www.biorxiv.org/content/10.1101/2024.08.02.606405v2.abstract" target="_blank">this preprint</a>.</p>
 <section id="getting-started" class="level2" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="getting-started"><span class="header-section-number">1.1</span> Getting started</h2>
@@ -7977,8 +7888,7 @@ background-color: null;
 font-style: inherit;">length</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">unique</span>(x))]</span>
-<span id="cb15-12"></span>
-<span id="cb15-13"><span class="fu" style="color: #4758AB;
+<span id="cb15-12"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(xy, <span class="at" style="color: #657422;
 background-color: null;
@@ -7993,19 +7903,18 @@ background-color: null;
 font-style: inherit;">asp =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>,</span>
-<span id="cb15-14">     <span class="at" style="color: #657422;
+<span id="cb15-13">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">col =</span> cols[<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">as.numeric</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">as.factor</span>(x))])</span>
-<span id="cb15-15"></span>
-<span id="cb15-16"></span>
-<span id="cb15-17"><span class="co" style="color: #5E5E5E;
+<span id="cb15-14"></span>
+<span id="cb15-15"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># plotting a continuous variable that goes up from 0:</span></span>
-<span id="cb15-18"><span class="fu" style="color: #4758AB;
+<span id="cb15-16"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(xy, <span class="at" style="color: #657422;
 background-color: null;
@@ -8020,7 +7929,7 @@ background-color: null;
 font-style: inherit;">asp =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>,</span>
-<span id="cb15-19">     <span class="at" style="color: #657422;
+<span id="cb15-17">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">col =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -8033,7 +7942,7 @@ background-color: null;
 font-style: inherit;">"#4B0082"</span>))(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">101</span>)[</span>
-<span id="cb15-20">       <span class="dv" style="color: #AD0000;
+<span id="cb15-18">       <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -8048,12 +7957,12 @@ background-color: null;
 font-style: inherit;">/</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">max</span>(x))</span>
-<span id="cb15-21">     ])</span>
-<span id="cb15-22"></span>
-<span id="cb15-23"><span class="co" style="color: #5E5E5E;
+<span id="cb15-19">     ])</span>
+<span id="cb15-20"></span>
+<span id="cb15-21"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># plotting a continuous variable centered at 0:</span></span>
-<span id="cb15-24"><span class="fu" style="color: #4758AB;
+<span id="cb15-22"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(xy, <span class="at" style="color: #657422;
 background-color: null;
@@ -8068,7 +7977,7 @@ background-color: null;
 font-style: inherit;">asp =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>,</span>
-<span id="cb15-25">     <span class="at" style="color: #657422;
+<span id="cb15-23">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">col =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -8083,7 +7992,7 @@ background-color: null;
 font-style: inherit;">"darkred"</span>))(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">101</span>)[</span>
-<span id="cb15-26">       <span class="dv" style="color: #AD0000;
+<span id="cb15-24">       <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">51</span> <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -8100,12 +8009,12 @@ background-color: null;
 font-style: inherit;">max</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">abs</span>(x)))</span>
-<span id="cb15-27">     ])</span>
-<span id="cb15-28"></span>
-<span id="cb15-29"><span class="co" style="color: #5E5E5E;
+<span id="cb15-25">     ])</span>
+<span id="cb15-26"></span>
+<span id="cb15-27"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># plotting a continous variable with arbitrary center:</span></span>
-<span id="cb15-30"><span class="fu" style="color: #4758AB;
+<span id="cb15-28"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(xy, <span class="at" style="color: #657422;
 background-color: null;
@@ -8120,7 +8029,7 @@ background-color: null;
 font-style: inherit;">asp =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>,</span>
-<span id="cb15-31">     <span class="at" style="color: #657422;
+<span id="cb15-29">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">col =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -8135,7 +8044,7 @@ background-color: null;
 font-style: inherit;">"darkred"</span>))(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">101</span>)[</span>
-<span id="cb15-32">       <span class="dv" style="color: #AD0000;
+<span id="cb15-30">       <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -8158,12 +8067,12 @@ background-color: null;
 font-style: inherit;">-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">min</span>(x)))</span>
-<span id="cb15-33">     ])</span>
-<span id="cb15-34"></span>
-<span id="cb15-35"><span class="co" style="color: #5E5E5E;
+<span id="cb15-31">     ])</span>
+<span id="cb15-32"></span>
+<span id="cb15-33"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># draw a histogram of the continuous variable to confirm it's not excessively long-tailed:</span></span>
-<span id="cb15-36"><span class="fu" style="color: #4758AB;
+<span id="cb15-34"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">hist</span>(x, <span class="at" style="color: #657422;
 background-color: null;
@@ -8367,7 +8276,7 @@ font-style: inherit;">"processed_data/pre_de_obj.RDS"</span>)</span>
 <h2 data-number="3.2" class="anchored" data-anchor-id="running-smide"><span class="header-section-number">3.2</span> running smiDE</h2>
 <p>Now, at last, we’re ready to run DE. Here we’re faced with tradeoffs between model thoroughness and computation time. The best models to date are prohibitively slow in large studies, while the fastest models compute in moments but suffer more false positives.</p>
 <p>What do we mean by the “best models?” DE in spatial data runs into two challenges:</p>
-<p>First, errors in cell segmentation bias cells to resemble their neighbors. This can cause false positive results when comparing across different spatial contexts. We already screened out genes at unacceptable risk of segmentation errors, but ideally we’ll take the further step of directly modeling this bias in the genes that remain.</p>
+<p>First, errors in cell segmentation bias cells to resemble their neighbors. This can cause false positive results when comparing across different spatial contexts. We already screened out genes at unacceptable risk of segmentation errors, but ideally we’ll take the further step of directly adjusting for this bias in the genes that remain.</p>
 <p>Second, we would ideally model the <em>spatial correlation</em> in our data. Expression among spatially neighboring cells is often correlated due to some spatially smooth factor unrelated to our predictor variable. This can lead to biased effect estimates, and potentially inflated statistical significance. We can model this correlation and get more accurate p-values by including a spatial random effect. This works best when the magnitude of variation in the spatial random effect is small, or when the correlation between the random effect and the covariate is small. In addition, it’s helpful for the DE predictor to be more spatially nuanced than the smooth random effect. Unfortunately, modeling spatial correlation becomes very computationally intensive over large numbers of cells.</p>
 <p>Our recommended modeling approaches for different settings are below:</p>
 <table class="caption-top table">
@@ -9314,7 +9223,7 @@ font-style: inherit;">length</span>(ps.spatial)]</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/figures/DE heatmap.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/figures/DE heatmap.png" class="img-fluid figure-img" style="width:50.0%"></p>
 </figure>
 </div>
 </div>
@@ -9324,7 +9233,7 @@ font-style: inherit;">length</span>(ps.spatial)]</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/figures/VEGFA.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/figures/VEGFA.png" class="img-fluid figure-img" style="width:50.0%"></p>
 </figure>
 </div>
 </div>
@@ -9334,7 +9243,7 @@ font-style: inherit;">length</span>(ps.spatial)]</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/figures/VEGFA-traceplot.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/figures/VEGFA-traceplot.png" class="img-fluid figure-img" style="width:50.0%"></p>
 </figure>
 </div>
 </div>
@@ -27034,7 +26943,7 @@ Tip
   author = {Lidan Wu and Aster Wardhani and Joseph-Tin Phan},
   year = {2025},
   url = {https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/image-segmentation-models/},
-  note = {Accessed: 2025-12-12}
+  note = {Accessed: 2025-12-13}
 }</code></pre>
 </div>
 <div id="tabset-1-4" class="tab-pane" aria-labelledby="tabset-1-4-tab">

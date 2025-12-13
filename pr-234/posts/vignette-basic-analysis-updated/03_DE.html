@@ -236,7 +236,7 @@ cookieconsent.run({
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">December 12, 2025</p>
+        <p class="date-modified">December 13, 2025</p>
       </div>
     </div>
       
@@ -288,7 +288,12 @@ cookieconsent.run({
 <section id="introduction" class="level1" data-number="1">
 <h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
 <p>Whether you crafted your study with specific hypotheses in mind or discovered interesting trends while exploring your data, most CosMx<sup>®</sup> analyses will culminate in differential expression (DE) analyses. DE is a remarkably versatile tool for posing biological questions about how cells’ behavior changes in response to exposures like spatial context or patient-level attributes. Here we provide a convenient framework for posing your biological questions as DE tests.</p>
-<p>Code is organized into the following sections: 1. A collection of code chunks that can be edited and recombined to produce exactly the DE question you want. 2. A collection of code chunks for run DE under different conditions 3. Recommended code for exploring DE results</p>
+<p>Code is organized into the following sections:</p>
+<ol type="1">
+<li>A collection of code chunks that can be edited and recombined to produce exactly the DE question you want.</li>
+<li>A collection of code chunks for run DE under different conditions</li>
+<li>Recommended code for exploring DE results</li>
+</ol>
 <p>This document exists to facilitate the coding of DE analyses, not as a literature review or an unveiling of new methods. For an extensive discussion of DE in spatial data, see <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/" target="_blank">this ealier post</a>. We’ll be relying on the <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/smiDE" target="_blank">smiDE package</a>, described in <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/smiDE/" target="_blank">this post</a> and <a href="https://www.biorxiv.org/content/10.1101/2024.08.02.606405v2.abstract" target="_blank">this preprint</a>.</p>
 <section id="getting-started" class="level2" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="getting-started"><span class="header-section-number">1.1</span> Getting started</h2>
@@ -745,31 +750,29 @@ cookieconsent.run({
 <span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"#FDBF6F"</span>, <span class="st">"#FF7F00"</span>, <span class="st">"#CAB2D6"</span>, <span class="st">"#6A3D9A"</span>, <span class="st">"#FFFF99"</span>,</span>
 <span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"#B15928"</span>, <span class="st">"#8DD3C7"</span>, <span class="st">"#FFFFB3"</span>, <span class="st">"#BEBADA"</span>, <span class="st">"#FB8072"</span></span>
 <span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>), <span class="dv">3</span>)[<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(<span class="fu">unique</span>(x))]</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">cex =</span> <span class="fl">0.1</span>, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">asp =</span> <span class="dv">1</span>,</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> cols[<span class="fu">as.numeric</span>(<span class="fu">as.factor</span>(x))])</span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="co"># plotting a continuous variable that goes up from 0:</span></span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">cex =</span> <span class="fl">0.1</span>, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">asp =</span> <span class="dv">1</span>,</span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"grey80"</span>, <span class="st">"#4B0082"</span>))(<span class="dv">101</span>)[</span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>       <span class="dv">1</span> <span class="sc">+</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> x <span class="sc">/</span> <span class="fu">max</span>(x))</span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>     ])</span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a><span class="co"># plotting a continuous variable centered at 0:</span></span>
-<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">cex =</span> <span class="fl">0.1</span>, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">asp =</span> <span class="dv">1</span>,</span>
-<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"darkblue"</span>, <span class="st">"grey80"</span>, <span class="st">"darkred"</span>))(<span class="dv">101</span>)[</span>
-<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>       <span class="dv">51</span> <span class="sc">+</span> <span class="fu">round</span>(<span class="dv">50</span> <span class="sc">*</span> x <span class="sc">/</span> <span class="fu">max</span>(<span class="fu">abs</span>(x)))</span>
-<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>     ])</span>
-<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a><span class="co"># plotting a continous variable with arbitrary center:</span></span>
-<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">cex =</span> <span class="fl">0.1</span>, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">asp =</span> <span class="dv">1</span>,</span>
-<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"darkblue"</span>, <span class="st">"grey80"</span>, <span class="st">"darkred"</span>))(<span class="dv">101</span>)[</span>
-<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>       <span class="dv">1</span> <span class="sc">+</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> (x <span class="sc">-</span> <span class="fu">min</span>(x)) <span class="sc">/</span> (<span class="fu">max</span>(x) <span class="sc">-</span> <span class="fu">min</span>(x)))</span>
-<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>     ])</span>
-<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a><span class="co"># draw a histogram of the continuous variable to confirm it's not excessively long-tailed:</span></span>
-<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(x, <span class="at">breaks =</span> <span class="dv">40</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">cex =</span> <span class="fl">0.1</span>, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">asp =</span> <span class="dv">1</span>,</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> cols[<span class="fu">as.numeric</span>(<span class="fu">as.factor</span>(x))])</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="co"># plotting a continuous variable that goes up from 0:</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">cex =</span> <span class="fl">0.1</span>, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">asp =</span> <span class="dv">1</span>,</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"grey80"</span>, <span class="st">"#4B0082"</span>))(<span class="dv">101</span>)[</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>       <span class="dv">1</span> <span class="sc">+</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> x <span class="sc">/</span> <span class="fu">max</span>(x))</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>     ])</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a><span class="co"># plotting a continuous variable centered at 0:</span></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">cex =</span> <span class="fl">0.1</span>, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">asp =</span> <span class="dv">1</span>,</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"darkblue"</span>, <span class="st">"grey80"</span>, <span class="st">"darkred"</span>))(<span class="dv">101</span>)[</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>       <span class="dv">51</span> <span class="sc">+</span> <span class="fu">round</span>(<span class="dv">50</span> <span class="sc">*</span> x <span class="sc">/</span> <span class="fu">max</span>(<span class="fu">abs</span>(x)))</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>     ])</span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a><span class="co"># plotting a continous variable with arbitrary center:</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">cex =</span> <span class="fl">0.1</span>, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">asp =</span> <span class="dv">1</span>,</span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"darkblue"</span>, <span class="st">"grey80"</span>, <span class="st">"darkred"</span>))(<span class="dv">101</span>)[</span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>       <span class="dv">1</span> <span class="sc">+</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> (x <span class="sc">-</span> <span class="fu">min</span>(x)) <span class="sc">/</span> (<span class="fu">max</span>(x) <span class="sc">-</span> <span class="fu">min</span>(x)))</span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>     ])</span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a><span class="co"># draw a histogram of the continuous variable to confirm it's not excessively long-tailed:</span></span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(x, <span class="at">breaks =</span> <span class="dv">40</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
@@ -829,7 +832,7 @@ cookieconsent.run({
 <h2 data-number="3.2" class="anchored" data-anchor-id="running-smide"><span class="header-section-number">3.2</span> running smiDE</h2>
 <p>Now, at last, we’re ready to run DE. Here we’re faced with tradeoffs between model thoroughness and computation time. The best models to date are prohibitively slow in large studies, while the fastest models compute in moments but suffer more false positives.</p>
 <p>What do we mean by the “best models?” DE in spatial data runs into two challenges:</p>
-<p>First, errors in cell segmentation bias cells to resemble their neighbors. This can cause false positive results when comparing across different spatial contexts. We already screened out genes at unacceptable risk of segmentation errors, but ideally we’ll take the further step of directly modeling this bias in the genes that remain.</p>
+<p>First, errors in cell segmentation bias cells to resemble their neighbors. This can cause false positive results when comparing across different spatial contexts. We already screened out genes at unacceptable risk of segmentation errors, but ideally we’ll take the further step of directly adjusting for this bias in the genes that remain.</p>
 <p>Second, we would ideally model the <em>spatial correlation</em> in our data. Expression among spatially neighboring cells is often correlated due to some spatially smooth factor unrelated to our predictor variable. This can lead to biased effect estimates, and potentially inflated statistical significance. We can model this correlation and get more accurate p-values by including a spatial random effect. This works best when the magnitude of variation in the spatial random effect is small, or when the correlation between the random effect and the covariate is small. In addition, it’s helpful for the DE predictor to be more spatially nuanced than the smooth random effect. Unfortunately, modeling spatial correlation becomes very computationally intensive over large numbers of cells.</p>
 <p>Our recommended modeling approaches for different settings are below:</p>
 <table class="caption-top table">
@@ -1072,7 +1075,7 @@ cookieconsent.run({
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="figures/DE heatmap.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<p><img src="figures/DE heatmap.png" class="img-fluid figure-img" style="width:50.0%"></p>
 </figure>
 </div>
 </div>
@@ -1082,7 +1085,7 @@ cookieconsent.run({
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="figures/VEGFA.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<p><img src="figures/VEGFA.png" class="img-fluid figure-img" style="width:50.0%"></p>
 </figure>
 </div>
 </div>
@@ -1092,7 +1095,7 @@ cookieconsent.run({
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="figures/VEGFA-traceplot.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<p><img src="figures/VEGFA-traceplot.png" class="img-fluid figure-img" style="width:50.0%"></p>
 </figure>
 </div>
 </div>

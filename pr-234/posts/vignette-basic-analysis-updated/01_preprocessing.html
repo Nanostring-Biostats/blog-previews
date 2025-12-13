@@ -238,7 +238,7 @@ cookieconsent.run({
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">December 12, 2025</p>
+        <p class="date-modified">December 13, 2025</p>
       </div>
     </div>
       
@@ -303,7 +303,6 @@ cookieconsent.run({
 <section id="loading" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> Loading flat files</h1>
 <p>First we’ll load the packages we need. Importantly, we’ll load “Matrix”, which handles <em>sparse matrices</em>. When a matrix has mainly zeroes, which is generally the case for single cell data, storing it in sparse matrix format has huge memory savings. Given the size of CosMx data, it is vital to be memory-efficient.</p>
-<p>Note: we’ll store our count matrices with cells in rows and genes in columns. Many protocols arrange their count matrix the other way around, but our approach here will be more performant for most operations.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -333,6 +332,7 @@ In the code below, we load the counts matrices in chunks.<br>
 * First, we’ll use <code>data.table::fread</code> function which can directly read gzipped files, and determine how many rows and columns we’re working with.<br>
 * Then, we’ll read each chunk of data in, and convert it to a low-memory sparse matrix format before moving onto the next chunk.<br>
 * At the end, we’ll combine our sparse matrices to create the full data matrix.</p>
+<p>Note: we’ll store our count matrices with cells in rows and genes in columns. Many protocols arrange their count matrix the other way around, but our approach here will be more performant for most operations.</p>
 <p>To begin, tell your script where to operate:</p>
 <div class="cell">
 <details class="code-fold">
@@ -446,9 +446,9 @@ Note
 </section>
 <section id="xy" class="level1" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Customizing the tissues’ spatial arrangements</h1>
-<p>To show multiple slides in the same spatial plot, or just to produce spatial plots without a lot of extraneous white space, we often have to shift around tissues’ and/or FOVs’ xy positions. (We if course will preserve the relative xy positions of any cells we plan to analyze together spatially.) Only a small number of operations are required to do so; below are some tools and code chunks for facilitating these operations, some borrowed from <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/visuals-reduce-whitespace/" target="_blank">this post</a>.</p>
+<p>To show multiple slides in the same spatial plot, or just to produce spatial plots without a lot of extraneous white space, we often have to shift around tissues’ and/or FOVs’ xy positions. (We of course will preserve the relative xy positions of any cells we plan to analyze together spatially.) Below are some tools and code chunks for facilitating these operations, some borrowed from <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/visuals-reduce-whitespace/" target="_blank">this post</a>.</p>
 <p>The basic operations of customized xy layouts are as follows:</p>
-<p><strong>First</strong>, for multi-slide studies, adjust the slides’ xy positions do they don’t overlap. This function is called within our flat file reader, but you will often want to customize how slides are tiled.</p>
+<p><strong>First</strong>, for multi-slide studies, adjust the slides’ xy positions do they don’t overlap. This function is called within our flat file reader, but you can call it again to customize how slides are tiled.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -463,7 +463,7 @@ Note
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>                      <span class="at">widthheightratio =</span> <span class="dv">4</span><span class="sc">/</span><span class="dv">3</span>) <span class="co"># desired shape of final xy locations </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p><strong>Second</strong>, break your cells into spatially contiguous groups (which may be separate tissues from one slide, or merely discontinuous FOV blocks from the same tissue). This can be done manually, e.g.&nbsp;below where we select cells in a selected xy range:</p>
+<p><strong>Second</strong>, break your cells into spatially contiguous groups (which may be separate tissues from one slide, or merely discontinuous FOV blocks from the same tissue). This can be done manually, as in the below chunk where we select cells in a selected xy range:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -522,7 +522,7 @@ Note
 <p>Our workflow will create then add to <code>flag</code>, a vector marking cells flagged for one reason or another. When we’re done, we’ll delete everything we’ve flagged. (The full original data will remain on AtoMx, so this step is not as drastic as it seems. For smaller studies it could still be reasonable to hold on to the pre-QC .RDS files.)</p>
 <section id="per-cell-qc" class="level2" data-number="4.1">
 <h2 data-number="4.1" class="anchored" data-anchor-id="per-cell-qc"><span class="header-section-number">4.1</span> Per-cell QC:</h2>
-<p>First, we’ll apply a threshold on cells’ total counts. Our defaults are fairly permissive; it would be reasonable double them in datasets where you can do so without throwing out too many cells.</p>
+<p>First, we’ll apply a threshold on cells’ total counts. Our defaults are fairly permissive; it would be reasonable to double them in datasets where you can do so without throwing out too many cells.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -534,7 +534,7 @@ Note
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co"># - 6000plex: 50 (permissive) or 100 (conservative)</span></span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># - WTX: 100 (permissive) or 200 (conservative)</span></span>
 <span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co"># - all panels: no more than 5% of cells (permissive) or 10% of cells (conservative)</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>count_threshold <span class="ot">&lt;-</span> <span class="fu">min</span>(<span class="dv">200</span>, <span class="fu">quantile</span>(metadata<span class="sc">$</span>nCount_RNA, <span class="fl">0.05</span>)) <span class="co"># apply threshold, but don't flag &gt;5% of cells</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>count_threshold <span class="ot">&lt;-</span> <span class="fu">min</span>(<span class="dv">200</span>, <span class="fu">quantile</span>(metadata<span class="sc">$</span>nCount_RNA, <span class="fl">0.10</span>)) <span class="co"># apply threshold, but don't flag &gt;10% of cells</span></span>
 <span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="fu">log2</span>(count_threshold), <span class="at">col =</span> <span class="st">"red"</span>)</span>
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>flag <span class="ot">&lt;-</span> metadata<span class="sc">$</span>nCount_RNA <span class="sc">&lt;</span> count_threshold</span>
 <span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topleft"</span>, <span class="at">legend =</span> <span class="fu">paste0</span>(<span class="fu">round</span>(<span class="fu">mean</span>(flag) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="st">"% rejected"</span>))</span>
@@ -576,7 +576,7 @@ Note
 </div>
 </div>
 </div>
-<p>Note: some tissues do have very large cells, e.g.&nbsp;purkinje cells in the brain or cardiomyocytes in the heart.</p>
+<p>Note: some tissues do have very large cells, e.g.&nbsp;purkinje cells in the brain or cardiomyocytes in the heart. You’ll want to skip the area filter in those studies.</p>
 <p>To check for segmentation errors, consider our R package <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/segmentation-error-evaluation/" target="_blank">FastReseg</a>, which uses transcript positions to flag cells with likely segmentation errors, then remove or reassign transcripts assigned to the wrong cells. We also advise examining the segmentation results in AtoMx’s tissue viewer; studies will occasionally need to be re-segmented under a different set of parameters.</p>
 </section>
 <section id="fov-qc" class="level2" data-number="4.2">
@@ -686,13 +686,13 @@ Note
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="figures/spatial_bgoversignal.png" class="img-fluid figure-img" width="464"></p>
+<p><img src="figures/spatial_bgoversignal.png" class="img-fluid figure-img" style="width:115.0%"></p>
 </figure>
 </div>
 </div>
 </div>
 <p>FOV edge effects are also notable here, presumably downstream from suppressed signal in those locations. Of greater note is a band of higher-background FOVs towards the lower left of the tissue. No immediate action is needed, but by becoming aware of this small technical effect we’ll be armed to interpret any strange results driven by it.</p>
-<p>Finally, we just flagged cells in space:</p>
+<p>Finally, we plot flagged cells in space:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -737,7 +737,7 @@ Note
 </section>
 <section id="normalization" class="level2" data-number="4.5">
 <h2 data-number="4.5" class="anchored" data-anchor-id="normalization"><span class="header-section-number">4.5</span> Normalization</h2>
-<p>We typically normalize each cell’s expression profile to its total counts. The below code does this efficiently. In fact, given the size of the matrix and the speed of this calculation, there is no need to save a normalized data object; it’s usually cheaper to re-compute it that to store it.</p>
+<p>We typically normalize each cell’s expression profile to its total counts. The below code does this efficiently. In fact, given the size of the matrix and the speed of this calculation, there is no need to save a normalized data object; it’s cheaper to re-compute it that to store it.</p>
 <p>Note that no steps in this workflow actually use the normalized data, although the dimension reduction step performs its own normalization under the hood. Normalized data will be useful in later analyses, e.g.&nbsp;for plotting expression over space or running differential expression.</p>
 <div class="cell">
 <details class="code-fold">
@@ -752,7 +752,7 @@ Note
 </section>
 <section id="dimred" class="level1" data-number="5">
 <h1 data-number="5"><span class="header-section-number">5</span> Dimension reduction</h1>
-<p>Here we demonstrate an important improvement in dimension reduction for large studies. The single cell analysis world has long used Pearson residuals to normalize &amp; transform their data prior to running PCA; these residuals scale count data to better balance the information available in each cell / gene. However, Pearson residuals are dense, meaning we cannot encode them with a sparse matrix, making them computationally intractable for larger datasets. To benefit from Pearson residuals without taxing our compute instances, we have developed a method of calculating the principal components of a Pearson residual matrix without ever having to store the entire matrix. We demonstrate this function below. (Scratch Space post on the subject coming soon.)</p>
+<p>Here we demonstrate an important improvement in dimension reduction for large studies. The single cell analysis world has long used Pearson residuals to normalize &amp; transform their data prior to running PCA; these residuals scale count data to better balance the information available in each cell / gene. However, Pearson residuals are dense, meaning we cannot encode them with a sparse matrix, making them computationally intractable for larger datasets. To benefit from Pearson residuals without taxing our compute instances, we have developed a method of calculating the principal components of a Pearson residual matrix without ever having to store the entire matrix. A full description is <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/pearsonpca/" target="_blank">here</a>. We demonstrate this function below.</p>
 <p>We’ll start by identifying highly variable genes. In this section we’ll take advantage of some of the functions in the Seurat ecosystem.</p>
 <div class="cell">
 <details class="code-fold">
@@ -875,7 +875,7 @@ Note
 </section>
 <section id="clust" class="level1" data-number="6">
 <h1 data-number="6"><span class="header-section-number">6</span> Cell typing</h1>
-<p>Here we demo the most consistently-successful approach to cell typing we have found. First, we perform unsupervised clustering using a set of a few thousand highly variable genes (hvg’s). This approach is robust, and requires minimal configuration and re-running. Naming clusters used to be time-consuming, but we have found that the right prompts to a large language model (LLM), <strong>combined with rigorous oversight</strong>, minimize the burden of cluster naming. We will demonstrate two approaches to unsupervised clustering:</p>
+<p>Here we demonstrate the most consistently-successful approach to cell typing we have found. First, we perform unsupervised clustering using a set of a few thousand highly variable genes (hvg’s). This approach is robust, and requires minimal configuration and re-running. Naming clusters used to be time-consuming, but we have found that the right prompts to a large language model (LLM), <em>combined with rigorous oversight</em>, minimize the burden of cluster naming. We will demonstrate two approaches to unsupervised clustering:</p>
 <ul>
 <li>Louvain clustering, using PC’s derived from Pearson residuals of hvg’s.</li>
 <li>InSituType’s unsupervised mode, run on hvg’s.</li>
@@ -962,7 +962,13 @@ Note
 <span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>  unsup <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/unsup.RDS"</span>))</span>
 <span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="co"># save results</span></span>
-<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>clust <span class="ot">&lt;-</span> clust <span class="ot">&lt;-</span> unsup<span class="sc">$</span>clust</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>clust <span class="ot">&lt;-</span> clust <span class="ot">&lt;-</span> unsup<span class="sc">$</span>clust</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick xy and umap plots of clusters to confirm resolution looks right:</span></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(umapobj<span class="sc">$</span>ump<span class="sc">@</span>cell.embeddings, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">asp =</span> <span class="dv">1</span>, <span class="at">cex =</span> <span class="fl">0.1</span>, </span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> scales<span class="sc">::</span><span class="fu">alpha</span>(cellcols[<span class="fu">as.numeric</span>(<span class="fu">as.factor</span>(clust))], <span class="fl">0.05</span>))</span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">asp =</span> <span class="dv">1</span>, <span class="at">cex =</span> <span class="fl">0.1</span>, </span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> cellcols[<span class="fu">as.numeric</span>(<span class="fu">as.factor</span>(clust))])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </div>
@@ -1224,7 +1230,7 @@ Note
 <ol type="1">
 <li>Cancer cells tend to be extremely transcriptionally active. Clusters with high total counts per cell are usually cancer.</li>
 <li>The <a href="https://github.com/Jonyyqn/scMalignantFinder" target="_blank">scMalignantFinder algorithm</a> promises to call cells as cancer vs.&nbsp;non-cancer. We have not tried it, but it seems promising.</li>
-<li>For WTX studies, it’s possible to estimate cells’ copy number variants. We have used <a href="https://github.com/Moldia/InSituCNV" target="_blank">insituCNV</a> successfully. A newer method, <a href="https://github.com/seasoncloud/Clonalscope" target="_blank">ClonalScope</a>, also looks promising.</li>
+<li>For WTX studies, it’s possible to estimate cells’ copy number variants. Cells with clear CNV’s will usually be cancer. We have used <a href="https://github.com/Moldia/InSituCNV" target="_blank">insituCNV</a> successfully. A newer method, <a href="https://github.com/seasoncloud/Clonalscope" target="_blank">ClonalScope</a>, also looks promising.</li>
 </ol>
 </div>
 </div>
@@ -1363,67 +1369,11 @@ Note
 <span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>celltype <span class="ot">&lt;-</span> metadata<span class="sc">$</span>celltype <span class="ot">&lt;-</span> merged<span class="sc">$</span>celltype[<span class="fu">match</span>(metadata<span class="sc">$</span>cell_id, merged<span class="sc">$</span>cell_id)]</span>
 <span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a><span class="co"># # combine hieratype and clustering:</span></span>
-<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a><span class="co"># immune.ids &lt;- hieratyperes$post_probs$l1$cell_ID[</span></span>
-<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a><span class="co">#   !is.element(hieratyperes$post_probs$l1$celltype_thresh, c("epithelial", "fibroblast", "endothelial", "smooth_muscle"))]</span></span>
-<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a><span class="co"># celltype &lt;- clust</span></span>
-<span id="cb33-23"><a href="#cb33-23" aria-hidden="true" tabindex="-1"></a><span class="co"># names(celltype) &lt;- metadata$cell_id</span></span>
-<span id="cb33-24"><a href="#cb33-24" aria-hidden="true" tabindex="-1"></a><span class="co"># celltype[immune.ids] &lt;- htclust[immune.ids]</span></span>
-<span id="cb33-25"><a href="#cb33-25" aria-hidden="true" tabindex="-1"></a><span class="co"># # which clusters to reassign: &gt;90% taken by hieratype, and &lt; 5% of total cells left.</span></span>
-<span id="cb33-26"><a href="#cb33-26" aria-hidden="true" tabindex="-1"></a><span class="co"># propoverwritten &lt;- by(clust != celltype, clust, mean)</span></span>
-<span id="cb33-27"><a href="#cb33-27" aria-hidden="true" tabindex="-1"></a><span class="co"># proppercluster &lt;- table(celltype) / length(celltype)</span></span>
-<span id="cb33-28"><a href="#cb33-28" aria-hidden="true" tabindex="-1"></a><span class="co"># clusterstodrop &lt;- union(</span></span>
-<span id="cb33-29"><a href="#cb33-29" aria-hidden="true" tabindex="-1"></a><span class="co">#   intersect(</span></span>
-<span id="cb33-30"><a href="#cb33-30" aria-hidden="true" tabindex="-1"></a><span class="co">#     names(which(propoverwritten &gt; 0.9)),</span></span>
-<span id="cb33-31"><a href="#cb33-31" aria-hidden="true" tabindex="-1"></a><span class="co">#     names(which(proppercluster &lt; 0.05))),</span></span>
-<span id="cb33-32"><a href="#cb33-32" aria-hidden="true" tabindex="-1"></a><span class="co">#   intersect(</span></span>
-<span id="cb33-33"><a href="#cb33-33" aria-hidden="true" tabindex="-1"></a><span class="co">#     names(which(propoverwritten &gt; 0.5)),</span></span>
-<span id="cb33-34"><a href="#cb33-34" aria-hidden="true" tabindex="-1"></a><span class="co">#     names(which(proppercluster &lt; 0.01)))</span></span>
-<span id="cb33-35"><a href="#cb33-35" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
-<span id="cb33-36"><a href="#cb33-36" aria-hidden="true" tabindex="-1"></a><span class="co"># # find nearest neighbors (in valid clusters) for cells in target clusters:</span></span>
-<span id="cb33-37"><a href="#cb33-37" aria-hidden="true" tabindex="-1"></a><span class="co"># cellstoreclassify &lt;- names(celltype)[is.element(celltype, clusterstodrop)]</span></span>
-<span id="cb33-38"><a href="#cb33-38" aria-hidden="true" tabindex="-1"></a><span class="co"># neighborclusts &lt;- InSituCor:::neighbor_tabulate(celltype, neighbors = umapobj$grph)</span></span>
-<span id="cb33-39"><a href="#cb33-39" aria-hidden="true" tabindex="-1"></a><span class="co"># neighborclusts &lt;- neighborclusts[, !is.element(colnames(neighborclusts), clusterstodrop)]</span></span>
-<span id="cb33-40"><a href="#cb33-40" aria-hidden="true" tabindex="-1"></a><span class="co"># # reclassify by most common nearest neighbor among valid clusters:</span></span>
-<span id="cb33-41"><a href="#cb33-41" aria-hidden="true" tabindex="-1"></a><span class="co"># celltype[cellstoreclassify] &lt;- colnames(neighborclusts)[apply(neighborclusts[cellstoreclassify, ], 1, which.max)]</span></span>
-<span id="cb33-42"><a href="#cb33-42" aria-hidden="true" tabindex="-1"></a><span class="co">#   </span></span>
-<span id="cb33-43"><a href="#cb33-43" aria-hidden="true" tabindex="-1"></a><span class="co"># table(celltype)[order(table(celltype))]</span></span>
-<span id="cb33-44"><a href="#cb33-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-45"><a href="#cb33-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-46"><a href="#cb33-46" aria-hidden="true" tabindex="-1"></a><span class="co"># # what to do with the leftover immune cells from clustering?</span></span>
-<span id="cb33-47"><a href="#cb33-47" aria-hidden="true" tabindex="-1"></a><span class="co"># setdiff(unique(celltype), unique(htclust))</span></span>
-<span id="cb33-48"><a href="#cb33-48" aria-hidden="true" tabindex="-1"></a><span class="co"># louvain_immune_names &lt;- c("Macrophages (APOE+/C1QA+ TAMs)",</span></span>
-<span id="cb33-49"><a href="#cb33-49" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "Neutrophils (state A; S100A8/A9-max)",</span></span>
-<span id="cb33-50"><a href="#cb33-50" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "Neutrophils (state C, degranulating/secretory-high)",</span></span>
-<span id="cb33-51"><a href="#cb33-51" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "T cells (CD4-like, resting)",</span></span>
-<span id="cb33-52"><a href="#cb33-52" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "Antigen-presenting myeloid (cDC2 / moDC)",</span></span>
-<span id="cb33-53"><a href="#cb33-53" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "Neutrophils (state B)",</span></span>
-<span id="cb33-54"><a href="#cb33-54" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "Plasma cells",</span></span>
-<span id="cb33-55"><a href="#cb33-55" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "Antigen-presenting cells (B/cDC; cycling, uncertain)",</span></span>
-<span id="cb33-56"><a href="#cb33-56" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "Cytotoxic T / NK cells")</span></span>
-<span id="cb33-57"><a href="#cb33-57" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb33-58"><a href="#cb33-58" aria-hidden="true" tabindex="-1"></a><span class="co"># # check overlaps, making sure there aren't huge numbers of cells called immune by Louvain but not HieraType:</span></span>
-<span id="cb33-59"><a href="#cb33-59" aria-hidden="true" tabindex="-1"></a><span class="co"># par(mar = c(22,4,2,1))</span></span>
-<span id="cb33-60"><a href="#cb33-60" aria-hidden="true" tabindex="-1"></a><span class="co"># barplot(table(celltype), las = 2, </span></span>
-<span id="cb33-61"><a href="#cb33-61" aria-hidden="true" tabindex="-1"></a><span class="co">#         col = c("grey", "orange", "cornflowerblue")[1 + is.element(names(table(celltype)), louvain_immune_names) + 2 * is.element(names(table(celltype)), unique(htclust))])</span></span>
-<span id="cb33-62"><a href="#cb33-62" aria-hidden="true" tabindex="-1"></a><span class="co"># legend("topleft", fill = c("grey", "orange", "cornflowerblue"), legend = c("Louvain non-immune", "Louvain immune", "HieraType immune"))</span></span>
-<span id="cb33-63"><a href="#cb33-63" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb33-64"><a href="#cb33-64" aria-hidden="true" tabindex="-1"></a><span class="co"># # overwrite left-behind louvain immune clusters:</span></span>
-<span id="cb33-65"><a href="#cb33-65" aria-hidden="true" tabindex="-1"></a><span class="co"># celltype[is.element(celltype, louvain_immune_names)] &lt;- "immune_unspecified"</span></span>
-<span id="cb33-66"><a href="#cb33-66" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(celltype, <span class="at">file =</span> <span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/celltype.RDS"</span>))</span>
-<span id="cb33-67"><a href="#cb33-67" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(metadata, <span class="at">file =</span> <span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/metadata.RDS"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a><span class="co"># celltype[is.element(celltype, louvain_immune_names)] &lt;- "immune_unspecified"</span></span>
+<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(celltype, <span class="at">file =</span> <span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/celltype.RDS"</span>))</span>
+<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(metadata, <span class="at">file =</span> <span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/metadata.RDS"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="figures/celltype_merge_barplot.png" class="img-fluid figure-img" style="width:75.0%"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Note that in the above plot, we have 3 tall bars from neutrophil clusters called by Louvain. This result would be concerning for a merge of HieraType and Louvain, implying many immune cells were getting left behind. In our case, these are the 3 clusters that the LLM misclassified; we renamed them to “cancer” for our analysis.</p>
 <p>Once our cell types are complete, we re-generate the spatial plots:</p>
 <div class="cell">
 <details class="code-fold">
@@ -1449,19 +1399,7 @@ Note
 </section>
 <section id="conclusion" class="level1" data-number="9">
 <h1 data-number="9"><span class="header-section-number">9</span> Conclusion</h1>
-<p>The code above provides a direct path through the basic preprocessing of CosMx data. With these results secured, you’re ready to proceed to the rewarding parts of data analysis: exploring your data and testing hypotheses. We will have posts on these subjects soon. For now, here are some reasonable next steps:</p>
-<p>Exploratory analysis:</p>
-<ul>
-<li>If your experiment has baseline / control tissues, try <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/insitudiff/" target="_blank">InSituDiff</a>.</li>
-<li>To explore genes’ spatial correlation in studies without control tissues (e.g.&nbsp;tumors), try <a href="https://github.com/Nanostring-Biostats/InSitucor" target="_blank">InSituCor</a>.</li>
-<li>Calculate pathway scores using <a href="https://github.com/aertslab/AUCell" target="_blank">AUCell</a>.</li>
-</ul>
-<p>Hypothesis testing:</p>
-<ul>
-<li>Use <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/smiDE/" target="_blank">smiDE</a> for differential expression testing.</li>
-<li>Try Ligand-Receptor analysis (many packages exist; we have no recommendation yet).</li>
-</ul>
-<p>We recommend containing those analyses in standalone scripts, each beginning by loading the data we’ve prepared here:</p>
+<p>The code above provides a direct path through the basic preprocessing of CosMx data. With these results secured, you’re ready to proceed to the rewarding parts of data analysis: exploring your data and testing hypotheses. The next pages of this vignette discuss those topics. For exploratory analysis, differential expression, or any other further analysis, we recommend containing distinct analyses in standalone scripts, each beginning by loading the data we’ve prepared here:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
