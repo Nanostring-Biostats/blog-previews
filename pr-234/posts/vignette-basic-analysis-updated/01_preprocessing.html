@@ -238,7 +238,7 @@ cookieconsent.run({
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">December 13, 2025</p>
+        <p class="date-modified">December 15, 2025</p>
       </div>
     </div>
       
@@ -271,7 +271,8 @@ cookieconsent.run({
   <li><a href="#clustqc" id="toc-clustqc" class="nav-link" data-scroll-target="#clustqc"><span class="header-section-number">7</span> QC of clustering results</a></li>
   <li><a href="#hieratype" id="toc-hieratype" class="nav-link" data-scroll-target="#hieratype"><span class="header-section-number">8</span> Optimizing immune cell calling with the HieraType algorithm</a>
   <ul class="collapse">
-  <li><a href="#merging-clustering-and-hieratype-results" id="toc-merging-clustering-and-hieratype-results" class="nav-link" data-scroll-target="#merging-clustering-and-hieratype-results"><span class="header-section-number">8.0.1</span> Merging clustering and HieraType results</a></li>
+  <li><a href="#running-hieratype" id="toc-running-hieratype" class="nav-link" data-scroll-target="#running-hieratype"><span class="header-section-number">8.0.1</span> Running HieraType</a></li>
+  <li><a href="#merging-clustering-and-hieratype-results" id="toc-merging-clustering-and-hieratype-results" class="nav-link" data-scroll-target="#merging-clustering-and-hieratype-results"><span class="header-section-number">8.0.2</span> Merging clustering and HieraType results</a></li>
   </ul></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">9</span> Conclusion</a></li>
   </ul>
@@ -1237,6 +1238,8 @@ Note
 </section>
 <section id="hieratype" class="level1" data-number="8">
 <h1 data-number="8"><span class="header-section-number">8</span> Optimizing immune cell calling with the HieraType algorithm</h1>
+<section id="running-hieratype" class="level3" data-number="8.0.1">
+<h3 data-number="8.0.1" class="anchored" data-anchor-id="running-hieratype"><span class="header-section-number">8.0.1</span> Running HieraType</h3>
 <p>We created the <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/immune-cell-typing-smooth/" target="_blank">HieraType algorithm</a> to classify immune cells in a way that is informed by marker genes. We have found it to consistently outperform other algorithms in immune cell typing. Our standard approach now is to overwrite our initial clustering results with HieraType’s results whenever it calls an immune cell.</p>
 <p>Below, we run HieraType in two steps. In the first, we call broad cell types (e.g.&nbsp;epithelial, immune, …) then subclassify the immune cells (B, T, macrophage…)</p>
 <div class="cell">
@@ -1345,8 +1348,9 @@ Note
 </div>
 </div>
 </div>
-<section id="merging-clustering-and-hieratype-results" class="level3" data-number="8.0.1">
-<h3 data-number="8.0.1" class="anchored" data-anchor-id="merging-clustering-and-hieratype-results"><span class="header-section-number">8.0.1</span> Merging clustering and HieraType results</h3>
+</section>
+<section id="merging-clustering-and-hieratype-results" class="level3" data-number="8.0.2">
+<h3 data-number="8.0.2" class="anchored" data-anchor-id="merging-clustering-and-hieratype-results"><span class="header-section-number">8.0.2</span> Merging clustering and HieraType results</h3>
 <p>To finish our cell typing exercise, we now merge the Louvain and HieraType results. All cells called immune by HieraType will get HieraType labels. All other cells will retain their old labels, with one important exception: clusters that were overwhelmingly called immune by HieraType will be removed, and their cells will be assigned to whatever consensus cell type is most abundant in its nearest neighbors in expression space.</p>
 <div class="cell">
 <details class="code-fold">

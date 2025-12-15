@@ -1608,6 +1608,179 @@ font-style: inherit;">100</span>))</span></code></pre></div>
 <li><strong>Exploratory analysis</strong>: See what unexpected trends your data holds. Ideally, these trends can be phrased as formal hypotheses to be tested.</li>
 <li><strong>Hypothesis testing</strong>: In our experience, most analyses culminate here, mainly taking the form of differential expression (DE) testing. DE is a flexible tool to interrogate both the hypotheses you designed the study around and new hypotheses discovered in exploratory analysis. We see DE as the workhorse of spatial analyses, but there are other useful tools: e.g., you might calculate changes in cell type abundance or co-localization across space, or compute various metrics of ligand-receptor interactions.</li>
 </ol>
+<p>A high-level view of our workflow is below:</p>
+<section id="basic-pre-processing" class="level3" data-number="1.1.1">
+<h3 data-number="1.1.1" class="anchored" data-anchor-id="basic-pre-processing"><span class="header-section-number">1.1.1</span> Basic pre-processing</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 34%">
+<col style="width: 39%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Step</strong></th>
+<th><strong>Inputs</strong></th>
+<th><strong>Outputs</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Load flat files</td>
+<td>Flat files</td>
+<td>Raw counts, metadata, xy</td>
+</tr>
+<tr class="even">
+<td>Customize xy</td>
+<td>xy</td>
+<td>xy</td>
+</tr>
+<tr class="odd">
+<td>QC</td>
+<td>Raw counts, metadata, xy</td>
+<td>Raw counts, metadata, xy (filtered)</td>
+</tr>
+<tr class="even">
+<td>Normalization</td>
+<td>Raw counts</td>
+<td>Normalized counts</td>
+</tr>
+<tr class="odd">
+<td>Dim reduction: HVGs</td>
+<td>Raw counts</td>
+<td>HVGs</td>
+</tr>
+<tr class="even">
+<td>Dim reduction: PCA</td>
+<td>xy, metadata, HVGs</td>
+<td>PCs</td>
+</tr>
+<tr class="odd">
+<td>Dim reduction: UMAP</td>
+<td>PCs</td>
+<td>UMAP projection, nearest neighbors</td>
+</tr>
+<tr class="even">
+<td>Graph clustering (Louvain or Leiden)</td>
+<td>Nearest neighbors</td>
+<td>Clusters</td>
+</tr>
+<tr class="odd">
+<td>InSituType clustering</td>
+<td>Raw counts, HVGs</td>
+<td>Clusters</td>
+</tr>
+<tr class="even">
+<td>Cluster naming / marker gene ID</td>
+<td>Clusters, raw counts</td>
+<td>Suggested cluster names</td>
+</tr>
+<tr class="odd">
+<td>HieraType: immune cell typing</td>
+<td>Raw counts, nearest neighbors</td>
+<td>HieraType calls</td>
+</tr>
+<tr class="even">
+<td>HieraType: merge with prior clusters</td>
+<td>HieraType calls, clusters</td>
+<td>Cell type calls</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="exploratory-analysis" class="level3" data-number="1.1.2">
+<h3 data-number="1.1.2" class="anchored" data-anchor-id="exploratory-analysis"><span class="header-section-number">1.1.2</span> Exploratory analysis</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 34%">
+<col style="width: 39%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Step</strong></th>
+<th><strong>Inputs</strong></th>
+<th><strong>Outputs</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Pathway scoring with AUCell</td>
+<td>raw counts</td>
+<td>pathway scores</td>
+</tr>
+<tr class="even">
+<td>Moran’s I for spatially variable genes</td>
+<td>normalized counts, xy, cell type per-gene Moran’s I stats</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>InSituCor: spatially correlated genes</td>
+<td>normalized counts, xy, cell type modules of spatially correlated genes</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>InSituDiff: perturbations from baseline</td>
+<td>normalized counts, xy diverse outputs</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="differential-expression" class="level3" data-number="1.1.3">
+<h3 data-number="1.1.3" class="anchored" data-anchor-id="differential-expression"><span class="header-section-number">1.1.3</span> Differential expression</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 34%">
+<col style="width: 39%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Step</strong></th>
+<th><strong>Inputs</strong></th>
+<th><strong>Outputs</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Defining predictor variables</td>
+<td>Diverse &amp; bespoke</td>
+<td>Predictor variables</td>
+</tr>
+<tr class="even">
+<td>Find safe genes via overlap ratio metric</td>
+<td>Raw counts, xy, cell type</td>
+<td>Genes to analyze per cell type</td>
+</tr>
+<tr class="odd">
+<td>pre-DE</td>
+<td>xy</td>
+<td>preDE (object for modeling segmentation errors)</td>
+</tr>
+<tr class="even">
+<td>“Standard” DE with smiDE</td>
+<td>Raw counts, preDE, cell type, list of genes to analyze per cell type</td>
+<td>DE outputs: p-values, effect sizes, etc.</td>
+</tr>
+<tr class="odd">
+<td>“Optimal / slow” DE with smiDE</td>
+<td>Raw counts, preDE, cell type, genes to analyze per cell type</td>
+<td>DE outputs: p-values, effect sizes, etc.</td>
+</tr>
+<tr class="even">
+<td>“Hasty / exploratory” DE with hastyDE</td>
+<td>Normalized counts, cell type, genes to analyze per cell type</td>
+<td>DE outputs: p-values, effect sizes, etc.</td>
+</tr>
+<tr class="odd">
+<td>“Stepwise” DE with hastyDE &amp; smiDE</td>
+<td>Normalized counts, cell type, genes to analyze per cell type</td>
+<td>DE outputs: p-values, effect sizes, etc.</td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="basic-analysis-strategy-large-studies" class="level2" data-number="1.2">
 <h2 data-number="1.2" class="anchored" data-anchor-id="basic-analysis-strategy-large-studies"><span class="header-section-number">1.2</span> Basic analysis strategy: large studies</h2>
@@ -5389,6 +5562,8 @@ Note
 </section>
 <section id="hieratype" class="level1" data-number="8">
 <h1 data-number="8"><span class="header-section-number">8</span> Optimizing immune cell calling with the HieraType algorithm</h1>
+<section id="running-hieratype" class="level3" data-number="8.0.1">
+<h3 data-number="8.0.1" class="anchored" data-anchor-id="running-hieratype"><span class="header-section-number">8.0.1</span> Running HieraType</h3>
 <p>We created the <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/immune-cell-typing-smooth/" target="_blank">HieraType algorithm</a> to classify immune cells in a way that is informed by marker genes. We have found it to consistently outperform other algorithms in immune cell typing. Our standard approach now is to overwrite our initial clustering results with HieraType’s results whenever it calls an immune cell.</p>
 <p>Below, we run HieraType in two steps. In the first, we call broad cell types (e.g.&nbsp;epithelial, immune, …) then subclassify the immune cells (B, T, macrophage…)</p>
 <div class="cell">
@@ -5807,8 +5982,9 @@ font-style: inherit;">print</span>(hm_unsup)</span></code></pre></div>
 </div>
 </div>
 </div>
-<section id="merging-clustering-and-hieratype-results" class="level3" data-number="8.0.1">
-<h3 data-number="8.0.1" class="anchored" data-anchor-id="merging-clustering-and-hieratype-results"><span class="header-section-number">8.0.1</span> Merging clustering and HieraType results</h3>
+</section>
+<section id="merging-clustering-and-hieratype-results" class="level3" data-number="8.0.2">
+<h3 data-number="8.0.2" class="anchored" data-anchor-id="merging-clustering-and-hieratype-results"><span class="header-section-number">8.0.2</span> Merging clustering and HieraType results</h3>
 <p>To finish our cell typing exercise, we now merge the Louvain and HieraType results. All cells called immune by HieraType will get HieraType labels. All other cells will retain their old labels, with one important exception: clusters that were overwhelmingly called immune by HieraType will be removed, and their cells will be assigned to whatever consensus cell type is most abundant in its nearest neighbors in expression space.</p>
 <div class="cell">
 <details class="code-fold">
@@ -9248,6 +9424,36 @@ font-style: inherit;">length</span>(ps.spatial)]</span></code></pre></div>
 </div>
 </div>
 </div>
+<p>For categorical variables, we can use polygons over space to denote predictor category, while using color to show expression:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/figures/depolygons.png" class="img-fluid figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>And we can use standard bar plots (or better, bar-and-whisker plots), or violin plots, to summarize expression across categories:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/figures/pdcd1.png" class="img-fluid figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Or we can use a heatmap to show the mean expression per category of many genes at once:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/figures/deheatmap2.png" class="img-fluid figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+</div>
+</div>
 
 
 </section>
@@ -9282,6 +9488,578 @@ font-style: inherit;">length</span>(ps.spatial)]</span></code></pre></div>
   <guid>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/spatial-discovery-tips/</guid>
   <pubDate>Thu, 11 Dec 2025 00:00:00 GMT</pubDate>
   <media:content url="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/spatial-discovery-tips/figures/tile.png" medium="image" type="image/png" height="135" width="144"/>
+</item>
+<item>
+  <title>CosMx® Multiomics: Deriving an expression matrix from aligned CosMx RNA data</title>
+  <dc:creator>Claire Williams</dc:creator>
+  <link>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/aligned_rna_exp_matrix/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<section id="cosmx-smi-aligned-rna-to-expression-matrix" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> CosMx<sup>®</sup> SMI Aligned RNA to Expression matrix</h1>
+<p>When running a multiomic CosMx<sup>®</sup> SMI experiment, RNA data must be aligned to protein data as described in the post <a href="../../posts/multiomics-alignment/index.html">here</a>. This alignment generates new transcript location files for each FOV in a folder with the suffix <code>_Shifted</code>, as shown in panel (b) of the screenshot below (Figure&nbsp;1).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-align-screenshot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-align-screenshot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/aligned_rna_exp_matrix/figures/Figure6.png" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-align-screenshot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Output of RNA alignment to protein data
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>For downstream analysis, it’s common to create an expression matrix that captures gene expression for every cell on the slide. This brief post includes <code>R</code> code demonstrating how to extract transcripts for each cell and combine them into a single sparse matrix. After loading the three indicated libraries and the three functions, the key function is <code>load_aligned_RNA_to_expMat</code>. The resulting matrices, one for endogenous targets and another for Negative Probes, can be used directly or converted into a convenient format, such as a Seurat object with the function <code>CreateSeuratObject</code>, for further processing.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># ---- Load required libraries ----</span></span>
+<span id="cb1-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(data.table)    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Fast file reading and data manipulation</span></span>
+<span id="cb1-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(Matrix)        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Sparse matrix operations</span></span>
+<span id="cb1-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(future.apply)  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Parallel processing</span></span>
+<span id="cb1-5"></span>
+<span id="cb1-6"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># ---- Helper: Pad a sparse matrix to full gene/cell dimensions ----</span></span>
+<span id="cb1-7">pad_matrix <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(mat, all_genes, all_cells) {</span>
+<span id="cb1-8">  out <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">Matrix</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">nrow =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">length</span>(all_genes), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ncol =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">length</span>(all_cells), </span>
+<span id="cb1-9">                <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">sparse =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>,</span>
+<span id="cb1-10">                <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">dimnames =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(all_genes, all_cells))</span>
+<span id="cb1-11">  out[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">match</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rownames</span>(mat), all_genes), <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">match</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">colnames</span>(mat), all_cells)] <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> mat</span>
+<span id="cb1-12">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">return</span>(out)</span>
+<span id="cb1-13">}</span>
+<span id="cb1-14"></span>
+<span id="cb1-15"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># ---- Helper: Load one target file into sparse matrices ----</span></span>
+<span id="cb1-16">load_to_exp_mat <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(target_file, slide_number) {</span>
+<span id="cb1-17">  calls <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">fread</span>(target_file, </span>
+<span id="cb1-18">                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">select =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"CellId"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"fov"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"codeclass"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"target"</span>))</span>
+<span id="cb1-19">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">nrow</span>(calls) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">return</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">Endogenous =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">Negative =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>))</span>
+<span id="cb1-20">  </span>
+<span id="cb1-21">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Get gene sets BEFORE filtering CellId == 0</span></span>
+<span id="cb1-22">  all_endogenous <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">unique</span>(calls[codeclass <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Endogenous"</span>, target])</span>
+<span id="cb1-23">  all_negative <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">unique</span>(</span>
+<span id="cb1-24">    calls[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">grepl</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Neg"</span>, codeclass, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ignore.case =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>), target])</span>
+<span id="cb1-25">  </span>
+<span id="cb1-26">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Remove extracellular transcripts</span></span>
+<span id="cb1-27">  calls <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> calls[CellId <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>]</span>
+<span id="cb1-28">  </span>
+<span id="cb1-29">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Add slide-wide cell ID</span></span>
+<span id="cb1-30">  calls[, cell_ID <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">paste0</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"c_"</span>, slide_number, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"_"</span>, fov, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"_"</span>, CellId)]</span>
+<span id="cb1-31">  all_cells <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">unique</span>(calls<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>cell_ID)</span>
+<span id="cb1-32">  </span>
+<span id="cb1-33">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Function to build sparse matrix for a given type</span></span>
+<span id="cb1-34">  make_sparse <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(type, genes) {</span>
+<span id="cb1-35">    subset <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> calls[codeclass <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> type]</span>
+<span id="cb1-36">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">nrow</span>(subset) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>) {</span>
+<span id="cb1-37">      <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">return</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">Matrix</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">nrow =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">length</span>(genes), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ncol =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">length</span>(all_cells), </span>
+<span id="cb1-38">                    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">sparse =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>,</span>
+<span id="cb1-39">                    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">dimnames =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(genes, all_cells)))</span>
+<span id="cb1-40">    }</span>
+<span id="cb1-41">    counts <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> subset[, .N, by <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> .(target, cell_ID)]</span>
+<span id="cb1-42">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sparseMatrix</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">i =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">match</span>(counts<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>target, genes),</span>
+<span id="cb1-43">                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">j =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">match</span>(counts<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>cell_ID, all_cells),</span>
+<span id="cb1-44">                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> counts<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>N,</span>
+<span id="cb1-45">                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">dims =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">length</span>(genes), <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">length</span>(all_cells)),</span>
+<span id="cb1-46">                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">dimnames =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(genes, all_cells))</span>
+<span id="cb1-47">  }</span>
+<span id="cb1-48">  </span>
+<span id="cb1-49">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">Endogenous =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_sparse</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Endogenous"</span>, all_endogenous),</span>
+<span id="cb1-50">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">Negative =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_sparse</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Negative"</span>, all_negative))</span>
+<span id="cb1-51">}</span>
+<span id="cb1-52"></span>
+<span id="cb1-53"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># ---- Main Function ----</span></span>
+<span id="cb1-54"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#' Load aligned RNA data into sparse expression matrices</span></span>
+<span id="cb1-55"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#'</span></span>
+<span id="cb1-56"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#' Reads multiple target call files from an aligned RNA directory </span></span>
+<span id="cb1-57"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#' and returns two sparse matrices: </span></span>
+<span id="cb1-58"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#' one for endogenous targets (genes) and one for negative controls.</span></span>
+<span id="cb1-59"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#'</span></span>
+<span id="cb1-60"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#' @param aligned_RNA_dir Path to aligned RNA data </span></span>
+<span id="cb1-61"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#' (folder ending with "_Shifted")</span></span>
+<span id="cb1-62"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#' @param slide_number Slide number used in cell IDs</span></span>
+<span id="cb1-63"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#' @return A named list with two sparse matrices: "Endogenous" and "Negative"</span></span>
+<span id="cb1-64"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#' @examples</span></span>
+<span id="cb1-65"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#' exp_matrices &lt;- load_aligned_RNA_to_expMat(</span></span>
+<span id="cb1-66"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#'                      "AnalysisResults/7hzxsoa7rs_Shifted", 2)</span></span>
+<span id="cb1-67"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#' </span></span>
+<span id="cb1-68"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#' library(Seurat)</span></span>
+<span id="cb1-69"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#' sem &lt;- CreateSeuratObject(exp_matrices[["Endogenous"]])</span></span>
+<span id="cb1-70"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#' </span></span>
+<span id="cb1-71"> </span>
+<span id="cb1-72"></span>
+<span id="cb1-73">load_aligned_RNA_to_expMat <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(aligned_RNA_dir, slide_number) {</span>
+<span id="cb1-74">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Validate input</span></span>
+<span id="cb1-75">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dir.exists</span>(aligned_RNA_dir)) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stop</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Directory does not exist"</span>)</span>
+<span id="cb1-76">  </span>
+<span id="cb1-77">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Get target call files</span></span>
+<span id="cb1-78">  target_call_files <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list.files</span>(aligned_RNA_dir, </span>
+<span id="cb1-79">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pattern =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"_complete_code_cell_target_call_coord.csv"</span>,</span>
+<span id="cb1-80">                                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">recursive =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">full.names =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)</span>
+<span id="cb1-81">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">length</span>(target_call_files) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stop</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"No target call files found"</span>)</span>
+<span id="cb1-82">  </span>
+<span id="cb1-83">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Parallel load of all FOVs</span></span>
+<span id="cb1-84">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plan</span>(multisession)  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Set parallel backend</span></span>
+<span id="cb1-85">  exp_mat_list <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">future_lapply</span>(target_call_files, load_to_exp_mat, </span>
+<span id="cb1-86">                                <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">slide_number =</span> slide_number)</span>
+<span id="cb1-87">  </span>
+<span id="cb1-88">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Collect all genes and cells across FOVs</span></span>
+<span id="cb1-89">  all_endogenous_genes <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">unique</span>(</span>
+<span id="cb1-90">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">unlist</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(exp_mat_list, <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(x) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rownames</span>(x[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Endogenous"</span>]]))))</span>
+<span id="cb1-91">  all_negative_genes <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">unique</span>(</span>
+<span id="cb1-92">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">unlist</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(exp_mat_list, <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(x) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rownames</span>(x[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Negative"</span>]]))))</span>
+<span id="cb1-93">  all_cells <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">unique</span>(</span>
+<span id="cb1-94">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">unlist</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(exp_mat_list, <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(x) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">colnames</span>(x[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Endogenous"</span>]]))))</span>
+<span id="cb1-95">  </span>
+<span id="cb1-96">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Combine matrices across FOVs</span></span>
+<span id="cb1-97">  combine_mats <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(type, all_genes) {</span>
+<span id="cb1-98">    mats <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(exp_mat_list, <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(x) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">pad_matrix</span>(x[[type]], </span>
+<span id="cb1-99">                                                        all_genes, all_cells))</span>
+<span id="cb1-100">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">Reduce</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">+</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>, mats)</span>
+<span id="cb1-101">  }</span>
+<span id="cb1-102">  </span>
+<span id="cb1-103">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">Endogenous =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">combine_mats</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Endogenous"</span>, all_endogenous_genes),</span>
+<span id="cb1-104">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">Negative =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">combine_mats</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Negative"</span>, all_negative_genes))</span>
+<span id="cb1-105">}</span></code></pre></div>
+</details>
+</div>
+<p>Once you have this expression matrix and / or Seurat object, you are ready to continue with downstream tertiary analysis. As mentioned in the alignment post, after alignment all cell metadata and segmentation information is contained in the protein data and thus can be extracted from the protein run outputs. As one example of a downstream analysis utilizing both the RNA and protein data, see our recently released approach for <a href="../../posts/multiomics-hieratype/index.html">multiomic cell typing</a>.</p>
+
+
+</section>
+
+ ]]></description>
+  <category>multiomics</category>
+  <category>RNA</category>
+  <category>alignment</category>
+  <guid>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/aligned_rna_exp_matrix/</guid>
+  <pubDate>Wed, 26 Nov 2025 00:00:00 GMT</pubDate>
+  <media:content url="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/aligned_rna_exp_matrix/figures/ExpMatrixSnippet.png" medium="image" type="image/png" height="31" width="144"/>
 </item>
 <item>
   <title>Integrated RNA + protein multiomic cell typing using HieraType</title>
@@ -17367,7 +18145,7 @@ Figure&nbsp;6: (a) Alignment tool shifts and re-assigns RNA transcripts to prote
 </section>
 <section id="conclusions" class="level1" data-number="4">
 <h1 data-number="4"><span class="header-section-number">4</span> Conclusions</h1>
-<p>After using the off-AtoMx alignment tool to apply protein cell segmentation boundaries and cell ID labels to the RNA data, you can use transcript-to-cell alignments found in the <code>*_FOV#####__complete_code_cell_target_call_coords.csv</code> per FOV files within the <code>AnalysisResults_shifted</code> folder to continue analysis with the aligned RNA dataset. These updated files can be used alongside the protein run flat files to create a new multiomic data object. It’s important to note that all transcripts in the aligned RNA data will now reference the segmentation results and metadata from the protein run.</p>
+<p>After using the off-AtoMx alignment tool to apply protein cell segmentation boundaries and cell ID labels to the RNA data, you can use transcript-to-cell alignments found in the <code>*_FOV#####__complete_code_cell_target_call_coords.csv</code> per FOV files within the <code>AnalysisResults_shifted</code> folder to continue analysis with the aligned RNA dataset. For an example of how to gather the aligned RNA transcript information into an updated gene x cell expression matrix, see the post <a href="../posts/aligned_rna_exp_matrix/index.qmd">here</a>. These updated files can be used alongside the protein run flat files to create a new multiomic data object. It’s important to note that all transcripts in the aligned RNA data will now reference the segmentation results and metadata from the protein run.</p>
 <p>If you prefer to integrate the aligned RNA data into an existing data object, you can do so by starting with the protein run object and either replacing the protein expression matrix with an aligned RNA matrix or appending the RNA data as an additional assay.</p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -26943,7 +27721,7 @@ Tip
   author = {Lidan Wu and Aster Wardhani and Joseph-Tin Phan},
   year = {2025},
   url = {https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/image-segmentation-models/},
-  note = {Accessed: 2025-12-13}
+  note = {Accessed: 2025-12-15}
 }</code></pre>
 </div>
 <div id="tabset-1-4" class="tab-pane" aria-labelledby="tabset-1-4-tab">
@@ -35465,150 +36243,6 @@ Prompt to compile into HTML file
   <guid>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/cell-typing-cheat-sheets/</guid>
   <pubDate>Fri, 02 May 2025 00:00:00 GMT</pubDate>
   <media:content url="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/cell-typing-cheat-sheets/images/thumbnail.png" medium="image" type="image/png" height="131" width="144"/>
-</item>
-<item>
-  <title>Programmatic stitching of protein images with napari-cosmx</title>
-  <dc:creator>Evelyn Metzger</dc:creator>
-  <link>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-protein-stitching/napari-cosmx-protein-stitching.html</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<div class="cell">
-<div class="cell-output-display">
-<div id="fig-example" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-protein-stitching/figures/fig-protein-example.png" class="img-fluid figure-img" width="749">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: A small section of CosMx SMI data showing DNA (blue), PanCK (green) and the CD3 protein (yellow).
-</figcaption>
-</figure>
-</div>
-</div>
-</div>
-<p>The <code>napari-cosmx</code> plugin can be used to view CosMx<sup>®</sup> Spatial Molecular Imager (SMI) RNA and protein data. In a <a href="../../posts/napari-stitching/napari-cosmx-stitching.html">previous post</a>, I showed users how to programmatically stitch RNA exports from AtoMx<sup>®</sup> Spatial Informatics Platform (SIP). The process used to stitch protein is similar to RNA with some adjustments that are found below.</p>
-<p>This tutorial uses version 0.4.17.3 of the <code>napari-cosmx</code> plugin. This version is available as a <code>whl</code> file in the assets folder of the <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/blob/Main/assets/napari-cosmx%20releases/napari_CosMx-0.4.17.3-py3-none-any.whl">Scratch Space repository</a>. The tutorial below also builds upon the RNA-based post that more broadly covers how to create the napari environment, installing the plugin, and running scripts.</p>
-<p>When <code>napari-cosmx</code> is installed, we get a few package scripts that can be called directly. The ones needed to stitch protein are:</p>
-<ul>
-<li><code>stitch-images</code>, which builds the IF zarr stores</li>
-<li><code>stitch-expression</code>, which creates the zarr stores for each protein</li>
-</ul>
-<section id="exporting-protein-data" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Exporting protein data</h1>
-<p>When exporting data from AtoMx SIP, be sure to select “Raw Files” and include Morphology2D, Miscellaneous, and ProteinDir (Figure&nbsp;2).</p>
-<div class="cell">
-<div class="cell-output-display">
-<div id="fig-export-options" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-export-options-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-protein-stitching/figures/fig-export-options.png" class="img-fluid figure-img" width="548">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-export-options-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Export these components to stitch protein.
-</figcaption>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="stitching-immunofluorescence-images" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Stitching immunofluorescence images</h1>
-<p>This step is identical for RNA and protein.</p>
-<div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">stitch-images</span> <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">--help</span></span></code></pre></div>
-<pre><code>usage: stitch-images [-h] [-i INPUTDIR] [--imagesdir IMAGESDIR] [-o OUTPUTDIR] [-f OFFSETSDIR] [-l] [-u UMPERPX] [-z ZSLICE] [--dotzarr]
-
-Tile CellLabels and morphology TIFFs.
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -i INPUTDIR, --inputdir INPUTDIR
-                        Required: Path to CellLabels and morphology images.
-  --imagesdir IMAGESDIR
-                        Optional: Path to morphology images, if different than inputdir.
-  -o OUTPUTDIR, --outputdir OUTPUTDIR
-                        Required: Where to create zarr output.
-  -f OFFSETSDIR, --offsetsdir OFFSETSDIR
-                        Required: Path to directory location containing a file ending in FOV_Locations.csv or legacy format latest.fovs.csv.
-  -l, --labels          
-                        Optional: Only stitch labels.
-  -u UMPERPX, --umperpx UMPERPX
-                        Optional: Override image scale in um per pixel.
-                        Instrument-specific values to use:
-                        -&gt; beta04 = 0.1228
-  -z ZSLICE, --zslice ZSLICE
-                        Optional: Z slice to stitch.
-  --dotzarr             
-                        Optional: Add .zarr extension on multiscale pyramids.</code></pre>
-<p>Example:</p>
-<div class="sourceCode" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">stitch-images</span> <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">-i</span> path/to/CellStatsDir <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">-o</span> path/to/napari_zarr <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">-f</span> /path/to/RunSummary</span></code></pre></div>
-</section>
-<section id="stitch-protein-images" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Stitch Protein Images</h1>
-<p>RNA uses <code>read-targets</code> to create a file that stores the spatial location of RNA transcripts. In contrast, Protein SMI data are more similar to IF TIFF files and so we use the <code>stitch-expression</code> package script to stitch together individual protein files. When complete, protein data will be found in the <code>images/protein</code> subfolder.</p>
-<div class="sourceCode" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">stitch-expression</span> <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">--help</span></span></code></pre></div>
-<pre><code>usage: stitch-expression [-h] [-i INPUTDIR] [-o OUTPUTDIR] [-t TAG] [-u UMPERPX] [-s SCALE] [-c CYCLE] [--dotzarr]
-
-Tile protein expression images
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -i INPUTDIR, --inputdir INPUTDIR
-                        Required: Path to parent directory containing CellStatsDir, RunSummary, AnalysisResults, and ProteinDir.
-  -o OUTPUTDIR, --outputdir OUTPUTDIR
-                        Required: Where to create zarr output.
-  -t TAG, --tag TAG     
-                        Optional: Tag to append to end of protein names.
-  -u UMPERPX, --umperpx UMPERPX
-                        Optional: Override image scale in um per pixel.
-                        Instrument-specific values to use:
-                        -&gt; beta04 = 0.1228
-  -s SCALE, --scale SCALE
-                        Optional: Scale of expression images relative to raw,
-                          use if decoded images are binned.
-  -c CYCLE, --cycle CYCLE
-                        Optional: Cycle to use, default is 1.
-  --dotzarr             
-                        Optional: Add .zarr extension on multiscale pyramids.</code></pre>
-<p>Example:</p>
-<div class="sourceCode" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">stitch-expression</span> <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">-i</span> path/to/parent/slide_folder <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">-o</span> path/to/napari_zarr</span></code></pre></div>
-
-
-</section>
-
- ]]></description>
-  <category>napari</category>
-  <category>how-tos</category>
-  <category>python</category>
-  <category>protein</category>
-  <guid>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-protein-stitching/napari-cosmx-protein-stitching.html</guid>
-  <pubDate>Fri, 21 Feb 2025 00:00:00 GMT</pubDate>
-  <media:content url="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-protein-stitching/figures/fig-protein-example.png" medium="image" type="image/png" height="140" width="144"/>
 </item>
 </channel>
 </rss>

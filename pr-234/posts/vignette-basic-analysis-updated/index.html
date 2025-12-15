@@ -204,7 +204,7 @@ cookieconsent.run({
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">December 13, 2025</p>
+        <p class="date-modified">December 15, 2025</p>
       </div>
     </div>
       
@@ -220,7 +220,12 @@ cookieconsent.run({
   <ul>
   <li><a href="#new-best-practices-for-cosmx-analysis" id="toc-new-best-practices-for-cosmx-analysis" class="nav-link active" data-scroll-target="#new-best-practices-for-cosmx-analysis"><span class="header-section-number">1</span> New best practices for CosMx analysis</a>
   <ul class="collapse">
-  <li><a href="#basic-analysis-strategy" id="toc-basic-analysis-strategy" class="nav-link" data-scroll-target="#basic-analysis-strategy"><span class="header-section-number">1.1</span> Basic analysis strategy</a></li>
+  <li><a href="#basic-analysis-strategy" id="toc-basic-analysis-strategy" class="nav-link" data-scroll-target="#basic-analysis-strategy"><span class="header-section-number">1.1</span> Basic analysis strategy</a>
+  <ul class="collapse">
+  <li><a href="#basic-pre-processing" id="toc-basic-pre-processing" class="nav-link" data-scroll-target="#basic-pre-processing"><span class="header-section-number">1.1.1</span> Basic pre-processing</a></li>
+  <li><a href="#exploratory-analysis" id="toc-exploratory-analysis" class="nav-link" data-scroll-target="#exploratory-analysis"><span class="header-section-number">1.1.2</span> Exploratory analysis</a></li>
+  <li><a href="#differential-expression" id="toc-differential-expression" class="nav-link" data-scroll-target="#differential-expression"><span class="header-section-number">1.1.3</span> Differential expression</a></li>
+  </ul></li>
   <li><a href="#basic-analysis-strategy-large-studies" id="toc-basic-analysis-strategy-large-studies" class="nav-link" data-scroll-target="#basic-analysis-strategy-large-studies"><span class="header-section-number">1.2</span> Basic analysis strategy: large studies</a></li>
   </ul></li>
   </ul>
@@ -249,6 +254,179 @@ cookieconsent.run({
 <li><strong>Exploratory analysis</strong>: See what unexpected trends your data holds. Ideally, these trends can be phrased as formal hypotheses to be tested.</li>
 <li><strong>Hypothesis testing</strong>: In our experience, most analyses culminate here, mainly taking the form of differential expression (DE) testing. DE is a flexible tool to interrogate both the hypotheses you designed the study around and new hypotheses discovered in exploratory analysis. We see DE as the workhorse of spatial analyses, but there are other useful tools: e.g., you might calculate changes in cell type abundance or co-localization across space, or compute various metrics of ligand-receptor interactions.</li>
 </ol>
+<p>A high-level view of our workflow is below:</p>
+<section id="basic-pre-processing" class="level3" data-number="1.1.1">
+<h3 data-number="1.1.1" class="anchored" data-anchor-id="basic-pre-processing"><span class="header-section-number">1.1.1</span> Basic pre-processing</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 34%">
+<col style="width: 39%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Step</strong></th>
+<th><strong>Inputs</strong></th>
+<th><strong>Outputs</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Load flat files</td>
+<td>Flat files</td>
+<td>Raw counts, metadata, xy</td>
+</tr>
+<tr class="even">
+<td>Customize xy</td>
+<td>xy</td>
+<td>xy</td>
+</tr>
+<tr class="odd">
+<td>QC</td>
+<td>Raw counts, metadata, xy</td>
+<td>Raw counts, metadata, xy (filtered)</td>
+</tr>
+<tr class="even">
+<td>Normalization</td>
+<td>Raw counts</td>
+<td>Normalized counts</td>
+</tr>
+<tr class="odd">
+<td>Dim reduction: HVGs</td>
+<td>Raw counts</td>
+<td>HVGs</td>
+</tr>
+<tr class="even">
+<td>Dim reduction: PCA</td>
+<td>xy, metadata, HVGs</td>
+<td>PCs</td>
+</tr>
+<tr class="odd">
+<td>Dim reduction: UMAP</td>
+<td>PCs</td>
+<td>UMAP projection, nearest neighbors</td>
+</tr>
+<tr class="even">
+<td>Graph clustering (Louvain or Leiden)</td>
+<td>Nearest neighbors</td>
+<td>Clusters</td>
+</tr>
+<tr class="odd">
+<td>InSituType clustering</td>
+<td>Raw counts, HVGs</td>
+<td>Clusters</td>
+</tr>
+<tr class="even">
+<td>Cluster naming / marker gene ID</td>
+<td>Clusters, raw counts</td>
+<td>Suggested cluster names</td>
+</tr>
+<tr class="odd">
+<td>HieraType: immune cell typing</td>
+<td>Raw counts, nearest neighbors</td>
+<td>HieraType calls</td>
+</tr>
+<tr class="even">
+<td>HieraType: merge with prior clusters</td>
+<td>HieraType calls, clusters</td>
+<td>Cell type calls</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="exploratory-analysis" class="level3" data-number="1.1.2">
+<h3 data-number="1.1.2" class="anchored" data-anchor-id="exploratory-analysis"><span class="header-section-number">1.1.2</span> Exploratory analysis</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 34%">
+<col style="width: 39%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Step</strong></th>
+<th><strong>Inputs</strong></th>
+<th><strong>Outputs</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Pathway scoring with AUCell</td>
+<td>raw counts</td>
+<td>pathway scores</td>
+</tr>
+<tr class="even">
+<td>Moran’s I for spatially variable genes</td>
+<td>normalized counts, xy, cell type per-gene Moran’s I stats</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>InSituCor: spatially correlated genes</td>
+<td>normalized counts, xy, cell type modules of spatially correlated genes</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>InSituDiff: perturbations from baseline</td>
+<td>normalized counts, xy diverse outputs</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="differential-expression" class="level3" data-number="1.1.3">
+<h3 data-number="1.1.3" class="anchored" data-anchor-id="differential-expression"><span class="header-section-number">1.1.3</span> Differential expression</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 34%">
+<col style="width: 39%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Step</strong></th>
+<th><strong>Inputs</strong></th>
+<th><strong>Outputs</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Defining predictor variables</td>
+<td>Diverse &amp; bespoke</td>
+<td>Predictor variables</td>
+</tr>
+<tr class="even">
+<td>Find safe genes via overlap ratio metric</td>
+<td>Raw counts, xy, cell type</td>
+<td>Genes to analyze per cell type</td>
+</tr>
+<tr class="odd">
+<td>pre-DE</td>
+<td>xy</td>
+<td>preDE (object for modeling segmentation errors)</td>
+</tr>
+<tr class="even">
+<td>“Standard” DE with smiDE</td>
+<td>Raw counts, preDE, cell type, list of genes to analyze per cell type</td>
+<td>DE outputs: p-values, effect sizes, etc.</td>
+</tr>
+<tr class="odd">
+<td>“Optimal / slow” DE with smiDE</td>
+<td>Raw counts, preDE, cell type, genes to analyze per cell type</td>
+<td>DE outputs: p-values, effect sizes, etc.</td>
+</tr>
+<tr class="even">
+<td>“Hasty / exploratory” DE with hastyDE</td>
+<td>Normalized counts, cell type, genes to analyze per cell type</td>
+<td>DE outputs: p-values, effect sizes, etc.</td>
+</tr>
+<tr class="odd">
+<td>“Stepwise” DE with hastyDE &amp; smiDE</td>
+<td>Normalized counts, cell type, genes to analyze per cell type</td>
+<td>DE outputs: p-values, effect sizes, etc.</td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="basic-analysis-strategy-large-studies" class="level2" data-number="1.2">
 <h2 data-number="1.2" class="anchored" data-anchor-id="basic-analysis-strategy-large-studies"><span class="header-section-number">1.2</span> Basic analysis strategy: large studies</h2>
