@@ -2,10 +2,9 @@
   {
     "listing": "/index.html",
     "items": [
-      "/posts/vignette-basic-analysis-updated/02_exploratory_analysis.html",
-      "/posts/vignette-basic-analysis-updated/index.html",
-      "/posts/vignette-basic-analysis-updated/01_preprocessing.html",
       "/posts/vignette-basic-analysis-updated/03_DE.html",
+      "/posts/vignette-basic-analysis-updated/02_exploratory_analysis.html",
+      "/posts/vignette-basic-analysis-updated/01_preprocessing.html",
       "/posts/spatial-discovery-tips/index.html",
       "/posts/aligned_rna_exp_matrix/index.html",
       "/posts/multiomics-hieratype/index.html",

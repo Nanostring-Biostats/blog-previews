@@ -7,7 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Patrick Danaher">
-<meta name="dcterms.date" content="2025-12-11">
+<meta name="dcterms.date" content="2025-12-24">
+<meta name="description" content="Best practices for CosMx RNA analysis. Post 3 of 3, covering strategies for differential expression analysis. Covers both how to define useful variables for DE and strategies for running DE.">
 
 <title>Basic analysis vignette: differential expression – Blog</title>
 <style>
@@ -199,9 +200,16 @@ cookieconsent.run({
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
       <h1 class="title">Basic analysis vignette: differential expression</h1>
-                                <div class="quarto-categories">
+                  <div>
+        <div class="description">
+          Best practices for CosMx RNA analysis. Post 3 of 3, covering strategies for differential expression analysis. Covers both how to define useful variables for DE and strategies for running DE.
+        </div>
+      </div>
+                          <div class="quarto-categories">
                 <div class="quarto-category">recommended</div>
                 <div class="quarto-category">differential expression</div>
+                <div class="quarto-category">overview</div>
+                <div class="quarto-category">how-tos</div>
               </div>
                   </div>
   </div>
@@ -229,14 +237,14 @@ cookieconsent.run({
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">December 11, 2025</p>
+        <p class="date">December 24, 2025</p>
       </div>
     </div>
     
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">December 15, 2025</p>
+        <p class="date-modified">December 22, 2025</p>
       </div>
     </div>
       
@@ -287,13 +295,65 @@ cookieconsent.run({
 
 <section id="introduction" class="level1" data-number="1">
 <h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
+<p>Here we provide workflows for differential expression testing. Also see the companion posts on <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/01_preprocessing.html">pre-processing</a> and <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/02_exploratory_analysis.html">exploratory analysis</a>. A complete analysis will typically begin with the pre-processing workflow, use exploratory analyses to generate hypotheses, then conclude by using differential expression analysis to test those hypotheses.</p>
 <p>Whether you crafted your study with specific hypotheses in mind or discovered interesting trends while exploring your data, most CosMx<sup>®</sup> analyses will culminate in differential expression (DE) analyses. DE is a remarkably versatile tool for posing biological questions about how cells’ behavior changes in response to exposures like spatial context or patient-level attributes. Here we provide a convenient framework for posing your biological questions as DE tests.</p>
-<p>Code is organized into the following sections:</p>
-<ol type="1">
-<li>A collection of code chunks that can be edited and recombined to produce exactly the DE question you want.</li>
-<li>A collection of code chunks for run DE under different conditions</li>
-<li>Recommended code for exploring DE results</li>
-</ol>
+<p>Code is organized into the following sections, with the following inputs and outputs:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 34%">
+<col style="width: 39%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Step</strong></th>
+<th><strong>Inputs</strong></th>
+<th><strong>Outputs</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Defining predictor variables</td>
+<td>xy, cell type, custom inputs</td>
+<td>Predictor variables</td>
+</tr>
+<tr class="even">
+<td>Find safe genes via overlap ratio metric</td>
+<td>Raw counts, xy, cell type</td>
+<td>Genes to analyze per cell type</td>
+</tr>
+<tr class="odd">
+<td>pre-DE calculations</td>
+<td>xy</td>
+<td>preDE (object for modeling segmentation errors)</td>
+</tr>
+<tr class="even">
+<td>“Standard” DE with smiDE</td>
+<td>Predictor variables, Raw counts, preDE, cell type, list of genes to analyze per cell type</td>
+<td>DE outputs: p-values, effect sizes, etc.</td>
+</tr>
+<tr class="odd">
+<td>“Optimal / slow” DE with smiDE</td>
+<td>Predictor variables, Raw counts, preDE, cell type, genes to analyze per cell type</td>
+<td>DE outputs: p-values, effect sizes, etc.</td>
+</tr>
+<tr class="even">
+<td>“Hasty / exploratory” DE with hastyDE</td>
+<td>Predictor variables, Normalized counts, cell type, genes to analyze per cell type</td>
+<td>DE outputs: p-values, effect sizes, etc.</td>
+</tr>
+<tr class="odd">
+<td>“Stepwise” DE with hastyDE &amp; smiDE</td>
+<td>Predictor variables, Normalized counts, Raw counts, cell type, genes to analyze per cell type</td>
+<td>DE outputs: p-values, effect sizes, etc.</td>
+</tr>
+<tr class="even">
+<td>Analysis of DE results</td>
+<td>DE results</td>
+<td>plots and tables</td>
+</tr>
+</tbody>
+</table>
 <p>This document exists to facilitate the coding of DE analyses, not as a literature review or an unveiling of new methods. For an extensive discussion of DE in spatial data, see <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/" target="_blank">this ealier post</a>. We’ll be relying on the <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/smiDE" target="_blank">smiDE package</a>, described in <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/smiDE/" target="_blank">this post</a> and <a href="https://www.biorxiv.org/content/10.1101/2024.08.02.606405v2.abstract" target="_blank">this preprint</a>.</p>
 <section id="getting-started" class="level2" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="getting-started"><span class="header-section-number">1.1</span> Getting started</h2>
@@ -1115,7 +1175,7 @@ cookieconsent.run({
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="figures/pdcd1.png" class="img-fluid figure-img" style="width:85.0%"></p>
+<p><img src="figures/pdcd1.png" class="img-fluid figure-img" style="width:20.0%"></p>
 </figure>
 </div>
 </div>
@@ -1125,7 +1185,7 @@ cookieconsent.run({
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="figures/deheatmap2.png" class="img-fluid figure-img" style="width:85.0%"></p>
+<p><img src="figures/deheatmap2.png" class="img-fluid figure-img" style="width:15.0%"></p>
 </figure>
 </div>
 </div>

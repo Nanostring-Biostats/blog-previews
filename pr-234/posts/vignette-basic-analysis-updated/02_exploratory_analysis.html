@@ -7,7 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Patrick Danaher">
-<meta name="dcterms.date" content="2025-12-11">
+<meta name="dcterms.date" content="2025-12-23">
+<meta name="description" content="Best practices for CosMx RNA analysis. Post 2 of 3, covering exploratory analysis techniques - pathway scoring, Moran’s I for finding spatially dependent genes, InSituCor for finding modules of spatially correlated genes, and InSituDiff for analyzing perturbations from control samples.">
 
 <title>Basic analysis vignette: exploratory analysis – Blog</title>
 <style>
@@ -199,11 +200,16 @@ cookieconsent.run({
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
       <h1 class="title">Basic analysis vignette: exploratory analysis</h1>
-                                <div class="quarto-categories">
+                  <div>
+        <div class="description">
+          Best practices for CosMx RNA analysis. Post 2 of 3, covering exploratory analysis techniques - pathway scoring, Moran’s I for finding spatially dependent genes, InSituCor for finding modules of spatially correlated genes, and InSituDiff for analyzing perturbations from control samples.
+        </div>
+      </div>
+                          <div class="quarto-categories">
                 <div class="quarto-category">recommended</div>
-                <div class="quarto-category">quality control</div>
-                <div class="quarto-category">cell typing</div>
-                <div class="quarto-category">normalization</div>
+                <div class="quarto-category">exploratory analysis</div>
+                <div class="quarto-category">overview</div>
+                <div class="quarto-category">how-tos</div>
               </div>
                   </div>
   </div>
@@ -231,14 +237,14 @@ cookieconsent.run({
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">December 11, 2025</p>
+        <p class="date">December 23, 2025</p>
       </div>
     </div>
     
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">December 15, 2025</p>
+        <p class="date-modified">December 22, 2025</p>
       </div>
     </div>
       
@@ -280,15 +286,40 @@ cookieconsent.run({
 
 <section id="introduction" class="level1" data-number="1">
 <h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
+<p>Here we provide workflows for exploratory analysis. Also see the companion posts on <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/01_preprocessing.html">pre-processing</a> and confirmatory analysis with <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/03_DE.html">differential expression testing</a>. A complete analysis will typically begin with the pre-processing workflow, use exploratory analyses to generate hypotheses, then conclude by using differential expression analysis to test those hypotheses.</p>
 <p>CosMx datasets, with thousands of genes and hundreds of thousands of cells, contain an incomprehensible richness of biological trends. Even when you have a primary hypothesis in mind, it’s worth seeing what unexpected findings your data holds. To this end, various exploratory analysis tools exist to help you answer the basic question, “what in this dataset might be worth paying attention to?”</p>
-<p>A great many tools exist for exploring spatial data, and we do not attempt to catalog them here. Instead, we’ll share a few techniques we’ve found useful.</p>
-<p>Our primary strategies are:</p>
-<ol type="1">
-<li><a href="#pathway">Compute pathway scores to reduce your data to a smaller number of more stable and interpretable variables.</a></li>
-<li><a href="#moran">Look for spatially variable genes (or pathways)</a></li>
-<li><a href="#insitucor">Look for spatial correlation between genes using the InSituCor algorithm</a></li>
-<li><a href="#insitudiff">Look for perturbations in disease vs.&nbsp;baseline samples using the InSituDiff algorithm</a></li>
-</ol>
+<p>A great many tools exist for exploring spatial data, and we do not attempt to catalog them here. Instead, we’ll share a few techniques we’ve found useful. The four tools we discuss are:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th><strong>Approach</strong></th>
+<th><strong>Inputs</strong></th>
+<th><strong>Outputs</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#pathway">Score pathway activity with AUCell</a></td>
+<td>raw counts</td>
+<td>pathway scores</td>
+</tr>
+<tr class="even">
+<td><a href="#moran">Look for spatially variable genes (or pathways)</a></td>
+<td>normalized counts, xy, cell type</td>
+<td>per-gene Moran’s I stats</td>
+</tr>
+<tr class="odd">
+<td><a href="#insitucor">Look for spatially correlated genes using InSituCor</a></td>
+<td>normalized counts, xy, cell type</td>
+<td>modules of spatially correlated genes</td>
+</tr>
+<tr class="even">
+<td><a href="#insitudiff">Look for perturbations from baseline using InSituDiff</a></td>
+<td>normalized counts, xy</td>
+<td>diverse outputs</td>
+</tr>
+</tbody>
+</table>
 <section id="getting-started" class="level2" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="getting-started"><span class="header-section-number">1.1</span> Getting started</h2>
 <p>To begin, load your fully pre-processed data (including cell type annotations):</p>

@@ -223,7 +223,7 @@ cookieconsent.run({
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">December 15, 2025</p>
+        <p class="date-modified">December 22, 2025</p>
       </div>
     </div>
       
@@ -323,7 +323,7 @@ Figure&nbsp;3: Data selection for (a) Protein and (b) RNA export from AtoMx SIP
 </section>
 <section id="download-and-use-alignment-tool" class="level1" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Download and Use Alignment Tool</h1>
-<p>Download and unzip the <code>MultiO_Alignment_Tool_OCT2025.zip</code> file available <a href="https://bruker-my.sharepoint.com/:u:/p/s_korukonda/IQDEqiT2UmovRqi2xgteIkwrAbz2jIXuVVaOzDnts0Hivaw?e=jch110" target="_blank">here</a>. Once the file has been unzipped, launch the tool by double-clicking the <code>MultiOAligmentUI.bat</code> file. The executable will launch an interactive graphical user interface (GUI) as shown in <a href="#fig-gui" class="quarto-xref">Figure&nbsp;4</a>.</p>
+<p>Download and unzip the <code>MultiO_Alignment_Tool_DEC2025.zip</code> file available <a href="https://bruker-my.sharepoint.com/:u:/p/s_korukonda/IQDkKiNpm1DyQIcx6IslxoRhASKIftW94cPDfZYKQvIBAGg?e=2asnbz" target="_blank">here</a>. Once the file has been unzipped, launch the tool by double-clicking the <code>MultiOAligmentUI.bat</code> file. The executable will launch an interactive graphical user interface (GUI) as shown in <a href="#fig-gui" class="quarto-xref">Figure&nbsp;4</a>.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -440,7 +440,7 @@ Figure&nbsp;6: (a) Alignment tool shifts and re-assigns RNA transcripts to prote
 </section>
 <section id="conclusions" class="level1" data-number="4">
 <h1 data-number="4"><span class="header-section-number">4</span> Conclusions</h1>
-<p>After using the off-AtoMx alignment tool to apply protein cell segmentation boundaries and cell ID labels to the RNA data, you can use transcript-to-cell alignments found in the <code>*_FOV#####__complete_code_cell_target_call_coords.csv</code> per FOV files within the <code>AnalysisResults_shifted</code> folder to continue analysis with the aligned RNA dataset. For an example of how to gather the aligned RNA transcript information into an updated gene x cell expression matrix, see the post <a href="../posts/aligned_rna_exp_matrix/index.qmd">here</a>. These updated files can be used alongside the protein run flat files to create a new multiomic data object. It’s important to note that all transcripts in the aligned RNA data will now reference the segmentation results and metadata from the protein run.</p>
+<p>After using the off-AtoMx alignment tool to apply protein cell segmentation boundaries and cell ID labels to the RNA data, you can use transcript-to-cell alignments found in the <code>*_FOV#####__complete_code_cell_target_call_coords.csv</code> per FOV files within the <code>AnalysisResults_shifted</code> folder to continue analysis with the aligned RNA dataset. For an example of how to gather the aligned RNA transcript information into an updated gene x cell expression matrix, see the post <a href="../../posts/aligned_rna_exp_matrix/index.html">here</a>. These updated files can be used alongside the protein run flat files to create a new multiomic data object. It’s important to note that all transcripts in the aligned RNA data will now reference the segmentation results and metadata from the protein run.</p>
 <p>If you prefer to integrate the aligned RNA data into an existing data object, you can do so by starting with the protein run object and either replacing the protein expression matrix with an aligned RNA matrix or appending the RNA data as an additional assay.</p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
