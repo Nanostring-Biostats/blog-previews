@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.30">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Patrick Danaher">
+<meta name="dcterms.date" content="2025-12-24">
+<meta name="description" content="Best practices for CosMx RNA analysis. Post 3 of 3, covering strategies for differential expression analysis. Covers both how to define useful variables for DE and strategies for running DE.">
+
+<title>Basic analysis vignette: differential expression – Blog</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../assets/logo_Bruker_black.png" rel="icon" type="image/png">
+<script src="../../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-3a01e2046221230fdceeea94b1ec5d67.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-a4a11d514c7d463668e07712114998e6.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-8dd817d487e8e26707729065bc6b7e6d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-29W4MW0Y2W"></script>
+
+<script type="text/plain" cookie-consent="tracking">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-29W4MW0Y2W', { 'anonymize_ip': true});
+</script>
+
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({
+  "notice_banner_type":"simple",
+  "consent_type":"implied",
+  "palette":"light",
+  "language":"en",
+  "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
+  "notice_banner_reject_button_hide":false,
+  "preferences_center_close_button_hide":false,
+  "website_name":""
+  ,
+"language":"en"
+  });
+});
+</script> 
+  
+
+
+</head>
+
+<body class="floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../.././assets/logo_Bruker_white.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../license.html"> 
+<span class="menu-text">License</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../link-to-code.html"> 
+<span class="menu-text">Code</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">Browse Posts by Topic</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/company/bruker-spatial"> <i class="bi bi-linkedin" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../index.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Basic analysis vignette: differential expression</h1>
+                  <div>
+        <div class="description">
+          Best practices for CosMx RNA analysis. Post 3 of 3, covering strategies for differential expression analysis. Covers both how to define useful variables for DE and strategies for running DE.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">recommended</div>
+                <div class="quarto-category">differential expression</div>
+                <div class="quarto-category">overview</div>
+                <div class="quarto-category">how-tos</div>
+              </div>
+                  </div>
+  </div>
+    
+  <div class="quarto-title-meta-author">
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-heading">Affiliations</div>
+    
+      <div class="quarto-title-meta-contents">
+      <p class="author">Patrick Danaher <a href="https://orcid.org/0000-0002-2844-5883" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+    </div>
+    <div class="quarto-title-meta-contents">
+          <p class="affiliation">
+              Bruker Spatial Biology
+            </p>
+          <p class="affiliation">
+              Github: <a href="https://github.com/patrickjdanaher" target="_blank">patrickjdanaher</a>
+            </p>
+        </div>
+    </div>
+
+  <div class="quarto-title-meta">
+
+        
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">December 24, 2025</p>
+      </div>
+    </div>
+    
+      <div>
+      <div class="quarto-title-meta-heading">Modified</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date-modified">January 8, 2026</p>
+      </div>
+    </div>
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="1">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a>
+  <ul class="collapse">
+  <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started"><span class="header-section-number">1.1</span> Getting started</a></li>
+  </ul></li>
+  <li><a href="#crafting-predictor-variables-for-de" id="toc-crafting-predictor-variables-for-de" class="nav-link" data-scroll-target="#crafting-predictor-variables-for-de"><span class="header-section-number">2</span> Crafting predictor variables for DE</a>
+  <ul class="collapse">
+  <li><a href="#defining-categorical-variables" id="toc-defining-categorical-variables" class="nav-link" data-scroll-target="#defining-categorical-variables"><span class="header-section-number">2.1</span> Defining categorical variables</a></li>
+  <li><a href="#defining-continuous-variables" id="toc-defining-continuous-variables" class="nav-link" data-scroll-target="#defining-continuous-variables"><span class="header-section-number">2.2</span> Defining continuous variables</a></li>
+  <li><a href="#transformations-on-continuous-variables" id="toc-transformations-on-continuous-variables" class="nav-link" data-scroll-target="#transformations-on-continuous-variables"><span class="header-section-number">2.3</span> Transformations on continuous variables:</a></li>
+  <li><a href="#confirm-your-variable" id="toc-confirm-your-variable" class="nav-link" data-scroll-target="#confirm-your-variable"><span class="header-section-number">2.4</span> Confirm your variable:</a></li>
+  </ul></li>
+  <li><a href="#running-de" id="toc-running-de" class="nav-link" data-scroll-target="#running-de"><span class="header-section-number">3</span> Running DE</a>
+  <ul class="collapse">
+  <li><a href="#preliminaries-for-smide" id="toc-preliminaries-for-smide" class="nav-link" data-scroll-target="#preliminaries-for-smide"><span class="header-section-number">3.1</span> Preliminaries for smiDE</a></li>
+  <li><a href="#running-smide" id="toc-running-smide" class="nav-link" data-scroll-target="#running-smide"><span class="header-section-number">3.2</span> running smiDE</a></li>
+  </ul></li>
+  <li><a href="#analyzing-de-results" id="toc-analyzing-de-results" class="nav-link" data-scroll-target="#analyzing-de-results"><span class="header-section-number">4</span> Analyzing DE results</a>
+  <ul class="collapse">
+  <li><a href="#prioritizing-genes" id="toc-prioritizing-genes" class="nav-link" data-scroll-target="#prioritizing-genes"><span class="header-section-number">4.1</span> Prioritizing genes</a></li>
+  <li><a href="#exploring-results" id="toc-exploring-results" class="nav-link" data-scroll-target="#exploring-results"><span class="header-section-number">4.2</span> Exploring results</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="introduction" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
+<p>Here we provide workflows for differential expression testing. Also see the companion posts on <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/01_preprocessing.html">pre-processing</a> and <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/02_exploratory_analysis.html">exploratory analysis</a>. A complete analysis will typically begin with the pre-processing workflow, use exploratory analyses to generate hypotheses, then conclude by using differential expression analysis to test those hypotheses.</p>
+<p>Whether you crafted your study with specific hypotheses in mind or discovered interesting trends while exploring your data, most CosMx<sup>®</sup> analyses will culminate in differential expression (DE) analyses. DE is a remarkably versatile tool for posing biological questions about how cells’ behavior changes in response to exposures like spatial context or patient-level attributes. Here we provide a convenient framework for posing your biological questions as DE tests.</p>
+<p>Code is organized into the following sections, with the following inputs and outputs:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 34%">
+<col style="width: 39%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Step</strong></th>
+<th><strong>Inputs</strong></th>
+<th><strong>Outputs</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Defining predictor variables</td>
+<td>xy, cell type, custom inputs</td>
+<td>Predictor variables</td>
+</tr>
+<tr class="even">
+<td>Find safe genes via overlap ratio metric</td>
+<td>Raw counts, xy, cell type</td>
+<td>Genes to analyze per cell type</td>
+</tr>
+<tr class="odd">
+<td>pre-DE calculations</td>
+<td>xy</td>
+<td>preDE (object for modeling segmentation errors)</td>
+</tr>
+<tr class="even">
+<td>“Standard” DE with smiDE</td>
+<td>Predictor variables, Raw counts, preDE, cell type, list of genes to analyze per cell type</td>
+<td>DE outputs: p-values, effect sizes, etc.</td>
+</tr>
+<tr class="odd">
+<td>“Optimal / slow” DE with smiDE</td>
+<td>Predictor variables, Raw counts, preDE, cell type, genes to analyze per cell type</td>
+<td>DE outputs: p-values, effect sizes, etc.</td>
+</tr>
+<tr class="even">
+<td>“Hasty / exploratory” DE with hastyDE</td>
+<td>Predictor variables, Normalized counts, cell type, genes to analyze per cell type</td>
+<td>DE outputs: p-values, effect sizes, etc.</td>
+</tr>
+<tr class="odd">
+<td>“Stepwise” DE with hastyDE &amp; smiDE</td>
+<td>Predictor variables, Normalized counts, Raw counts, cell type, genes to analyze per cell type</td>
+<td>DE outputs: p-values, effect sizes, etc.</td>
+</tr>
+<tr class="even">
+<td>Analysis of DE results</td>
+<td>DE results</td>
+<td>plots and tables</td>
+</tr>
+</tbody>
+</table>
+<p>This document exists to facilitate the coding of DE analyses, not as a literature review or an unveiling of new methods. For an extensive discussion of DE in spatial data, see <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/DE-guide/" target="_blank">this ealier post</a>. We’ll be relying on the <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/smiDE" target="_blank">smiDE package</a>, described in <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/smiDE/" target="_blank">this post</a> and <a href="https://www.biorxiv.org/content/10.1101/2024.08.02.606405v2.abstract" target="_blank">this preprint</a>.</p>
+<section id="getting-started" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="getting-started"><span class="header-section-number">1.1</span> Getting started</h2>
+<p>To begin, load your fully pre-processed data (including cell type annotations). We assume the format generated by the <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/vignette-basic-analysis-updated/01_preprocessing.html">preprocessing vignette</a>:</p>
+<ul>
+<li>a sparse counts matrix with cells in rows and genes in columns</li>
+<li>a data table of per-cell metadata, row-aligned with the counts matrix</li>
+<li>a matrix of cells’ xy positions, row-aligned with the counts matrix</li>
+</ul>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="do">## load necessary libraries</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table) <span class="co"># for more memory efficient data frames</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Matrix) <span class="co"># for sparse matrices like our counts matrix</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(smiDE) <span class="co"># remotes::install_github("Nanostring-Biostats/CosMx-Analysis-Scratch-Space", subdir = "_code/smiDE", ref = "Main")</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pheatmap)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(InSituCor) <span class="co"># devtools::install_github("https://github.com/Nanostring-Biostats/InSituCor")</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="do">## load data:</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>counts <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/counts.RDS"</span>))</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>metadata <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/metadata.RDS"</span>)) <span class="co"># expected to have the column "celltype"</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>xy <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">paste0</span>(outdir, <span class="st">"/processed_data/xy.RDS"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Then we’ll define each cell’s neighbors. This will prove useful for a variety of downstream calculations. Note that cells are not included in their own neighbors.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## define cell neighborhoods:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># get the 50 nearest neighbors of each cell:</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>neighbors <span class="ot">&lt;-</span> InSituCor<span class="sc">:::</span><span class="fu">nearestNeighborGraph</span>(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> xy[, <span class="dv">1</span>], <span class="at">y =</span> xy[, <span class="dv">2</span>], </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">N =</span> <span class="dv">50</span>,  <span class="co"># number of neighbors</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">subset =</span> metadata<span class="sc">$</span>slide_ID_numeric)  <span class="co"># optional argument to ensure cells with similar xy positions in different slides aren't linked</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># or alternatively, get neighbors within a radius of 0.1mm:</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>neighbors <span class="ot">&lt;-</span> InSituCor<span class="sc">:::</span><span class="fu">radiusBasedGraph</span>(</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> xy[, <span class="dv">1</span>], <span class="at">y =</span> xy[, <span class="dv">2</span>], </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">R =</span> <span class="fl">0.1</span>,  <span class="co"># radius</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">subset =</span> metadata<span class="sc">$</span>slide_ID_numeric) <span class="co"># optional argument to ensure cells with similar xy positions in different slides aren't linked</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># see how many neighbors you're defining for each cell:</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(Matrix<span class="sc">::</span><span class="fu">rowSums</span>(<span class="dv">1</span> <span class="sc">*</span> (neighbors20 <span class="sc">&gt;</span> <span class="dv">0</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+</section>
+<section id="crafting-predictor-variables-for-de" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Crafting predictor variables for DE</h1>
+<p>Repurpose the below code chunks to create precisely the predictor variable you want to use in DE.</p>
+<section id="defining-categorical-variables" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="defining-categorical-variables"><span class="header-section-number">2.1</span> Defining categorical variables</h2>
+<p>Below we provide code for 4 different approaches to defining categorical variables for analysis:</p>
+<ol type="1">
+<li>Partitioning the tissue into niches / spatial domains using the Novae algorithm. Spatial domains are a natural framework for comparing cells’ expression patterns across spatial contexts; we have found the Novae algorithm to perform well.</li>
+<li>Selecting custom regions of interest. Use this code to hand-select regions for comparison, e.g.&nbsp;distinct lobes of a tumor, or a tertiary lymphoid structure, or a region suggested by review of H&amp;E, IF, or protein images.</li>
+<li>Logical combinations of existing metadata columns, including dichotomization of continuous variables, e.g.&nbsp;gene expression (“B2M high”), pathway score (“INFG signaling high”) or one of the continuous variables calculated below (“distance to tumor glands”).</li>
+<li>Defining anatomical features consisting of spatially contiguous cells.</li>
+</ol>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Novae niches</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Custom ROIs</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Combining existing annotations</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">Anatomical features / groups of contiguous cells</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p>You can now get Novae niches in an AtoMx pipeline module. Alternatively, compute them with the below code. Note that Novae is a python package; here we show how to call it from R, leaving details of python setup to you.</p>
+<p>First we’ll use R to prepare our data for Novae, writing it to a h5ad file:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create a seurat object:</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to single cell experiment</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>sce <span class="ot">&lt;-</span> <span class="fu">as.SingleCellExperiment</span>(seu.obj)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Save as h5ad</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>h5ad_path <span class="ot">&lt;-</span> <span class="fu">paste0</span>(objects_dir, <span class="st">"/assay_data.h5ad"</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#writeH5AD(se_hdf5, file = h5ad_path)</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="fu">writeH5AD</span>(sce, <span class="at">file =</span> h5ad_path, <span class="at">X_name =</span> <span class="st">"counts"</span>, <span class="at">assay =</span> <span class="st">"counts"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Now we run python code to call Novae. Note that this can easily take a day to compute on a CPU; a GPU might take 30 minutes.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reticulate)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">py_run_string</span>(<span class="st">"</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="st">import novae</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="st">import igraph</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="st">import matplotlib</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="st">matplotlib.use('Agg')</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="st">import matplotlib.pyplot as plt</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="st">import scanpy as sc</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="st">import numpy as np</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="st">import os</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="st">import hdf5plugin</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="st">sc.settings.figdir = os.path.join(r.niche_dir, "</span>Plots<span class="st">")</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="st">#torch.set_float32_matmul_precision('high') </span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="st">novae.settings.auto_preprocessing = True</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="st">#os.environ["</span>CUDA_VISIBLE_DEVICES<span class="st">"] = "</span><span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span><span class="st">"</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="st"># Read in sample</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="st">adata = sc.read_h5ad("</span>analysis<span class="sc">/</span>Robjects<span class="sc">/</span>assay_data.h5ad<span class="st">")</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="st">## convert spatial from mm to microns for novae</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="st"># Extract coordinates from obs</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="st">x_mm = adata.obs["</span>x_slide_mm<span class="st">"].to_numpy()</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="st">y_mm = adata.obs["</span>y_slide_mm<span class="st">"].to_numpy()</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="st"># Create spatial_mm matrix</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="st">spatial_mm = np.column_stack((x_mm, y_mm))</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="st">adata.obsm["</span>spatial_mm<span class="st">"] = spatial_mm</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="st"># Convert to microns</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="st">spatial_um = spatial_mm * 1000</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="st">adata.obsm["</span>spatial_um<span class="st">"] = spatial_um</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="st"># Duplicate spatial_um to spatial</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a><span class="st">adata.obsm["</span>spatial<span class="st">"] = spatial_um</span></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="st">## Start running novae</span></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="st"># Create a Delaunay graph of the data</span></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a><span class="st">novae.spatial_neighbors(adata, radius=80, coord_type='generic')</span></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a><span class="st"># Use a quick plot to ensure that neighbors were calculated appropriately</span></span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="st"># Looking for very few red (unconnected) cells that are only on the edges of tissue</span></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a><span class="st">novae.plot.connectivities(adata)</span></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a><span class="st"># Load in pre-trained model</span></span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="st">model1 = novae.Novae.from_pretrained("</span>MICS<span class="sc">-</span>Lab<span class="sc">/</span>novae<span class="sc">-</span>human<span class="dv">-0</span><span class="st">")</span></span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="st"># Fine tune model based on CosMx data in this study</span></span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a><span class="st">#model1.fine_tune(adata, max_epochs=50, logger=True, accelerator='cuda', num_workers=4)</span></span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="st">model1.fine_tune(adata, max_epochs=50, logger=True) # Took ~24 hours on an r5b.12xlarge with CPU only</span></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a><span class="st">model1.compute_representations(adata, zero_shot=False) # Took ~8 hrs</span></span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a><span class="st">for i in range(1, 20):</span></span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a><span class="st">  model1.assign_domains(adata, i)</span></span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a><span class="st">model1_dir = os.path.join(r.niche_dir, "</span>novae_model_one<span class="st">")</span></span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a><span class="st">model1.save_pretrained(save_directory=model1_dir)</span></span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a><span class="st">import matplotlib.pyplot as plt</span></span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a><span class="st">dh = model1.plot_domains_hierarchy()</span></span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a><span class="st">plt.savefig(os.path.join(r.niche_dir, "</span>Plots<span class="st">", "</span>novae_model1_hierarchy.png<span class="st">"))</span></span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a><span class="st">plt.close()</span></span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a><span class="st">novae.plot.paga(adata, obs_key="</span>novae_domains_11<span class="st">", save="</span>_novae_model1_graph.png<span class="st">")</span></span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a><span class="st">adata.write_h5ad(</span></span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a><span class="st">  os.path.join(r.objects_dir, "</span>anndata<span class="sc">-</span>plus<span class="sc">-</span>novae.h5ad<span class="st">"),</span></span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a><span class="st">  compression=hdf5plugin.FILTERS["</span>zstd<span class="st">"],</span></span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a><span class="st">  compression_opts=hdf5plugin.Zstd(clevel=5).filter_options</span></span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a><span class="st">)</span></span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p>Here we provide a function, <code>defineROI</code>, to support two workflows for selecting ROIs:</p>
+<ol type="1">
+<li>Clicking on points in the graphics window to define an ROI boundary (relies on the <code>identify</code> function, which can be buggy.)</li>
+<li>Hard-coding the xy coordinates of the ROI boundary.</li>
+</ol>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#' Define roi's by Clicking on cells in a graphics window</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#' </span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#' How to use:</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#' \itemize{</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">#' \item Plot your cells in xy space. Use asp = 1. </span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">#' \item Click cells around the boundary of your roi.</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#' \item Hit enter or escape when done with your selection.</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">#' }</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">#' Other details:</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">#' \itemize{</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">#' \item Uses graphics::identify() to select points. </span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">#' \item Only works for base graphics, not ggplots.</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">#' \item Can go wrong (draw rois in the wrong place) if the plot doesn't have asp = 1. </span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">#' }</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">#' @param xy Matrix of xy positions used in the plot. </span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">#' @param show Logical, for whether to show the selected roi when you're done. </span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co">#' @param type One of:</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co">#' \itemize{</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co">#' \item "direct" to define the boundary points in order, exactly as you click</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="co">#' \item "ahull" to draw an alpha hull around your selection</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co">#' } </span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="co">#' @return A list with 3 elements:</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="co">#' \itemize{</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="co">#' \item roi: The indices of the points in the roi</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="co">#' \item selected: The indices of the user-selected points</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="co">#' \item hull: The hull of the roi, either the user-selected polygon or the results of alphahull:ahull}</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="co">#' @importFrom graphics identify</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="co">#' @importFrom alphahull ahull</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="co">#' @</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>defineROI <span class="ot">&lt;-</span> <span class="cf">function</span>(xy, <span class="at">type =</span> <span class="st">"direct"</span>, <span class="at">boundary_points =</span> <span class="cn">NULL</span>, <span class="at">show =</span> <span class="cn">TRUE</span>) {</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(boundary_points)) {</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    hull.x <span class="ot">&lt;-</span> boundary_points[, <span class="dv">1</span>]</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    hull.y <span class="ot">&lt;-</span> boundary_points[, <span class="dv">2</span>]</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    <span class="co"># get points in the boundary:</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    roi <span class="ot">&lt;-</span> sp<span class="sc">::</span><span class="fu">point.in.polygon</span>(<span class="at">point.x =</span> xy[, <span class="dv">1</span>], <span class="at">point.y =</span> xy[, <span class="dv">2</span>], </span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>                                <span class="at">pol.x =</span> hull.x, <span class="at">pol.y =</span> hull.y) <span class="sc">&gt;</span> <span class="dv">0</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    inds <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    hull <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(boundary_points)) {</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.element</span>(type, <span class="fu">c</span>(<span class="st">"direct"</span>, <span class="st">"ahull"</span>))) {</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>      <span class="fu">stop</span>(<span class="st">"must either give boundary_points or set type to </span><span class="sc">\'</span><span class="st">direct</span><span class="sc">\'</span><span class="st"> or </span><span class="sc">\'</span><span class="st">ahull</span><span class="sc">\'</span><span class="st">"</span>)</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># user identifies boundary:</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>    identifyres <span class="ot">&lt;-</span> <span class="fu">identify</span>(xy, <span class="at">plot =</span> <span class="cn">FALSE</span>, <span class="at">order =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>    inds <span class="ot">&lt;-</span> identifyres<span class="sc">$</span>ind[<span class="fu">order</span>(identifyres<span class="sc">$</span>order)]</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"direct"</span>) {</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>      <span class="co"># The hull is just the polygon you've selected:</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>      hull.x <span class="ot">&lt;-</span> xy[inds, <span class="dv">1</span>]</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>      hull.y <span class="ot">&lt;-</span> xy[inds, <span class="dv">2</span>]</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>      hull <span class="ot">&lt;-</span> inds</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>      <span class="co"># get points in the boundary:</span></span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>      roi <span class="ot">&lt;-</span> sp<span class="sc">::</span><span class="fu">point.in.polygon</span>(<span class="at">point.x =</span> xy[, <span class="dv">1</span>], <span class="at">point.y =</span> xy[, <span class="dv">2</span>], </span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">pol.x =</span> hull.x, <span class="at">pol.y =</span> hull.y) <span class="sc">&gt;</span> <span class="dv">0</span></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"ahull"</span>) {</span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>      <span class="co"># get alpha hull of boundary:</span></span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>      hull <span class="ot">&lt;-</span> alphahull<span class="sc">::</span><span class="fu">ahull</span>(xy[inds, <span class="dv">1</span>], xy[inds, <span class="dv">2</span>], <span class="at">alpha =</span> <span class="fl">0.05</span>)</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>      <span class="co"># get points in the boundary:</span></span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>      roi <span class="ot">&lt;-</span> alphahull<span class="sc">::</span><span class="fu">inahull</span>(<span class="at">ahull.obj =</span> hull, xy)</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>  <span class="co"># plot:</span></span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (show) {</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>    <span class="fu">points</span>(xy[inds, ], <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">cex =</span> <span class="fl">0.5</span>, <span class="at">pch =</span> <span class="dv">16</span>)</span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>    <span class="fu">polygon</span>(xy[hull, ])</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>    <span class="fu">points</span>(xy[roi, ], <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="dv">1</span>, <span class="at">col =</span> scales<span class="sc">::</span><span class="fu">alpha</span>(<span class="st">"gold"</span>, <span class="fl">0.3</span>))</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>  out <span class="ot">=</span> <span class="fu">list</span>(<span class="at">roi =</span> roi, <span class="at">selected =</span> inds, <span class="at">hull =</span> hull)</span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(out)</span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>An example of the click-to-select workflow:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="do">### example usage 1: clicking the graphics window to identify a region </span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: uses the identify() function, which can be finnicky and hard to debug.</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.3</span>, <span class="at">asp =</span> <span class="dv">1</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">ylab =</span> <span class="st">""</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>roi <span class="ot">&lt;-</span> <span class="fu">defineROI</span>(xy, <span class="at">type =</span> <span class="st">"direct"</span>, <span class="at">show =</span> <span class="cn">TRUE</span>) </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># add to metadata: </span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>inmyroi <span class="ot">&lt;-</span> roi<span class="sc">$</span>roi</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>… and of the hard-coded boundary workflow:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">### example usage 2: inputing xy coordinates of the ROI's boundary:</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">0</span>,<span class="dv">0</span>))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.3</span>, <span class="at">asp =</span> <span class="dv">1</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">ylab =</span> <span class="st">""</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># place a grid over it to determine where to pick boundary points:</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="fu">pretty</span>(<span class="fu">range</span>(xy[,<span class="dv">2</span>]), <span class="at">n=</span><span class="dv">30</span>), <span class="at">v =</span> <span class="fu">pretty</span>(<span class="fu">range</span>(xy[,<span class="dv">1</span>]), <span class="at">n=</span><span class="dv">30</span>), <span class="at">lty=</span><span class="dv">3</span>, <span class="at">col=</span><span class="st">"grey20"</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># hard-code boundary points:</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>boundary_points <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">matrix</span>(<span class="fu">c</span>(</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1.85</span>,<span class="fl">7.05</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2</span>,<span class="fl">7.1</span>,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="fl">2.05</span>,<span class="fl">6.95</span>,</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1.95</span>,<span class="fl">6.85</span>,</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1.87</span>,<span class="fl">6.9</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>), <span class="at">nrow =</span> <span class="dv">2</span>))</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>roi <span class="ot">&lt;-</span> <span class="fu">defineROI</span>(xy, <span class="at">type =</span> <span class="cn">NULL</span>, <span class="at">boundary_points =</span> boundary_points, <span class="at">show =</span> <span class="cn">TRUE</span>) </span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co"># add to metadata: </span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>inmyroi <span class="ot">&lt;-</span> roi<span class="sc">$</span>roi</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<p>No example code is needed here, but here are some examples for inspiration:</p>
+<ul>
+<li><strong>Condense niches</strong>: in one study, we obtained 9 niches, then condensed them into 3 broad categories (tumor, interior stroma, exterior stroma) for some analyses.<br>
+</li>
+<li><strong>Dichotomize a continuous variable</strong>: for example, you could pretty accurately identify cells in glomeruli as all cells with &gt;5 native glomerular cells (podocytes/mesangial cells/glomerular endothelial cells…) in their 20 nearest neighbors. And in some tumors, you could pretty accurately define tertiary lymphoid structures as all cells with &gt;10 B/T cells in their 20 nearest neighbors. Or you could divide a tumor into glycolysis high/low zones by dichotomizing a score of cells’ mean neighborhood glycolysis pathway scores.</li>
+<li><strong>Combine metadata columns</strong>: for example, combine a handful of custom ROI’s into a single annotation column like “inflamed regions” or “dysplastic regions”.</li>
+</ul>
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<p>Often, instead of just selecting cells belonging to a given cell type, you want cells in anatomical structures. For example, you might want to select tumor glands while omitting single isolated tumor cells, or you might want to define blood vessels as groups of contiguous endothelial cells, omitting isolated endothelial cells. The below code uses the DBSCAN algorithm to achieve this:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># define the starting group of cells, e.g. cells of a given cell type:</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>tempcells <span class="ot">&lt;-</span> metadata<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">"Endothelial"</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>dbscancluster <span class="ot">&lt;-</span> dbscan<span class="sc">::</span><span class="fu">dbscan</span>(xy[tempcells, ],</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">eps =</span> <span class="fl">0.05</span>, <span class="co"># very small radius</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">minPts =</span> <span class="dv">5</span>  <span class="co"># throw out clusters of less than 5 cells</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                     )<span class="sc">$</span>cluster</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>selectedcells <span class="ot">&lt;-</span> dbscancluster <span class="sc">!=</span> <span class="dv">0</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>selected <span class="ot">&lt;-</span> <span class="cn">FALSE</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>selected[tempcells][selectedcells] <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="defining-continuous-variables" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="defining-continuous-variables"><span class="header-section-number">2.2</span> Defining continuous variables</h2>
+<p>Here we provide code for a few ways to define useful continuous variables:</p>
+<ul>
+<li>Distance to nearest cell in a set (e.g.&nbsp;nearest T-cell)</li>
+<li>Abundance of a cell set in a cell’s nearest neighbors (e.g.&nbsp;number of T-cell neighbors)</li>
+<li>Mean value of a continuous variable in a cell’s neighborhood (e.g.&nbsp;neighborhood CD274 expression, or neighborhood interferon gamma pathway score)</li>
+</ul>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Distance to nearest neighbor</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Number of neighbors</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false">Mean neighborhood expression</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<p>The below code shows how to find the distance to the nearest neighbor of a given set of cells, e.g.&nbsp;tumor cells, or cells in a given niche, or cells in a region of interest (ROI). This approach is appropriate when you expect your selected cells to impact their surroundings in a way that declines over distance, e.g.&nbsp;with oxygen availability dropping with distance to the nearest blood vessel.</p>
+<p>By modifying the <code>k</code> variable below you can take the distance to the <em>k</em>-th closest cell in the set. This can be useful when you’re trying to get distance to anatomical features like tumor glands rather than just single isolated tumor cells.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># collection of cells we want to take a distance to:</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>istargetcell <span class="ot">&lt;-</span> metadata<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">"Tcell"</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># record all cells' distances to k-th nearest target cell</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>dist2target <span class="ot">&lt;-</span> FNN<span class="sc">::</span><span class="fu">get.knnx</span>(</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">data  =</span> <span class="fu">as.matrix</span>(xy[istargetcell, , <span class="at">drop=</span><span class="cn">FALSE</span>]),</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">query =</span> <span class="fu">as.matrix</span>(xy),</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">k =</span> k</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>)<span class="sc">$</span>nn.dist[, k]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<p>The below code shows how to record how many of each cells’ nearest neighbors belong to a given set of cells, e.g.&nbsp;T-cells or This approach is appropriate when you expect the impact of your selected cells on their neighbors to compound. E.g., a neighborhood with more T cells might have a stronger inflammatory milieu than a neighborhood with just 1 T cell.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># collection of cells we want to take a distance to:</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>istargetcell <span class="ot">&lt;-</span> metadata<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">"Tcell"</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># count the target cells among cells' neighbors:</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>neighboring.targetcells <span class="ot">&lt;-</span> InSituCor<span class="sc">:::</span><span class="fu">neighbor_sum</span>(<span class="at">x =</span> <span class="dv">1</span> <span class="sc">*</span> (istargetcell),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                                                    <span class="at">neighbors =</span> neighbors)   <span class="co"># calculated in the preliminaries</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<p>The below code shows how to measure the mean / total expression of a gene in each cells’ neighborhood.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="do">## examples of a variable to average over neighborhoods:</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># raw counts of a gene:</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> counts[, <span class="st">"CXCL14"</span>] </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># normalized expression of a gene:</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> counts[, <span class="st">"CXCL14"</span>] <span class="sc">/</span> metadata<span class="sc">$</span>nCount_RNA</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co"># or you could use a pathway score, or protein expression (if measured)</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="do">## get average expression in each cell's neighborhood:</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>neighbormean <span class="ot">&lt;-</span> InSituCor<span class="sc">:::</span><span class="fu">neighbor_sum</span>(<span class="at">x =</span> x, <span class="at">neighbors =</span> neighbors)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="transformations-on-continuous-variables" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="transformations-on-continuous-variables"><span class="header-section-number">2.3</span> Transformations on continuous variables:</h2>
+<p>Once we’ve derived a continuous variable, we still have decisions to make. When we put a variable in a model, we are implicitly assume a linear relationship between the variable and our gene expression (“gene expression” occurring either on the linear or log scale, depending on the model). It often makes scientific sense to transform a variable before entering it into a model. See the code below for examples of useful transformations.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">Monotonic tranformations</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">Binning</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false">Splines</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<p>If you think distance to a feature matters because of some diffused signals, then concentration of those molecules will vary with 1/distance. If neighborhood expression of a molecule is strongly right-tailed, which is common, then a log transformation could prevent the end of the tail from having undue influence. To make effect sizes more interpretable, scale the variable from 0-1. For variables with strong skew or long tails, a quantile transformation can prevent extreme values from exerting excess influence on DE results.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># inverse:</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">pmax</span>(x, <span class="fu">min</span>(x[x <span class="sc">&gt;</span> <span class="dv">0</span>]))</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># log2-transform:</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">log2</span>(x <span class="sc">+</span> <span class="fl">1e-3</span>)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"># scale from 0-1:</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> (x <span class="sc">-</span> <span class="fu">min</span>(x)) <span class="sc">/</span> (<span class="fu">max</span>(x) <span class="sc">-</span> <span class="fu">min</span>(x))</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co"># scale to have unit SD:</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> x <span class="sc">/</span> <span class="fu">sd</span>(x)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co"># quantile transformation:</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">order</span>(<span class="fu">order</span>(x)) <span class="sc">/</span> <span class="fu">length</span>(x)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="co"># truncate at the upper extreme:</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">pmin</span>(x, <span class="fu">quantile</span>(x, <span class="fl">0.995</span>))</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co"># truncate at the lower extreme:</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">pmax</span>(x, <span class="fu">quantile</span>(x, <span class="fl">0.005</span>))</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="co"># truncate at both extremes:</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">pmin</span>(<span class="fu">pmax</span>(x, <span class="fu">quantile</span>(x, <span class="fl">0.005</span>)), <span class="fu">quantile</span>(x, <span class="fl">0.995</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<p>If you’re unwilling to commit to the shape of a relationship between a variable and gene expression, you can take a non-parametric approach and break it into bins. Our favored DE library, smiDE, will then give you results for all pairwise comparisons between bins, and it can be useful to e.g.&nbsp;compare all bins to the first bin. Alteratively, using various base R packages for linear models, you can run both a full model and a “null” model omitting your binned variable, then use a likelihood ratio test (<code>lrtest</code>) to get a p-value for the variable as a whole rather than for individual levels.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># break a variable into bins of equal width:</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">cut</span>(x, <span class="at">breaks =</span> <span class="dv">20</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># break a variable into bins of equal cell numbers:</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>quants <span class="ot">&lt;-</span> <span class="fu">quantile</span>(x, <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">length.out =</span> <span class="dv">21</span>))</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">cut</span>(x, <span class="at">breaks =</span> <span class="fu">unique</span>(quants))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>After the above, <code>x</code> is now a factor with 20 levels.</p>
+</div>
+<div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
+<p>Instead of forcing the data into discrete bins, we can use splines to get a smoother fit.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>splinex <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(splines<span class="sc">::</span><span class="fu">ns</span>(x, <span class="at">df =</span> <span class="dv">20</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>This produces a matrix with 20 columns, suitable as use as predictors for DE. Prioritize genes by their global p-values from a likelihood ratio test vs.&nbsp;a model excluding this matrix. (This approach is not yet supported by smiDE.)</p>
+</div>
+</div>
+</div>
+</section>
+<section id="confirm-your-variable" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="confirm-your-variable"><span class="header-section-number">2.4</span> Confirm your variable:</h2>
+<p>Once you’ve crafted a variable, plot it in space to confirm it’s as you hoped:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plotting a categorical variable:</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>cols <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">c</span>(</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"#E41A1C"</span>, <span class="st">"#377EB8"</span>, <span class="st">"#4DAF4A"</span>, <span class="st">"#984EA3"</span>, <span class="st">"#FF7F00"</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"#A65628"</span>, <span class="st">"#F781BF"</span>, <span class="st">"#999999"</span>, <span class="st">"#66C2A5"</span>, <span class="st">"#FC8D62"</span>,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"#8DA0CB"</span>, <span class="st">"#E78AC3"</span>, <span class="st">"#A6D854"</span>, <span class="st">"#FFD92F"</span>, <span class="st">"#E5C494"</span>,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"#B3B3B3"</span>, <span class="st">"#1B9E77"</span>, <span class="st">"#D95F02"</span>, <span class="st">"#7570B3"</span>, <span class="st">"#E7298A"</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"#66A61E"</span>, <span class="st">"#E6AB02"</span>, <span class="st">"#A6761D"</span>, <span class="st">"#666666"</span>, <span class="st">"#A6CEE3"</span>,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"#1F78B4"</span>, <span class="st">"#B2DF8A"</span>, <span class="st">"#33A02C"</span>, <span class="st">"#FB9A99"</span>, <span class="st">"#E31A1C"</span>,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"#FDBF6F"</span>, <span class="st">"#FF7F00"</span>, <span class="st">"#CAB2D6"</span>, <span class="st">"#6A3D9A"</span>, <span class="st">"#FFFF99"</span>,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"#B15928"</span>, <span class="st">"#8DD3C7"</span>, <span class="st">"#FFFFB3"</span>, <span class="st">"#BEBADA"</span>, <span class="st">"#FB8072"</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>), <span class="dv">3</span>)[<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(<span class="fu">unique</span>(x))]</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">cex =</span> <span class="fl">0.1</span>, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">asp =</span> <span class="dv">1</span>,</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> cols[<span class="fu">as.numeric</span>(<span class="fu">as.factor</span>(x))])</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="co"># plotting a continuous variable that goes up from 0:</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">cex =</span> <span class="fl">0.1</span>, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">asp =</span> <span class="dv">1</span>,</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"grey80"</span>, <span class="st">"#4B0082"</span>))(<span class="dv">101</span>)[</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>       <span class="dv">1</span> <span class="sc">+</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> x <span class="sc">/</span> <span class="fu">max</span>(x))</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>     ])</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a><span class="co"># plotting a continuous variable centered at 0:</span></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">cex =</span> <span class="fl">0.1</span>, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">asp =</span> <span class="dv">1</span>,</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"darkblue"</span>, <span class="st">"grey80"</span>, <span class="st">"darkred"</span>))(<span class="dv">101</span>)[</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>       <span class="dv">51</span> <span class="sc">+</span> <span class="fu">round</span>(<span class="dv">50</span> <span class="sc">*</span> x <span class="sc">/</span> <span class="fu">max</span>(<span class="fu">abs</span>(x)))</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>     ])</span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a><span class="co"># plotting a continous variable with arbitrary center:</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xy, <span class="at">cex =</span> <span class="fl">0.1</span>, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">asp =</span> <span class="dv">1</span>,</span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"darkblue"</span>, <span class="st">"grey80"</span>, <span class="st">"darkred"</span>))(<span class="dv">101</span>)[</span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>       <span class="dv">1</span> <span class="sc">+</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> (x <span class="sc">-</span> <span class="fu">min</span>(x)) <span class="sc">/</span> (<span class="fu">max</span>(x) <span class="sc">-</span> <span class="fu">min</span>(x)))</span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>     ])</span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a><span class="co"># draw a histogram of the continuous variable to confirm it's not excessively long-tailed:</span></span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(x, <span class="at">breaks =</span> <span class="dv">40</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+</section>
+<section id="running-de" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Running DE</h1>
+<p>In this section we’ll provide example code for running smiDE with the variables we created above.</p>
+<section id="preliminaries-for-smide" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="preliminaries-for-smide"><span class="header-section-number">3.1</span> Preliminaries for smiDE</h2>
+<p>To harden our DE results against bias from segmentation errors, we take two countermeasures before running DE.</p>
+<p><strong>First, we identify genes at risk of bias from segmentation errors, and omit them from our analysis</strong>. The intuition is simple: if a gene is more highly expressed in the neighbors of a cell type than in the cell type itself, then it’s at risk of meaningful bias from segmentation errors. We formalize this intuition in the function <code>smiDE::overlap_ratio_metric</code>, demonstrated below:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># obtain the overlap ratio metrics:</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="cn">TRUE</span>) {</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  overlapres <span class="ot">&lt;-</span> smiDE<span class="sc">::</span><span class="fu">overlap_ratio_metric</span>(</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">assay_matrix =</span> Matrix<span class="sc">::</span><span class="fu">t</span>(counts),</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">metadata =</span> <span class="fu">cbind</span>(xy, metadata),</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">cellid_col =</span> <span class="st">"cell_id"</span>,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">cluster_col =</span> <span class="st">"celltype"</span>,</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">sdimx_col =</span> <span class="fu">colnames</span>(xy)[<span class="dv">1</span>],</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">sdimy_col =</span> <span class="fu">colnames</span>(xy)[<span class="dv">2</span>],</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">radius =</span> <span class="fl">0.05</span>)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">saveRDS</span>(overlapres, <span class="at">file =</span> <span class="st">"processed_data/overlapres.RDS"</span>)</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  overlapres <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"processed_data/overlapres.RDS"</span>)</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="co"># extract the genes to analyze for your cell type (in this example, "macrophage"):</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>genes_to_analyze <span class="ot">&lt;-</span> overlapres[celltype<span class="sc">==</span><span class="st">"macrophage"</span>][ratio <span class="sc">&lt;</span> <span class="dv">1</span>][[<span class="st">"target"</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p><strong>Second, we record cells’ spatial neighbors</strong>, which smiDE uses to adjust for any lingering bias from segmentation errors:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># required preliminary for smiDE:</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="cn">TRUE</span>) {</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  pre_de_obj <span class="ot">&lt;-</span> </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pre_de</span>(<span class="at">metadata =</span> <span class="fu">cbind</span>(xy, metadata),</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">cell_type_metadata_colname =</span> <span class="st">"celltype"</span>,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">cellid_colname =</span> <span class="st">"cell_id"</span>,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">split_neighbors_by_colname =</span> <span class="st">"tissue"</span>,</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">mm_radius =</span> <span class="fl">0.05</span>,</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">sdimx_colname =</span> <span class="fu">colnames</span>(xy)[<span class="dv">1</span>],</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">sdimy_colname =</span> <span class="fu">colnames</span>(xy)[<span class="dv">2</span>],</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">verbose=</span><span class="cn">TRUE</span>)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">saveRDS</span>(pre_de_obj, <span class="at">file =</span> <span class="st">"processed_data/pre_de_obj.RDS"</span>)</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  pre_de_obj <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"processed_data/pre_de_obj.RDS"</span>)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="running-smide" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="running-smide"><span class="header-section-number">3.2</span> running smiDE</h2>
+<p>Now, at last, we’re ready to run DE. Here we’re faced with tradeoffs between model thoroughness and computation time. The best models to date are prohibitively slow in large studies, while the fastest models compute in moments but suffer more false positives.</p>
+<p>What do we mean by the “best models?” DE in spatial data runs into two challenges:</p>
+<p>First, errors in cell segmentation bias cells to resemble their neighbors. This can cause false positive results when comparing across different spatial contexts. We already screened out genes at unacceptable risk of segmentation errors, but ideally we’ll take the further step of directly adjusting for this bias in the genes that remain.</p>
+<p>Second, we would ideally model the <em>spatial correlation</em> in our data. Expression among spatially neighboring cells is often correlated due to some spatially smooth factor unrelated to our predictor variable. This can lead to biased effect estimates, and potentially inflated statistical significance. We can model this correlation and get more accurate p-values by including a spatial random effect. This works best when the magnitude of variation in the spatial random effect is small, or when the correlation between the random effect and the covariate is small. In addition, it’s helpful for the DE predictor to be more spatially nuanced than the smooth random effect. Unfortunately, modeling spatial correlation becomes very computationally intensive over large numbers of cells.</p>
+<p>Our recommended modeling approaches for different settings are below:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Approach</strong></th>
+<th><strong>Model bias from segmentation errors?</strong></th>
+<th><strong>Model spatial correlation?</strong></th>
+<th><strong>Speed</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Standard</strong></td>
+<td>Yes</td>
+<td>No</td>
+<td>moderate</td>
+</tr>
+<tr class="even">
+<td><strong>Optimal/slow</strong></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>very slow</td>
+</tr>
+<tr class="odd">
+<td><strong>Hasty/exploratory</strong></td>
+<td>No</td>
+<td>No</td>
+<td>very fast</td>
+</tr>
+<tr class="even">
+<td><strong>Stepwise: screen with hasty, validate with optimal</strong></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>moderate</td>
+</tr>
+</tbody>
+</table>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">Standard</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">Optimal/slow</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-3" role="tab" aria-controls="tabset-4-3" aria-selected="false">Hasty/exploratory</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-4" role="tab" aria-controls="tabset-4-4" aria-selected="false">Stepwise</a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="do">## define the problem:</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># which cells to analyze: (a logical vector over all cells)</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>inds <span class="ot">&lt;-</span> metadata<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">"macrophage"</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>totalcounts <span class="ot">&lt;-</span> metadata<span class="sc">$</span>nCount_RNA</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(totalcounts) <span class="ot">&lt;-</span> metadata<span class="sc">$</span>cell_id</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="do">## run smiDE with a Negative Binomial model and no spatial correlation modeling:</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>de_obj <span class="ot">&lt;-</span> </span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>   <span class="fu">smi_de</span>(<span class="at">assay_matrix =</span> Matrix<span class="sc">::</span><span class="fu">t</span>(counts),</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>          <span class="at">metadata =</span> metadata[inds, ],</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>          <span class="at">formula =</span> <span class="sc">~</span><span class="fu">RankNorm</span>(otherct_expr) <span class="sc">+</span> <span class="fu">offset</span>(<span class="fu">log</span>(nCount_RNA)) <span class="sc">+</span> distance_to_tumor,   <span class="co"># &lt;----- first two terms adjust for segmentation errors and per-cell signal strength, final term is the variable to be analyzed, must be a column in metadata</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>          <span class="at">pre_de_obj =</span> pre_de_obj,  <span class="co"># depends on pre_de_obj calculated earlier</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>          <span class="at">cellid_colname =</span> <span class="st">"cell_id"</span>,</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_cell_type_metadata_colname =</span> <span class="st">"celltype"</span>,</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_overlap_weight_colname =</span> <span class="cn">NULL</span>,</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_overlap_agg =</span><span class="st">"sum"</span>,</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_totalcount_normalize =</span> <span class="cn">FALSE</span>,    <span class="co">#&lt;--------- @Dan: correct, since I have that offset term above?</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_totalcount_scalefactor =</span> <span class="cn">NULL</span>,</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>          <span class="at">family=</span><span class="st">"nbinom2"</span>,</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>          <span class="at">targets=</span>genes_to_analyze     <span class="co"># calculated in earlier code block</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>   ) </span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> smiDE<span class="sc">::</span><span class="fu">results</span>(de_obj)  <span class="co"># use res$pairwise for most cases. res$one.vs.rest can also be useful. </span></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(res) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</div>
+<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="do">## define the problem:</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co"># which cells to analyze: (a logical vector over all cells)</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>inds <span class="ot">&lt;-</span> metadata<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">"macrophage"</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>sdimx <span class="ot">&lt;-</span> xy[, <span class="dv">1</span>]</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>sdimy <span class="ot">&lt;-</span> xy[, <span class="dv">2</span>]</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>totalcounts <span class="ot">&lt;-</span> metadata<span class="sc">$</span>nCount_RNA</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(totalcounts) <span class="ot">&lt;-</span> metadata<span class="sc">$</span>cell_id</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="co"># which genes: (this method is SLOW, so don't just test everything)</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>selected_genes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"KRT16"</span>, <span class="st">"EPCAM"</span>)</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="do">## run smiDE with a Negative Binomial model and no spatial correlation modeling:</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>de_obj <span class="ot">&lt;-</span> </span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>   <span class="fu">smi_de</span>(<span class="at">assay_matrix =</span> Matrix<span class="sc">::</span><span class="fu">t</span>(counts),</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">metadata =</span> metadata[inds, ],</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>          <span class="at">formula =</span> <span class="sc">~</span><span class="fu">RankNorm</span>(otherct_expr) <span class="sc">+</span> <span class="fu">offset</span>(<span class="fu">log</span>(nCount_RNA)) <span class="sc">+</span> distance_to_tumor,   <span class="co"># &lt;----- first two terms adjust for segmentation errors and per-cell signal strength, final term is the variable to be analyzed, must be a column in metadata</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>          <span class="at">pre_de_obj =</span> pre_de_obj,  <span class="co"># depends on pre_de_obj calculated earlier</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>          <span class="at">cellid_colname =</span> <span class="st">"cell_id"</span>,</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_cell_type_metadata_colname =</span> <span class="st">"celltype"</span>,</span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_overlap_weight_colname =</span> <span class="cn">NULL</span>,</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_overlap_agg =</span><span class="st">"sum"</span>,</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_totalcount_normalize =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_totalcount_scalefactor =</span> totalcounts,</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>          <span class="at">family=</span><span class="st">"nbinom2"</span>,</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>          <span class="at">targets=</span>selected_genes,    </span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>          <span class="at">spatial_model =</span> <span class="fu">list</span>(<span class="at">name=</span><span class="st">"GP_INLA"</span>,</span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>                               <span class="at">x_coord_col =</span> <span class="st">"sdimx"</span>,  </span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>                               <span class="at">y_coord_col =</span> <span class="st">"sdimy"</span>,</span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>                               <span class="at">quantiles =</span> <span class="fu">c</span>(<span class="fl">0.025</span><span class="sc">/</span><span class="fu">nrow</span>(targs), <span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>, <span class="dv">1</span><span class="fl">-0.025</span><span class="sc">/</span><span class="fu">nrow</span>(targs)),</span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a>                               <span class="at">num.threads=</span><span class="dv">1</span>)          </span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>   ) </span>
+<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> smiDE<span class="sc">::</span><span class="fu">results</span>(de_obj)<span class="sc">$</span>pairwise    <span class="co"># use res$pairwise for most cases. res$one.vs.rest can also be useful. </span></span>
+<span id="cb19-33"><a href="#cb19-33" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(res) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</div>
+<div id="tabset-4-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-3-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="do">## define the problem:</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># which cells to analyze: (a logical vector over all cells)</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>inds <span class="ot">&lt;-</span> metadata<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">"macrophage"</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"># variable to analyze (defined over all cells):</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> distance_to_tumor</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co"># normalized data:</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>normfactor <span class="ot">&lt;-</span> <span class="fu">mean</span>(metadata<span class="sc">$</span>nCount_RNA) <span class="sc">/</span> metadata<span class="sc">$</span>nCount_RNA </span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>norm <span class="ot">&lt;-</span> counts</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>norm<span class="sc">@</span>x <span class="ot">&lt;-</span> counts<span class="sc">@</span>x <span class="sc">*</span> normfactor[ counts<span class="sc">@</span>i <span class="sc">+</span> <span class="dv">1</span>L ]</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="do">## to put genes on similar scales, scale the columns of norm:</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>genefactors <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">pmax</span>(<span class="fl">0.05</span>, Matrix<span class="sc">::</span><span class="fu">colMeans</span>(norm))  </span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>normscaled <span class="ot">&lt;-</span> norm <span class="sc">%*%</span> Matrix<span class="sc">::</span><span class="fu">Diagonal</span>(<span class="at">x =</span> genefactors)</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(normscaled) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(norm)</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="do">## source the fast DE function:</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"https://raw.githubusercontent.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/refs/heads/Main/_code/PatchDE/DEutils.R"</span>)</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a><span class="do">## run fast DE:</span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>fastres <span class="ot">&lt;-</span> <span class="fu">hastyDE</span>(<span class="at">y =</span> normscaled[, genes_to_analyze], <span class="at">df =</span> <span class="fu">data.frame</span>(<span class="at">distance2tumor =</span> x))</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a><span class="do">## extract estimates and p-values:</span></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>ests <span class="ot">&lt;-</span> fastres<span class="sc">$</span>effect</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>ps <span class="ot">&lt;-</span> fastres<span class="sc">$</span>p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</div>
+<div id="tabset-4-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-4-tab">
+<p>When it’s vital to adjust for spatial correlation, but our dataset’s size makes that impractical, we can run a very efficient but spatially blind model to prioritize the most useful genes, then validate them with a proper spatial correlation model in smiDE.</p>
+<p><strong>An important caveat</strong>: because we’ve selected the genes for the smiDE run based on their evidence in the spatial-free DE model, calculating proper adjusted p-values becomes very complicated - we can neither ignore the omitted genes, nor can we use their (presumably over-optimistic) spatial-free p-values.</p>
+<p>As a solution, we propose the following procedure, which will produce conservative adjusted p-values:</p>
+<ol type="1">
+<li>Keep the smiDE p-values from the screened genes.</li>
+<li>For the remaining genes, throw out the “hasty” p-values, and generate p-values from the null distribution, i.e.&nbsp;uniformly between 0-1.</li>
+<li>Run your preferred p-value adjustment method on the resulting vector of p-values.</li>
+</ol>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="do">## define the problem:</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co"># which cells to analyze: (a logical vector over all cells)</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>inds <span class="ot">&lt;-</span> metadata<span class="sc">$</span>celltype <span class="sc">==</span> <span class="st">"macrophage"</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># variable to analyze (defined over all cells):</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> distance_to_tumor</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co"># normalized data:</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>normfactor <span class="ot">&lt;-</span> <span class="fu">mean</span>(metadata<span class="sc">$</span>nCount_RNA) <span class="sc">/</span> metadata<span class="sc">$</span>nCount_RNA </span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>norm <span class="ot">&lt;-</span> counts</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>norm<span class="sc">@</span>x <span class="ot">&lt;-</span> counts<span class="sc">@</span>x <span class="sc">*</span> normfactor[ counts<span class="sc">@</span>i <span class="sc">+</span> <span class="dv">1</span>L ]</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="co"># to put genes on similar scales, scale the columns of norm:</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>genefactors <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">pmax</span>(<span class="fl">0.05</span>, Matrix<span class="sc">::</span><span class="fu">colMeans</span>(norm))  </span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>normscaled <span class="ot">&lt;-</span> norm <span class="sc">%*%</span> Matrix<span class="sc">::</span><span class="fu">Diagonal</span>(<span class="at">x =</span> genefactors)</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(normscaled) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(norm)</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a><span class="do">## source the fast DE function:</span></span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"https://raw.githubusercontent.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/refs/heads/Main/_code/PatchDE/DEutils.R"</span>)</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a><span class="do">## run fast DE:</span></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>fastres <span class="ot">&lt;-</span> <span class="fu">hastyDE</span>(<span class="at">y =</span> normscaled[, genes_to_analyze], <span class="at">df =</span> <span class="fu">data.frame</span>(<span class="at">distance2tumor =</span> x))</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract top genes:</span></span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a><span class="co"># This example takes the top 10 genes by effect size from the top 1% of p-values.</span></span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a><span class="co"># We recommend extracting top genes with some human oversight. </span></span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>topgenes <span class="ot">&lt;-</span> <span class="fu">names</span>(fastres<span class="sc">$</span>p)[<span class="fu">order</span>(<span class="fu">abs</span>(fastres<span class="sc">$</span>effect) <span class="sc">*</span> (fastres<span class="sc">$</span>p <span class="sc">&lt;=</span> <span class="fu">quantile</span>(fastres<span class="sc">$</span>p, <span class="fl">0.01</span>)), <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)]  </span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Run smiDE on the top genes with the optimal / spatial-aware call to smiDE:</span></span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a><span class="do">## define the problem:</span></span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>sdimx <span class="ot">&lt;-</span> xy[, <span class="dv">1</span>]</span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>metadata<span class="sc">$</span>sdim2 <span class="ot">&lt;-</span> xy[, <span class="dv">2</span>]</span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>totalcounts <span class="ot">&lt;-</span> metadata<span class="sc">$</span>nCount_RNA</span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(totalcounts) <span class="ot">&lt;-</span> metadata<span class="sc">$</span>cell_id</span>
+<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a><span class="do">## run smiDE with a Negative Binomial model and with spatial correlation modeling:</span></span>
+<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>de_obj <span class="ot">&lt;-</span> </span>
+<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a>   <span class="fu">smi_de</span>(<span class="at">assay_matrix =</span> Matrix<span class="sc">::</span><span class="fu">t</span>(counts),</span>
+<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a>          <span class="at">metadata =</span> metadata[inds, ],</span>
+<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a>          <span class="at">formula =</span> <span class="sc">~</span><span class="fu">RankNorm</span>(otherct_expr) <span class="sc">+</span> <span class="fu">offset</span>(<span class="fu">log</span>(nCount_RNA)) <span class="sc">+</span> distance_to_tumor,   <span class="co"># &lt;----- first two terms adjust for segmentation errors and per-cell signal strength, final term is the variable to be analyzed, must be a column in metadata</span></span>
+<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a>          <span class="at">pre_de_obj =</span> pre_de_obj,  <span class="co"># depends on pre_de_obj calculated earlier</span></span>
+<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a>          <span class="at">cellid_colname =</span> <span class="st">"cell_id"</span>,</span>
+<span id="cb21-40"><a href="#cb21-40" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_cell_type_metadata_colname =</span> <span class="st">"celltype"</span>,</span>
+<span id="cb21-41"><a href="#cb21-41" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_overlap_weight_colname =</span> <span class="cn">NULL</span>,</span>
+<span id="cb21-42"><a href="#cb21-42" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_overlap_agg =</span><span class="st">"sum"</span>,</span>
+<span id="cb21-43"><a href="#cb21-43" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_totalcount_normalize =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb21-44"><a href="#cb21-44" aria-hidden="true" tabindex="-1"></a>          <span class="at">neighbor_expr_totalcount_scalefactor =</span> totalcounts,</span>
+<span id="cb21-45"><a href="#cb21-45" aria-hidden="true" tabindex="-1"></a>          <span class="at">family=</span><span class="st">"nbinom2"</span>,</span>
+<span id="cb21-46"><a href="#cb21-46" aria-hidden="true" tabindex="-1"></a>          <span class="at">targets=</span>topgenes,     <span class="co"># only analyze the genes of greatest interest</span></span>
+<span id="cb21-47"><a href="#cb21-47" aria-hidden="true" tabindex="-1"></a>          <span class="at">spatial_model =</span> <span class="fu">list</span>(<span class="at">name=</span><span class="st">"GP_INLA"</span>,</span>
+<span id="cb21-48"><a href="#cb21-48" aria-hidden="true" tabindex="-1"></a>                               <span class="at">x_coord_col =</span> <span class="st">"sdimx"</span>,  </span>
+<span id="cb21-49"><a href="#cb21-49" aria-hidden="true" tabindex="-1"></a>                               <span class="at">y_coord_col =</span> <span class="st">"sdimy"</span>,</span>
+<span id="cb21-50"><a href="#cb21-50" aria-hidden="true" tabindex="-1"></a>                               <span class="at">quantiles =</span> <span class="fu">c</span>(<span class="fl">0.025</span><span class="sc">/</span><span class="fu">nrow</span>(targs), <span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span>, <span class="dv">1</span><span class="fl">-0.025</span><span class="sc">/</span><span class="fu">nrow</span>(targs)),</span>
+<span id="cb21-51"><a href="#cb21-51" aria-hidden="true" tabindex="-1"></a>                               <span class="at">num.threads=</span><span class="dv">1</span>)          </span>
+<span id="cb21-52"><a href="#cb21-52" aria-hidden="true" tabindex="-1"></a>   ) </span>
+<span id="cb21-53"><a href="#cb21-53" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">results</span>(de_obj)<span class="sc">$</span>pairwise   </span>
+<span id="cb21-54"><a href="#cb21-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-55"><a href="#cb21-55" aria-hidden="true" tabindex="-1"></a><span class="co"># get conservative adjusted p-values for the top genes, replacing hasty p-values with the null distribution:</span></span>
+<span id="cb21-56"><a href="#cb21-56" aria-hidden="true" tabindex="-1"></a>ps.spatial <span class="ot">&lt;-</span> res<span class="sc">$</span>pairwise<span class="sc">$</span>p.value[<span class="fu">grepl</span>(<span class="st">"distance_to_tumor"</span>, res<span class="sc">$</span>pairwise<span class="sc">$</span>contrast)]</span>
+<span id="cb21-57"><a href="#cb21-57" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(ps.spatial) <span class="ot">&lt;-</span> res<span class="sc">$</span>pairwise<span class="sc">$</span>target[<span class="fu">grepl</span>(<span class="st">"distance_to_tumor"</span>, res<span class="sc">$</span>pairwise<span class="sc">$</span>contrast)]</span>
+<span id="cb21-58"><a href="#cb21-58" aria-hidden="true" tabindex="-1"></a>ps.null <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">length.out =</span> <span class="fu">length</span>(genes_to_analyze) <span class="sc">-</span> <span class="fu">length</span>(topgenes))</span>
+<span id="cb21-59"><a href="#cb21-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-60"><a href="#cb21-60" aria-hidden="true" tabindex="-1"></a>ps.spatial.adjusted <span class="ot">&lt;-</span> <span class="fu">p.adjust</span>(<span class="fu">c</span>(ps.spatial, ps.null), <span class="at">method =</span> <span class="st">"BH"</span>)[<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(ps.spatial)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="analyzing-de-results" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Analyzing DE results</h1>
+<p>When your models have finished, it remains to prioritize the most promising genes for reporting and further analysis, then validate and explore their results.</p>
+<section id="prioritizing-genes" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="prioritizing-genes"><span class="header-section-number">4.1</span> Prioritizing genes</h2>
+<p>How you prioritize genes depends on your setting. There are two basic cases:</p>
+<p><strong>High power settings</strong>: when your model has high N (e.g.&nbsp;&gt;10000 cells) and no adjusting for spatial correlation, it’s common to get very tiny p-values, e.g.&nbsp;&lt; 10^-50. In these cases, apply a reasonable p-value cutoff, say the top 20% of genes, then rank genes by effect size.</p>
+<p><strong>Low power settings</strong>: when p-values aren’t infinitesimal, rank genes as you would in other DE settings, i.e.&nbsp;considering both p-value and effect size.</p>
+</section>
+<section id="exploring-results" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="exploring-results"><span class="header-section-number">4.2</span> Exploring results</h2>
+<p>The usual DE tools, like volcano plots and GSEA, apply directly to spatial data, and your existing workflows should work without modification. A few additional techniques bear mention. Since these explorations are highly custom, we leave it to you to code these final plots however you like.</p>
+<p>For continuous variables like distance to a cell type or local abundance of a cell type, it can be helpful to show mean expression across bins of the variable. E.g. in the below image, we show selected genes’ mean expression in tumor cells at different distances from blood vessels. This lets us see in more nuance how genes change over space, and it lets us cluster together genes with similar spatial patterns.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="figures/DE heatmap.png" class="img-fluid figure-img" style="width:50.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Second, unlike in single cell data, we can easily verify our results by plotting a gene’s expression in our given cell type over space. We favor plots that both show the “exposure” you’re studying and color the cells we’re studying by gene expression. E.g., in the below image, we were studying how tumor cells respond to proximity to blood vessels. Most cells are in a mute grey. Then we brightly color the exposure (blood vessels) blue, and use a yellow-red color scale to show a target gene’s expression in tumor cells.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="figures/VEGFA.png" class="img-fluid figure-img" style="width:40.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Finally, we can plot a single gene’s mean expression across values of a continuous variable. E.g., below we plot VEGFA expression vs.&nbsp;distance from vessels, with lines showing trends in 4 different cell types:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="figures/VEGFA-traceplot.png" class="img-fluid figure-img" style="width:40.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>For categorical variables, we can use polygons over space to denote predictor category, while using color to show expression:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="figures/depolygons.png" class="img-fluid figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>And we can use standard bar plots (or better, bar-and-whisker plots), or violin plots, to summarize expression across categories:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="figures/pdcd1.png" class="img-fluid figure-img" style="width:20.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Or we can use a heatmap to show the mean expression per category of many genes at once:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="figures/deheatmap2.png" class="img-fluid figure-img" style="width:15.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/nanostring-biostats\.github\.io\/CosMx-Analysis-Scratch-Space");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="../../license.html">
+<p>License</p>
+</a>
+  </li>  
+</ul>
+    <div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
