@@ -532,13 +532,6 @@
     "text": "4.9 Specify individual cell types\nHere’s my last tip for this post. Using the color_cells method, one can choose the color of the cell types and which cells to color by supplying a dictionary. If a cell type is not in the supplied dictionary, it will not be shown as a color.\n\ncustom_colors = {\n\"MOL\":\"#AA0DFE\",\n\"GN\":\"#85660D\",\n\"CHO_HB\":\"orange\" # need not be hexcode\n}\n\ngem.color_cells('RNA_nbclust_clusters', color=custom_colors)\nfig_path = output_path + \"/fig-color_three.png\"\nwith imageio.get_writer(fig_path, dpi=(800, 800)) as writer:\n        screenshot = gem.viewer.screenshot(canvas_only=True)\n        writer.append_data(screenshot)\n\n\n\n\n\n\n\n\n\nFigure 15: Same extent as Figure 7 highlighting three cell types only. MOL = mature oligodenrocytes = purple; GN = granule neurons = brown; CHO_HB = Cholinergic neurons Habenula = orange; cyan = all other cells."
   },
   {
-    "objectID": "posts/spatial-discovery-tips/index.html",
-    "href": "posts/spatial-discovery-tips/index.html",
-    "title": "Interactive Spatial Analysis with LLMs",
-    "section": "",
-    "text": "▶ Create Study (0:00)\n      ▶ View Results (0:38)\n      ▶ Download Spatial Discovery Results (1:47)\n      ▶ Converse with your favorite LMM (2:11)\n      ▶ Infer cell types (3:47)\n      ▶ Infer domain names (4:32)\n      ▶ Pathway insights (7:05)"
-  },
-  {
     "objectID": "posts/spatial-discovery-tips/index.html#spatial-discovery",
     "href": "posts/spatial-discovery-tips/index.html#spatial-discovery",
     "title": "Interactive Spatial Analysis with LLMs",
