@@ -50,7 +50,8 @@
 </ul>
 </section></div><section id="spatial-discovery" class="level2">
 <h2 class="anchored" data-anchor-id="spatial-discovery">Spatial Discovery</h2>
-<p>AtoMx SIP 2.2 brings several new features to users in the beta release of its brand new visual-first experience. This includes pre-processing and pre-calculations of many of “upstream” modules like quality, cluster, <em>etc</em>. In addition to visual enhancements, this new experience brings new analysis modules like Novae domains and Spatial Discovery. In this “vlog” post, I quickly explain what the Spatial Discovery is and demonstrate and example of how I use it in combination with LMMs to accelerate my discoveries. Click the chapters to the left of the video to begin.</p>
+<p>AtoMx SIP 2.2 brings several new features and enhancements to users in the beta release of its brand new visual-first experience. This includes pre-processing and pre-calculations of many of “upstream” modules like quality, cluster, <em>etc</em>. In addition to visual enhancements, this new experience brings new analysis modules like Novae domains and Spatial Discovery.</p>
+<p>In this “vlog” post, I quickly explain what the Spatial Discovery is and demonstrate and example of how I use it in combination with LMMs to accelerate my discoveries. Click the chapters to the right of the video to begin.</p>
 </section>
 <section id="study-insights" class="level2">
 <h2 class="anchored" data-anchor-id="study-insights">Study Insights</h2>
@@ -27622,7 +27623,7 @@ Tip
   author = {Lidan Wu and Aster Wardhani and Joseph-Tin Phan},
   year = {2025},
   url = {https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/image-segmentation-models/},
-  note = {Accessed: 2026-01-28}
+  note = {Accessed: 2026-01-29}
 }</code></pre>
 </div>
 <div id="tabset-1-4" class="tab-pane" aria-labelledby="tabset-1-4-tab">
