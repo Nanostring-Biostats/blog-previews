@@ -22,7 +22,7 @@
 
 
 <p>
-This is an end-to-end workflow that walks through analyzing a WTX single slide dataset – from loading flat files to quality processing to performing Pathway analysis – using open-sourced tools in a blend of R and python. In here you will find best practices, interactive visualizations to show what effects certain processing parameters have on the data, and applications to cutting-edge tools that have described in our blog like HieraType.
+This is an end-to-end workflow that walks through analyzing CosMx® whole transcriptome single-slide dataset – from loading flat files to quality processing to performing pathway analysis – using open-source tools in a blend of R and Python. Here you will find best practices, interactive visualizations to show what effects certain processing parameters have on the data, and applications of cutting-edge tools that have been described in our blog, like HieraType.
 </p>
 <p>
 <a href="../../guides/the-wtx-guide/index.html">Please click here navigate to the new Guides section</a>.
@@ -27648,7 +27648,7 @@ Tip
   author = {Lidan Wu and Aster Wardhani and Joseph-Tin Phan},
   year = {2025},
   url = {https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/image-segmentation-models/},
-  note = {Accessed: 2026-01-30}
+  note = {Accessed: 2026-01-31}
 }</code></pre>
 </div>
 <div id="tabset-1-4" class="tab-pane" aria-labelledby="tabset-1-4-tab">
