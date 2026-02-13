@@ -914,7 +914,7 @@
     "href": "bbytes/index.html",
     "title": "Browser Bytes",
     "section": "",
-    "text": "We have created lightweight and serverless tools that can be run directly from your browser using quarto-live. You can interact with pre-loaded CosMx® SMI results or analyze your own results all from your browser.\n \nDifferential Expression Explorer for CosMx® SMI\n\n\nInteract with your differential expression results derived smiDE with this tool.\n\n\n\n (icon / image tbd)\n\n\n \nIf you want to see additional tools, please let us know on github by creating an issue with the tag “browser bytes”."
+    "text": "We have created lightweight and serverless tools that can be run directly from your browser using quarto-live. You can interact with pre-loaded CosMx® SMI results or analyze your own results all from your browser.\n \nDifferential Expression Explorer for CosMx® SMI\n\n\nInteract with your differential expression results derived smiDE with this tool.\n\n\n\n\n\n\n \nIf you want to see additional tools, please let us know on github by creating an issue with the tag “browser bytes”."
   },
   {
     "objectID": "about.html",
