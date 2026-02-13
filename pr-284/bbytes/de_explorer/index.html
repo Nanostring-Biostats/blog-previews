@@ -224,7 +224,7 @@ cookieconsent.run({
         
       </div>
     </div>
-<div id="dashboard-collapse" class="navbar-collapse collapse"><ul class="navbar-nav navbar-nav-scroll me-auto" role="tablist"><li class="nav-item" role="presentation"><a id="tab-volcano-plots" class="nav-link active" data-bs-toggle="tab" role="tab" data-bs-target="#volcano-plots" data-scrolling="false" href="#volcano-plots" aria-controls="volcano-plots" aria-selected="true"><span class="nav-link-text">Volcano Plots</span></a></li><li class="nav-item" role="presentation"><a id="tab-marginal-means" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#marginal-means" data-scrolling="false" href="#marginal-means" aria-controls="marginal-means" aria-selected="false"><span class="nav-link-text">Marginal Means</span></a></li><li class="nav-item" role="presentation"><a id="tab-spatial-plots" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#spatial-plots" data-scrolling="false" href="#spatial-plots" aria-controls="spatial-plots" aria-selected="false"><span class="nav-link-text">Spatial Plots</span></a></li><li class="nav-item" role="presentation"><a id="tab-use-your-own-data" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#use-your-own-data" data-scrolling="true" href="#use-your-own-data" aria-controls="use-your-own-data" aria-selected="false"><span class="nav-link-text">Use Your Own Data</span></a></li><li class="nav-item" role="presentation"><a id="tab-advanced" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#advanced" data-scrolling="false" href="#advanced" aria-controls="advanced" aria-selected="false"><span class="nav-link-text">Advanced</span></a></li><li class="nav-item" role="presentation"><a id="tab-debugging" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#debugging" data-scrolling="false" href="#debugging" aria-controls="debugging" aria-selected="false"><span class="nav-link-text">Debugging</span></a></li></ul></div></div>
+<div id="dashboard-collapse" class="navbar-collapse collapse"><ul class="navbar-nav navbar-nav-scroll me-auto" role="tablist"><li class="nav-item" role="presentation"><a id="tab-volcano-plots" class="nav-link active" data-bs-toggle="tab" role="tab" data-bs-target="#volcano-plots" data-scrolling="false" href="#volcano-plots" aria-controls="volcano-plots" aria-selected="true"><span class="nav-link-text">Volcano Plots</span></a></li><li class="nav-item" role="presentation"><a id="tab-marginal-means" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#marginal-means" data-scrolling="false" href="#marginal-means" aria-controls="marginal-means" aria-selected="false"><span class="nav-link-text">Marginal Means</span></a></li><li class="nav-item" role="presentation"><a id="tab-spatial-plots" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#spatial-plots" data-scrolling="false" href="#spatial-plots" aria-controls="spatial-plots" aria-selected="false"><span class="nav-link-text">Spatial Plots</span></a></li><li class="nav-item" role="presentation"><a id="tab-use-your-own-data" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#use-your-own-data" data-scrolling="true" href="#use-your-own-data" aria-controls="use-your-own-data" aria-selected="false"><span class="nav-link-text">Use Your Own Data</span></a></li><li class="nav-item" role="presentation"><a id="tab-advanced" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#advanced" data-scrolling="false" href="#advanced" aria-controls="advanced" aria-selected="false"><span class="nav-link-text">Advanced</span></a></li><li class="nav-item" role="presentation"><a id="tab-r-console" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#r-console" data-scrolling="false" href="#r-console" aria-controls="r-console" aria-selected="false"><span class="nav-link-text">R Console</span></a></li></ul></div></div>
 </nav>
 </header></header>
 <!-- content -->
@@ -750,8 +750,8 @@ grid-auto-rows: minmax(0, 1fr);">
 Description
 </span></div></div>
 <div class="card-body html-fill-item html-fill-container">
-<p>This plot shows the estimated mean expression of a gene (<em>i.e.</em>, marginal means) between the pairwise contrast that are currently selected. This can help you gauge the magnitude of the difference between the two groups after accounting for any other variables in the model.</p>
-<p>Like the volcano plot, the x-axis shows the log2 fold change. The y-axis shows marginal mean response (log2 transformed) Each gene is represented by up to two points (one for each level of the contrast) with error bars. When “vs rest” or “vs all” is selected, only a single level is shown.</p>
+<p>This plot shows the estimated mean expression of a gene (<em>i.e.</em>, marginal means) between the pairwise contrast that is currently selected. This can help you gauge the magnitude of the difference between the two groups after accounting for any other variables in the model.</p>
+<p>Like the volcano plot, the x-axis shows the log2 fold change. The y-axis shows marginal mean response (log2 transformed). Each gene is represented by up to two points (one for each level of the contrast) with error bars. When “vs rest” or “vs all” is selected, only a single level is shown.</p>
 </div>
 <div class="cell hidden card-body html-fill-item html-fill-container">
 <div class="sourceCode cell-code hidden html-fill-item html-fill-container" id="cb22" data-startfrom="1054" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 1053;"><span id="cb22-1054"><a href="#cb22-1054" aria-hidden="true" tabindex="-1"></a>available_levels <span class="op">=</span> {</span>
@@ -1978,8 +1978,18 @@ eyJhdHRyIjp7ImF1dG9ydW4iOnRydWUsImRlZmluZSI6WyJ2b2xjYW5vX3Bsb3RfZW1pdCIsInBsb3RW
 </div>
 </div>
 </div>
-</div><div id="debugging" class="dashboard-page tab-pane grid-skip html-fill-item html-fill-container" data-orientation="rows" aria-labelledby="tab-debugging">
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr) minmax(3em, max-content); grid-auto-columns: minmax(0, 1fr);">
+</div><div id="r-console" class="dashboard-page tab-pane grid-skip html-fill-item html-fill-container" data-orientation="rows" aria-labelledby="tab-r-console">
+<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, max-content) minmax(3em, 1fr) minmax(3em, max-content); grid-auto-columns: minmax(0, 1fr);">
+<div class="card html-fill-item html-fill-container bslib-card" data-fill="false" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<p>This <code>webR</code> console is available for anything from quick calculations to creating additional plots. For a list of pre-compiled R packages that are available take a look at <a href="https://repo.r-wasm.org/" target="_blank">https://repo.r-wasm.org/</a>.</p>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
 <div class="card cell html-fill-item html-fill-container bslib-card" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
 <div class="card-body html-fill-item html-fill-container">
 <div class="html-fill-item html-fill-container">
