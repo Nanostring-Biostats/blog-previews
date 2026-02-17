@@ -6,10 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Patrick Danaher">
-<meta name="dcterms.date" content="2025-12-11">
+<meta name="author" content="Evelyn Metzger">
+<meta name="dcterms.date" content="2026-01-28">
 
-<title>Tips for effective use of the AtoMx Spatial Discovery workflow – Blog</title>
+<title>Interactive Spatial Analysis with LLMs – Blog</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -43,7 +43,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-a4a11d514c7d463668e07712114998e6.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-8dd817d487e8e26707729065bc6b7e6d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-9679bafb626ded606b541676956920af.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
 <link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
@@ -103,7 +103,7 @@ cookieconsent.run({
 
 </head>
 
-<body class="nav-fixed fullcontent">
+<body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
@@ -124,18 +124,18 @@ cookieconsent.run({
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../../license.html"> 
-<span class="menu-text">License</span></a>
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">Topics</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../link-to-code.html"> 
-<span class="menu-text">Code</span></a>
+    <a class="nav-link" href="../../guides/index.html"> 
+<span class="menu-text">Guides (new!)</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../../about.html"> 
-<span class="menu-text">Browse Posts by Topic</span></a>
+    <a class="nav-link" href="../../link-to-code.html"> 
+<span class="menu-text">Source Code</span></a>
   </li>  
   <li class="nav-item compact">
     <a class="nav-link" href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space"> <i class="bi bi-github" role="img">
@@ -163,65 +163,123 @@ cookieconsent.run({
 <!-- content -->
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-body">
-      <h1 class="title">Tips for effective use of the AtoMx Spatial Discovery workflow</h1>
+    <div class="quarto-title column-page-left">
+      <h1 class="title">Interactive Spatial Analysis with LLMs</h1>
                                 <div class="quarto-categories">
-                <div class="quarto-category">AtoMx</div>
+                <div class="quarto-category">AtoMx SIP</div>
+                <div class="quarto-category">LLMs</div>
               </div>
                   </div>
   </div>
     
-  <div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-author column-page-left">
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-heading">Affiliations</div>
     
       <div class="quarto-title-meta-contents">
-      <p class="author">Patrick Danaher <a href="https://orcid.org/0000-0002-2844-5883" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+      <p class="author">Evelyn Metzger <a href="https://orcid.org/0000-0002-4074-9003" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
     </div>
     <div class="quarto-title-meta-contents">
           <p class="affiliation">
               Bruker Spatial Biology
             </p>
           <p class="affiliation">
-              Github: <a href="https://github.com/patrickjdanaher" target="_blank">patrickjdanaher</a>
+              Github: <a href="https://github.com/eveilyeverafter" target="_blank">eveilyeverafter</a>
             </p>
         </div>
     </div>
 
-  <div class="quarto-title-meta">
+  <div class="quarto-title-meta column-page-left">
 
         
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">December 11, 2025</p>
+        <p class="date">January 28, 2026</p>
       </div>
     </div>
     
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">January 28, 2026</p>
+        <p class="date-modified">February 17, 2026</p>
       </div>
     </div>
       
     </div>
     
   
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
+    </div>
 <!-- main -->
-<main class="content quarto-banner-title-block" id="quarto-document-content">
+<main class="content quarto-banner-title-block page-columns page-full column-page-left" id="quarto-document-content">
 
 
 
 
 
-<section id="coming-soon" class="level1">
-<h1>Coming soon</h1>
-<p>Stay tuned for tips on the best ways to use the AtoMx Spatial Discovery workflow, including suggested LLM prompts.</p>
+<script>
+  function jumpTo(seconds) {
+    var vid = document.getElementById("mainVideo");
+    if (vid) {
+      vid.currentTime = seconds;
+      vid.play();
+    }
+  }
+</script>
+
+<div class="video-wrapper">
+  <video id="mainVideo" controls="" playsinline="" style="width: 100%; border-radius: 8px;">
+      <source src="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/releases/download/spatial_discovery/SDM-demo.mp4" type="video/mp4">
+  </video>
+</div>
+
+<div class="no-row-height column-margin column-container"><section id="quick-jump" class="level3">
+<h3 class="anchored" data-anchor-id="quick-jump">Quick Jump</h3>
+<ul>
+<li><a href="javascript:void(0);" onclick="jumpTo(0)">▶ Create Study (0:00)</a></li>
+<li><a href="javascript:void(0);" onclick="jumpTo(38)">▶ View Results (0:38)</a></li>
+<li><a href="javascript:void(0);" onclick="jumpTo(107)">▶ Download Results (1:47)</a></li>
+<li><a href="javascript:void(0);" onclick="jumpTo(131)">▶ Converse with LLM (2:11)</a></li>
+<li><a href="javascript:void(0);" onclick="jumpTo(227)">▶ Infer cell types (3:47)</a></li>
+<li><a href="javascript:void(0);" onclick="jumpTo(272)">▶ Infer domain names (4:32)</a></li>
+<li><a href="javascript:void(0);" onclick="jumpTo(425)">▶ Pathway insights (7:05)</a></li>
+</ul>
+</section></div><section id="spatial-discovery" class="level2">
+<h2 class="anchored" data-anchor-id="spatial-discovery">Spatial Discovery</h2>
+<p>AtoMx SIP 2.2 brings several new features and enhancements to users in the beta release of its brand new visual-first experience. This includes pre-processing and pre-calculations of many of “upstream” modules like quality, cluster, <em>etc</em>. In addition to visual enhancements, this new experience brings new analysis modules like Novae domains and Spatial Discovery.</p>
+<p>In this “vlog” post, I quickly explain what the Spatial Discovery is and demonstrate and example of how I use it in combination with LLMs to accelerate my discoveries. Click the chapters to the right of the video to begin.</p>
+</section>
+<section id="study-insights" class="level2">
+<h2 class="anchored" data-anchor-id="study-insights">Study Insights</h2>
+<p>When downloading the <a href="javascript:void(0);" onclick="jumpTo(107)">Spatial Discovery Study Insights</a> you will get a zip file. Within that zip file is a series of text files containing pertinent results from the study. One of those files is the readme markdown file which explains what each file contains, the column names, the data types, and other useful information that an LLM can use for added context.</p>
+</section>
+<section id="example-prompts" class="level2">
+<h2 class="anchored" data-anchor-id="example-prompts">Example Prompts</h2>
+<p>One of the most exciting things about this interactive approach is that you can really ask any number of questions to the prompt. I typically start by confirming if it can understand the files I uploaded and some questions defining my spatial domains and cell types before asking about biological processes but it’s entirely open-ended. Here’s some example prompts that you can try.</p>
+<ul>
+<li>Can you read and understand the contents of these files related to my colon cancer dataset? If so, I would like to have a conversation about the data with you.</li>
+<li>Tell me the most likely cell types from my Leiden clusters. From the data, can you provide me a table with the Leiden cluster, the most likely cell type, 1-3 marker genes that helped you determine this cell type, and a brief biological justification?</li>
+<li>From the Leiden cluster and domain information, can you provide a contingency table showing the counts? For example, in domain1 there are X number of Leiden 1 cells.</li>
+<li>Given the composition of cell types (Leiden) and domains, can you assign a biological name to each domain for me?</li>
+<li>What are the top 5 biologically relevant pathways in each domain?</li>
+<li>For &lt;insert pathway&gt;, show me the relationship between mean intensity and spatial autocorrelation for each cell type (Leiden cluster). Make this an interactive xy scatter plot for me.</li>
+<li>Tell me something interesting about this dataset.</li>
+<li>Give me three interesting pathway paterns that you found that I should check out spatially in AtoMx SIP.</li>
+</ul>
+</section>
+<section id="tips-when-working-with-llms" class="level2">
+<h2 class="anchored" data-anchor-id="tips-when-working-with-llms">Tips when working with LLMs</h2>
+<ul>
+<li>We have tested this on several models (chatGPT, copilot, Gemini) and premium tiers tend to perform best as they can hold more content than the free tiers. Free tiers also have a shorter conversaton limit and more restricting data upload size limits.</li>
+<li>If working with many samples and/or conditions, using “temporary” chats can reduce the LLMs from “pulling in” results that are not related to the current study.</li>
+<li>Taking screenshots of the sample from AtoMx SIP and pasting them in the chat can help provide the LLM more context. LLMs thrive on plain text and verification is recommended.</li>
+</ul>
+<p>If you discover other tips when working an analyzing your CosMx SMI results in this format, I would love to hear from you.</p>
 
 
 </section>
