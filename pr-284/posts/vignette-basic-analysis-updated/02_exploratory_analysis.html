@@ -78,7 +78,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-a4a11d514c7d463668e07712114998e6.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-27d3d13f624089e27c0f86020ba708d8.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-8dd817d487e8e26707729065bc6b7e6d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
 <link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
@@ -248,7 +248,7 @@ cookieconsent.run({
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">February 13, 2026</p>
+        <p class="date-modified">February 23, 2026</p>
       </div>
     </div>
       
@@ -399,7 +399,7 @@ cookieconsent.run({
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Source the efficient Moran's function</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"https://raw.githubusercontent.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/Main/_code/vignette2/utils/moransMultiFast.R"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"https://raw.githubusercontent.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/Main/_code/vignette2/moransMultiFast.R"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># compute neighbors matrix:</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>neighbors <span class="ot">&lt;-</span> InSituCor<span class="sc">:::</span><span class="fu">nearestNeighborGraph</span>(xy[, <span class="dv">1</span>], xy[, <span class="dv">2</span>], <span class="at">N =</span> <span class="dv">50</span>, <span class="at">subset =</span> metadata<span class="sc">$</span>slide_ID)  </span>
@@ -442,21 +442,22 @@ cookieconsent.run({
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>inds <span class="ot">&lt;-</span> celltype <span class="sc">==</span> <span class="st">"macrophage"</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the neighbor relationships within just the cell type:</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># (Here we'll use a radius-based approach to account for the fact that cells from a given cell type may fall quite far from their nearest neighbors from the same cell type.)</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>tempneighbors <span class="ot">&lt;-</span> InSituCor<span class="sc">:::</span><span class="fu">radiusBasedGraph</span>(xy[inds, <span class="dv">1</span>], xy[inds, <span class="dv">2</span>], <span class="at">R =</span> <span class="fl">0.25</span>, <span class="at">subset =</span> metadata<span class="sc">$</span>slide_ID)  </span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># check there's a reasonable number of neighbors per cell:</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(Matrix<span class="sc">::</span><span class="fu">rowSums</span>(tempneighbors <span class="sc">&gt;</span> <span class="dv">0</span>))</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># compute moran's:</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>morans_mycelltype <span class="ot">&lt;-</span> <span class="fu">moransMultiFast</span>(<span class="at">X =</span> norm[inds, ], <span class="at">W =</span> neighbors[inds, inds], <span class="at">perm =</span> <span class="dv">10</span>, <span class="at">compute_sparse =</span> <span class="cn">TRUE</span>, <span class="at">compute_perm =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"># plot moran's vs. mean expression</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>meanexpr_mycelltype <span class="ot">&lt;-</span> Matrix<span class="sc">::</span><span class="fu">colMeans</span>(counts[inds, ])</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">log2</span>(<span class="fl">1e-2</span> <span class="sc">+</span> meanexpr_mycelltype), </span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>     morans_mycelltype<span class="sc">$</span>I[<span class="fu">match</span>(<span class="fu">names</span>(meanexpr_mycelltype), morans_mycelltype<span class="sc">$</span>gene)], <span class="at">col =</span> <span class="dv">0</span>, </span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Log2 mean counts"</span>, <span class="at">ylab =</span> <span class="st">"Moran's I"</span>)</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fu">log2</span>(<span class="fl">1e-2</span> <span class="sc">+</span> meanexpr_mycelltype), </span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>     morans_mycelltype<span class="sc">$</span>I[<span class="fu">match</span>(<span class="fu">names</span>(meanexpr_mycelltype), morans_mycelltype<span class="sc">$</span>gene)], </span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>     <span class="fu">names</span>(meanexpr_mycelltype), <span class="at">cex =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>tempneighbors <span class="ot">&lt;-</span> InSituCor<span class="sc">:::</span><span class="fu">radiusBasedGraph</span>(xy[inds, <span class="dv">1</span>], xy[inds, <span class="dv">2</span>], <span class="at">R =</span> <span class="fl">0.03</span>, <span class="at">subset =</span> metadata<span class="sc">$</span>slide_ID[inds])</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># check there's a reasonable number of neighbors per cell:</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(Matrix<span class="sc">::</span><span class="fu">rowSums</span>(tempneighbors <span class="sc">&gt;</span> <span class="dv">0</span>))</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"># compute moran's:</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>morans_mycelltype <span class="ot">&lt;-</span> <span class="fu">moransMultiFast</span>(<span class="at">X =</span> norm[inds, ], <span class="at">W =</span> tempneighbors, <span class="at">perm =</span> <span class="dv">10</span>, <span class="at">compute_sparse =</span> <span class="cn">TRUE</span>, <span class="at">compute_perm =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co"># plot moran's vs. mean expression</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>meanexpr_mycelltype <span class="ot">&lt;-</span> Matrix<span class="sc">::</span><span class="fu">colMeans</span>(counts[inds, ])</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">log2</span>(<span class="fl">1e-2</span> <span class="sc">+</span> meanexpr_mycelltype), </span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>     morans_mycelltype<span class="sc">$</span>I[<span class="fu">match</span>(<span class="fu">names</span>(meanexpr_mycelltype), morans_mycelltype<span class="sc">$</span>gene)], <span class="at">col =</span> <span class="dv">0</span>, </span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Log2 mean counts"</span>, <span class="at">ylab =</span> <span class="st">"Moran's I"</span>)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fu">log2</span>(<span class="fl">1e-2</span> <span class="sc">+</span> meanexpr_mycelltype), </span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>     morans_mycelltype<span class="sc">$</span>I[<span class="fu">match</span>(<span class="fu">names</span>(meanexpr_mycelltype), morans_mycelltype<span class="sc">$</span>gene)], </span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>     <span class="fu">names</span>(meanexpr_mycelltype), <span class="at">cex =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
