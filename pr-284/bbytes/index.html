@@ -41,7 +41,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-a4a11d514c7d463668e07712114998e6.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-8dd817d487e8e26707729065bc6b7e6d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-af213591e084c97bf384adea636fbb33.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
 <link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
@@ -101,7 +101,7 @@ cookieconsent.run({
 
 </head>
 
-<body class="nav-fixed fullcontent">
+<body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -163,12 +163,12 @@ cookieconsent.run({
     </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
     
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content page-columns page-full column-body" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -177,7 +177,7 @@ cookieconsent.run({
 
 
 
-<div class="quarto-title-meta">
+<div class="quarto-title-meta column-body">
 
     
   
@@ -189,22 +189,38 @@ cookieconsent.run({
 </header>
 
 
-<p>We have created lightweight and serverless tools that can be run directly from your browser using <a href="https://r-wasm.github.io/quarto-live/" target="_blank">quarto-live</a>. You can interact with pre-loaded CosMx<sup>®</sup> SMI results or analyze your own results all from your browser.</p>
-<p><br> <br></p>
-<p><a href="de_explorer/index.html">Differential Expression Explorer for CosMx<sup>®</sup> SMI</a></p>
-<div class="columns">
-<div class="column" style="width:65%;">
-<p>Interact with your differential expression results derived <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/#category=differential%20expression" target="_blank"><code>smiDE</code></a> with this tool.</p>
-</div><div class="column" style="width:3%;">
-
-</div><div class="column" style="width:32%;">
-<p><img src="./de_explorer/thumbnail.gif" class="img-fluid" style="width:70.0%"></p>
+<div class="column-screen hero-banner">
+<section id="scratch-spaces-browser-bytes" class="level1 content-block">
+<h1>Scratch Space’s Browser Bytes 🧬</h1>
+<p>Welcome to the new Browser Bytes section of Scratch Space. These are a collection of “Byte-sized” dashboards and tools that you may find useful as you explore your AtoMx® SIP, CosMx® SMI, or GeoMx® DSP data.</p>
+</section>
 </div>
+<div class="tech-note">
+<p><strong>Technical Note:</strong> Browser Bytes are primarily client-side tools, meaning computation occurs within your browser. Performance may vary based on your hardware. As part of the <strong>Scratch Space</strong> initiative, these tools are experimental and have not undergone standard rigorous testing. We prioritize rapid delivery to help you iterate at the speed of discovery.</p>
 </div>
-<p><br> <br></p>
-<p>If you want to see additional tools, please let us know on github by creating an issue with the tag “browser bytes”.</p>
+<section id="available-browser-bytes" class="level2 content-block">
+<h2 class="anchored" data-anchor-id="available-browser-bytes">Available Browser Bytes</h2>
+<div class="card-grid">
+<div class="tool-card">
+<div class="thumbnail-container">
+<p><img src="./de_explorer/thumbnail.gif" class="img-fluid"></p>
+</div>
+<section id="de-explorer" class="level3">
+<h3 class="anchored" data-anchor-id="de-explorer">DE Explorer</h3>
+<p><strong>Differential Expression for CosMx® SMI</strong></p>
+<p>A companion dashboard for interacting with results from AtoMx® SIP or <code>smiDE</code>. Developed for rapid visualization of volcano plots and spatial contexts.</p>
+<p><a href="de_explorer/index.html" class="btn btn-primary">Launch Dashboard →</a></p>
+</section>
+</div>
+<section id="request-a-tool" class="level3 tool-card request-card">
+<h3 class="anchored" data-anchor-id="request-a-tool">Request a Tool</h3>
+<p><strong>Have a specific workflow in mind?</strong> We prioritize new tools based on your feedback. Help us expand the spatial toolkit by suggesting a feature or report.</p>
+<p><a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/issues/new?labels=BrowserBytes" class="btn btn-outline-primary" target="_blank">Create GitHub Issue</a></p>
+</section>
+</div>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
