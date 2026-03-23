@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/napari-3d-multiomics/index.html",
       "/posts/geomx_vignette/index.html",
       "/posts/wtx-guide-launcher-post/launcher.html",
       "/posts/spatial-discovery-tips/index.html",
@@ -23,7 +24,6 @@
       "/posts/immune-cell-typing-smooth/index.html",
       "/posts/smiDE/index.html",
       "/posts/cell-typing-cheat-sheets/index.html",
-      "/posts/napari-3d-multiomics/index.html",
       "/posts/napari-ome-tiff/cosmx-ome-tiff.html",
       "/posts/napari-protein-stitching/napari-cosmx-protein-stitching.html",
       "/posts/cosmx-cell-profiles/index.html",

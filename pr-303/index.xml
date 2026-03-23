@@ -10,7 +10,1302 @@
 <atom:link href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/index.xml" rel="self" type="application/rss+xml"/>
 <description>Bruker Spatial Biology&#39;s CosMx Analysis Scratch Space</description>
 <generator>quarto-1.6.30</generator>
-<lastBuildDate>Fri, 13 Feb 2026 00:00:00 GMT</lastBuildDate>
+<lastBuildDate>Mon, 23 Mar 2026 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Unlocking Spatial Insights: Multi-Omics &amp; 3D RNA Analysis with napari-CosMx v0.5.0</title>
+  <dc:creator>Lidan Wu</dc:creator>
+  <link>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-3d-multiomics/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<style>
+.feat-table table {
+  table-layout: fixed;
+  width: 100%;
+}
+.feat-table table th:first-child,
+.feat-table table td:first-child {
+  width: 22ch;
+  white-space: normal;
+}
+</style>
+<section id="introduction" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
+<p>Are you ready to accelerate your spatial biology discoveries? The latest <code>napari-CosMx</code> update empowers research teams to go beyond 2D, unlocking multi-omics (RNA + protein) exploration and volumetric 3D RNA analysis—all within a single, intuitive platform. Whether you’re visualizing complex datasets or building robust pipelines, these new features are designed to help you turn instrument output into actionable insights quickly, reproducibly, and at scale.</p>
+<ul>
+<li>Section&nbsp;2 What’s new at a glance</li>
+<li>Section&nbsp;3 How to use new features in <code>napari</code> GUI (widget flow, recommended for most users)</li>
+<li>Advanced usage with CLI (Section&nbsp;4) and Python API (Section&nbsp;5)</li>
+</ul>
+<p>Like other items in our <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/about.html" target="_blank">Analysis Scratch Space</a>, the usual <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/about.html" target="_blank">caveats</a> and <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/license.html" target="_blank">license</a> applies.</p>
+<section id="quick-install-upgrade" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="quick-install-upgrade"><span class="header-section-number">1.1</span> Quick install / upgrade</h2>
+<ol type="1">
+<li>Download the latest <code>whl</code> file for <code>napari-CosMx v0.5.0</code> from <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/assets/napari-cosmx%20releases" target="_blank">assets/napari-cosmx releases</a>.</li>
+</ol>
+<blockquote class="blockquote">
+<p>Known supported versions for this release:</p>
+<ul>
+<li><a href="https://www.python.org/downloads/" target="_blank">Python</a>: <code>3.8</code> to <code>3.11</code></li>
+<li><a href="https://napari.org/" target="_blank">napari</a>: originally developed for <code>0.4.17</code>; tested with <code>0.5.4</code> and <code>0.6.6</code></li>
+</ul>
+</blockquote>
+<ol start="2" type="1">
+<li><strong>Upgrade an existing environment</strong> (recommended when earlier version of <code>napari-cosmx</code> is already working):</li>
+</ol>
+<p>Install the new wheel <strong>without dependencies</strong> to avoid unnecessary resolver conflicts (especially around vaex-related packages)</p>
+<div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">pip</span> install <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--no-deps</span> /path/to/napari_CosMx-0.5.0.0-py3-none-any.whl</span></code></pre></div>
+<ol start="3" type="1">
+<li><strong>Install in a brand-new virtual environment</strong>:</li>
+</ol>
+<p>You could use the latest <code>napari==0.6.6</code>. If needed, <code>napari==0.5.4</code> is also a tested option.</p>
+<div class="sourceCode" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Linux / macOS</span></span>
+<span id="cb2-2"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">python3.11</span> <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-m</span> venv .venv</span>
+<span id="cb2-3"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">source</span> .venv/bin/activate</span>
+<span id="cb2-4"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">pip</span> install napari==0.6.6</span>
+<span id="cb2-5"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">pip</span> install /path/to/napari_CosMx-0.5.0.0-py3-none-any.whl</span></code></pre></div>
+<div class="sourceCode" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb3-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Windows PowerShell</span></span>
+<span id="cb3-2">py <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3.11</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>m venv <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">venv</span></span>
+<span id="cb3-3"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">venv</span>\Scripts\Activate<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ps1</span></span>
+<span id="cb3-4">pip install napari<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.6</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span></span>
+<span id="cb3-5"><span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">pip</span> install C<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span>\path\to\napari_cosmx-<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;</span>version<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;-</span>py3-none-any<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">whl</span></span></code></pre></div>
+<p>This post spotlights what’s new and how to get the most out of these features. For more details on installation and the basic 2D workflow, see our earlier <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/#category=napari" target="_blank">posts</a>.</p>
+</section>
+</section>
+<section id="sec-new-features" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> What’s New at a Glance</h1>
+<div class="feat-table">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>3D cell segmentation</strong></td>
+<td>Volumetric cell labels and segmentation outlines across Z planes for richer spatial context</td>
+</tr>
+<tr class="even">
+<td><strong>Z-plane navigation</strong></td>
+<td>Instantly view any channel, segmentation, or transcript layer for a single Z plane as a 2D image—perfect for side-by-side comparison</td>
+</tr>
+<tr class="odd">
+<td><strong>Multi-omics (RNA + Protein)</strong></td>
+<td>Seamlessly load and explore RNA transcripts alongside protein expression images from a single dataset</td>
+</tr>
+<tr class="even">
+<td><strong>Layer Group Manager</strong></td>
+<td>Organize napari layers into named groups; show/hide entire groups with one click for streamlined visualization</td>
+</tr>
+<tr class="odd">
+<td><strong>OME-TIFF export</strong></td>
+<td>Export OME-TIFF pyramids from the command line; 3D data is split into one CYX file per Z plane by default (QuPath-ready); use <code>--volumetrics</code> for full CZYX volume output</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="sec-widget-flow" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> How to Use in <code>napari</code> GUI</h1>
+<section id="new-capability-highlights" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="new-capability-highlights"><span class="header-section-number">3.1</span> New capability highlights</h2>
+<ol type="1">
+<li><strong>Multi-omics in one workspace (RNA + Protein):</strong> Explore both modalities in a unified, interactive environment (Figure&nbsp;1).</li>
+<li><strong>3D RNA workflows:</strong> Leverage volumetric labels, Z-aware loading, and Z-filtered transcript overlays for advanced spatial analysis (Figure&nbsp;2).</li>
+<li><strong>Layer Group Manager:</strong> Effortlessly organize layers into named groups and toggle visibility for efficient data review (Section&nbsp;3.3.6).</li>
+</ol>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs"><li class="nav-item"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" aria-controls="tabset-1-1" aria-selected="true">Multi-Omics View</a></li><li class="nav-item"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" aria-controls="tabset-1-2" aria-selected="false">3D RNA View</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" aria-labelledby="tabset-1-1-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-multiomics-overview" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-multiomics-overview-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-3d-multiomics/figures/fig-multiomics-overview.png" class="img-fluid figure-img" width="2021">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-multiomics-overview-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Multi-omics visualization in <code>napari-CosMx</code> with unified workspace showing aligned RNA and protein panels for the same sample, enabling side-by-side modality review.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-rna3d-overview" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-rna3d-overview-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-3d-multiomics/figures/fig-rna3d-overview.png" class="img-fluid figure-img" width="2024">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-rna3d-overview-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: 3D RNA view with volumetric cell segmentation and z-aware plotting across selected Z planes. Use <code>Roll Dimensions</code> button on lower left of the viewer to see the side-view of tissue section.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="reader-widget-flow" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="reader-widget-flow"><span class="header-section-number">3.2</span> Reader + Widget flow</h2>
+<p>Using <code>napari-CosMx</code> from the GUI is a simple two-step workflow:</p>
+<ol type="1">
+<li><strong>Step 1 — Stitch Images</strong> (Stitch Images panel): prepare your raw CosMx output into the <code>napari-CosMx</code> zarr format that is ready for <code>napari</code> viewer exploration.</li>
+<li><strong>Step 2 — Explore</strong> (Exploration panels): drag the prepared output folder into the napari viewer; the plugin reader is invoked automatically and opens the data exploration widget.</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>When you open a <strong>preprocessed folder</strong> through drag-and-drop, the exploration widget focuses on viewing panels and does <strong>not</strong> show the Stitch Images panel. If you want to process a <strong>new raw dataset</strong>, launch <code>Stitch Images</code> directly from the napari menu.</p>
+</div>
+</div>
+<section id="sec-stitch-panel" class="level3" data-number="3.2.1">
+<h3 data-number="3.2.1" class="anchored" data-anchor-id="sec-stitch-panel"><span class="header-section-number">3.2.1</span> Step 1: Stitch Images panel</h3>
+<p>Open a terminal, activate your environment, and launch <code>napari</code>:</p>
+<div class="sourceCode" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">napari</span></span></code></pre></div>
+<p>From the <code>napari</code> menu, choose <strong>Plugins → Stitch Images (napari CosMx)</strong>. The plugin opens with the <strong>Stitch Images</strong> panel. Use it to turn raw data output exported from AtoMx<sup>®</sup> Spatial Informatics Portal (SIP) into a napari-ready dataset.</p>
+<div id="fig-stitch-panel" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-stitch-panel-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-3d-multiomics/figures/fig-stitch-widget.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-stitch-panel-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: <strong>Stitch Images panel</strong> used to configure inputs, dimensionality, and output location before preprocessing raw data into napari-ready folder. (A) Launch <code>Stitch Images (napari CosMx)</code> widget under <code>napari</code> plugins menu. (B) <code>Stitch Images</code> widget layout. (C) Example setup and log messages for stitching RNA 3D data. (D) Example setup and log messages for stitching multiomics (Protein + RNA) 2D data.
+</figcaption>
+</figure>
+</div>
+<p><strong>How it works:</strong></p>
+<ol type="1">
+<li><p>Export raw data for your study from AtoMx SIP (see (earlier post)<span target="_blank">https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-cosmx-intro/#sec-export-raw-data</span>) and organize them by slide. Each slide folder (Figure&nbsp;4) should contain</p>
+<ul>
+<li><code>CellStatsDir</code>: contains per-FOV cell segmentation outcomes (<code>FOV*/CellLabels_F*.tif</code>) and morphological images (<code>Morphology2D</code> for 2D data or <code>Morphology3D</code> for 3D data).</li>
+<li><code>RunSummary</code>: contains fov position csv file, <code>*FOV_Locations.csv</code> or <code>*fov_positions_file.csv.gz</code> (flat file).</li>
+<li><code>AnalysisResults/&lt;guid&gt;</code>: contains per-FOV organized data for RNA transcripts (<code>FOV*/*FOV*__complete_code_cell_target_call_coord.csv</code>) or Protein images (<code>FOV*/ProteinImages/*_F*_&lt;ProbeID&gt;.TIF</code>).</li>
+<li><code>plex*.csv</code>: required if it’s protein data; csv file listing the protein names (<code>ProbID</code> &amp; <code>DisplayName</code>) included in your protein data.</li>
+</ul></li>
+<li><p>Click <strong>Browse Primary Folder</strong> and select your primary CosMx exported data folder. The folder must contain <code>CellStatsDir</code> and <code>RunSummary</code> sub-directories as mentioned above.</p>
+<blockquote class="blockquote">
+<p>For <strong>multi-omics</strong> runs where RNA and protein data live in separate source folders, choose the <strong>protein run folder</strong> as the primary input. Then use the <strong>Browse Additional RNA Folder (Optional)</strong> button (Step 2) to point to the RNA run folder; the widget will auto-detect the correct <code>AnalysisResults</code> path inside it.</p>
+</blockquote></li>
+<li><p>The plugin <strong>auto-detects</strong> whether the <code>CellLabels_F*.TIF</code> files carry a Z-index suffix (e.g.&nbsp;<code>CellLabels_F00001_Z003.TIF</code>) and sets <strong>Input ndim</strong> and <strong>Output ndim</strong> accordingly:</p>
+<pre><code>Detected input ndim: 3 (example: CellLabels_F001_Z001.TIF).
+Default plan set to 3D -&gt; 3D. You can override before stitching.</code></pre>
+<p>The widget also <strong>auto-detects RNA and protein inputs</strong> and pre-checks the corresponding workflow checkboxes. You can manually override either checkbox before clicking <strong>Stitch</strong>.</p></li>
+<li><p>Review the <strong>Planned stitch mode</strong> preview and adjust as needed:</p></li>
+</ol>
+<div class="feat-table">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Setting</th>
+<th>What it controls</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Input ndim</strong></td>
+<td>Whether the raw files are 2D or 3D (Z-stack) tiles</td>
+</tr>
+<tr class="even">
+<td><strong>Output ndim</strong></td>
+<td>Whether to write a volumetric (3D) or flat (2D) zarr store</td>
+</tr>
+<tr class="odd">
+<td><strong>Z slice</strong></td>
+<td>Which Z plane to extract when collapsing 3D → 2D</td>
+</tr>
+<tr class="even">
+<td><strong>Z step (µm)</strong></td>
+<td>Physical Z spacing, e.g.&nbsp;<code>0.8</code> for CosMx standard RNA 3D runs; leave blank to read it from raw data</td>
+</tr>
+<tr class="odd">
+<td><strong>Run read-targets for RNA</strong></td>
+<td>Parse transcript coordinates into <code>targets.hdf5</code></td>
+</tr>
+<tr class="even">
+<td><strong>Run stitch-expression for protein</strong></td>
+<td>Stitch protein expression images into the same store</td>
+</tr>
+</tbody>
+</table>
+</div>
+<ol start="5" type="1">
+<li>Click <strong>Choose Output Folder</strong> to set the destination, then click <strong>Stitch</strong>. High-level status messages appear in real time in the widget as each stage completes (reading labels, writing morphology, running RNA/protein steps).</li>
+</ol>
+<p>When stitching finishes, all morphological channels, segmentation masks, transcript tables (if RNA), and protein images (if protein) are written to an output directory that’s instantly ready for <code>napari-CosMx</code> data exploration.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs"><li class="nav-item"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" aria-controls="tabset-2-1" aria-selected="true">Raw Data Inputs</a></li><li class="nav-item"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" aria-controls="tabset-2-2" aria-selected="false">Stitched Outputs</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" aria-labelledby="tabset-2-1-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-raw-inputs" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-raw-inputs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-3d-multiomics/figures/fig-raw-inputs.jpg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-raw-inputs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Raw data inputs for <code>Stitch Images (napari CosMx)</code> plugin.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" aria-labelledby="tabset-2-2-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-stitch-outocmes" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-stitch-outocmes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-3d-multiomics/figures/fig-stitch-outocmes.png" class="img-fluid figure-img" width="1631">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-stitch-outocmes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Napari-ready data generated by <code>Stitch Images (napari CosMx)</code> plugin. Output folder examples for RNA-only (A) and multiomics (B).
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<strong>See it in action</strong>: Here’s how to stitch a multi-omics dataset.
+<figure style="text-align: center;" class="figure">
+<video src="figures/multiOmics_stitch_20260320.webm" controls="" autoplay="" loop="" muted="" style="max-width: 100%; height: auto;">
+Your browser does not support the video tag.
+</video>
+<figcaption>
+<b>Video 1:</b> Demonstration of the Stitch Images widget in <code>napari-CosMx</code> with a multi-omics dataset.
+</figcaption>
+</figure>
+</section>
+<section id="sec-explore-panels" class="level3" data-number="3.2.2">
+<h3 data-number="3.2.2" class="anchored" data-anchor-id="sec-explore-panels"><span class="header-section-number">3.2.2</span> Step 2: Opening stitched data in the viewer</h3>
+<p>Drag and drop your <strong>stitched output folder</strong> (which contains an <code>images</code> sub-folder) into the napari viewer canvas, or use <strong>File → Open Folder</strong>. Napari instantly detects the data and prompts you to choose a reader. Select <strong>napari-CosMx</strong>, check “Remember this choice,” and watch as the plugin loads your dataset and opens an interactive exploration environment tailored to your data.</p>
+<p>Each exploration panel is designed for a specific analysis task. Here’s what you get:</p>
+<div class="feat-table">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Panel</th>
+<th>Shown when…</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Dataset</strong></td>
+<td>Always — displays summary info and quick access to Layer Group Manager</td>
+</tr>
+<tr class="even">
+<td><strong>Morphology Images</strong></td>
+<td>Always — channel images (<code>DNA</code>, <code>PanCK</code>, etc.) with Z-plane navigation for 3D</td>
+</tr>
+<tr class="odd">
+<td><strong>RNA Transcripts</strong></td>
+<td>When transcript data is present — overlay genes as point clouds with Z-filtering</td>
+</tr>
+<tr class="even">
+<td><strong>Protein Expression</strong></td>
+<td>When protein images are present — visualize expression across channels</td>
+</tr>
+<tr class="odd">
+<td><strong>Color Cells</strong></td>
+<td>When cell labels are present — color cells by any metadata column</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Color by cell metadata">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Color by cell metadata
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>To enable cell coloring, include your metadata file before opening the dataset: either a custom <code>*_metadata.csv</code> (with <code>cell_ID</code> column following the <code>c_[slide]_[fov]_[CellId]</code> pattern) or the AtoMX SIP-exported <code>*_metadata_file.csv.gz</code> placed at the root of your napari-ready data folder.</p>
+</div>
+</div>
+<p><strong>See it in action:</strong> Here’s a multi-omics dataset being explored interactively—loading RNA transcripts, overlaying protein expression images, and switching between modalities seamlessly in one workspace:</p>
+<figure style="text-align: center;" class="figure">
+<video src="figures/multiOmics_breast_20260320.webm" controls="" autoplay="" loop="" muted="" style="max-width: 100%; height: auto;">
+Your browser does not support the video tag.
+</video>
+<figcaption>
+<b>Video 2:</b> Interactive multi-omics data exploration: RNA transcripts and protein expression visualized side-by-side in a unified napari workspace.
+</figcaption>
+</figure>
+<div class="callout callout-style-default callout-note callout-titled" title="Smart panel detection">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Smart panel detection
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The exploration widget automatically enables only the panels relevant to your data. If your dataset has RNA-only data, you’ll see Morphology Images and RNA Transcripts panels. For multi-omics (RNA + protein), all relevant panels appear. Each panel supports 3D datasets with full Z-plane filtering.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="data-exploration-widget" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="data-exploration-widget"><span class="header-section-number">3.3</span> Data Exploration widget</h2>
+<section id="dataset-panel" class="level3" data-number="3.3.1">
+<h3 data-number="3.3.1" class="anchored" data-anchor-id="dataset-panel"><span class="header-section-number">3.3.1</span> Dataset panel</h3>
+<p>At the top of the exploration widget, the <strong>Dataset</strong> panel provides a quick at-a-glance summary of your loaded data:</p>
+<pre><code>name:        Breast-multiomics
+folder:      /data/Breast-multiomics
+modalities:  rna, protein
+dimensions:  2D</code></pre>
+<p>This panel also contains the <strong>Layer Groups…</strong> button, giving you instant access to the Layer Group Manager for organizing and toggling your layers as you explore.</p>
+</section>
+<section id="morphology-images-panel" class="level3" data-number="3.3.2">
+<h3 data-number="3.3.2" class="anchored" data-anchor-id="morphology-images-panel"><span class="header-section-number">3.3.2</span> Morphology Images panel</h3>
+<p>Browse and display all available morphology channels (e.g.&nbsp;<code>DNA</code>, <code>PanCK</code>, <code>CD45</code>). Simply select a channel, pick your preferred colormap, and click <strong>Add layer</strong> to overlay it on your canvas.</p>
+<p><strong>For 3D datasets</strong>, a <strong>Z plane</strong> field unlocks depth-specific exploration:</p>
+<ul>
+<li>Leave blank → loads the <strong>full 3D volume</strong> (Z × Y × X) as a single multiscale layer for volumetric rendering</li>
+<li>Enter a Z value (e.g.&nbsp;<code>3</code>) → loads <strong>that plane only</strong> as a lightweight 2D layer named <code>DNA [z=3]</code> — perfect for rapid comparisons without reloading the entire stack</li>
+<li>Enter <code>current</code> → locks to whichever Z plane you’re currently viewing, automatically updating as you scroll</li>
+</ul>
+<p>This makes side-by-side depth comparisons effortless, as illustrated in the Z-plane Comparison for Metadata video below.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Visualize 3D data in `napari`">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Visualize 3D data in <code>napari</code>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In napari’s <strong>Dimensions</strong> controls (bottom-left), click on <strong>arrow</strong> sign to step through Z planes with the Z slider, or <strong>change the order of visual axes (roll dimensions)</strong> for side-view rendering (see Figure&nbsp;2).</p>
+</div>
+</div>
+</section>
+<section id="protein-expression-panel" class="level3" data-number="3.3.3">
+<h3 data-number="3.3.3" class="anchored" data-anchor-id="protein-expression-panel"><span class="header-section-number">3.3.3</span> Protein Expression panel</h3>
+<p>When protein data is present, this panel appears automatically. Select a protein channel, pick a colormap, and click <strong>Add layer</strong> to visualize expression patterns.</p>
+<p>The same <strong>Z plane</strong> field available in Morphology Images also applies here, giving you identical control for exploring protein expression across tissue depth:</p>
+<pre><code>Protein:   CD3
+Colormap:  red
+Z plane:   2     ← loads only the Z=2 plane as 'CD3 [z=2]'</code></pre>
+<p>When a gene and protein share the same name (e.g.&nbsp;<strong>B</strong>), <code>napari-CosMx</code> automatically assigns distinct layer names—<strong>B [rna]</strong> and <strong>B [protein]</strong>, so you can load both and compare their spatial distributions side-by-side without confusion.</p>
+</section>
+<section id="rna-transcripts-panel" class="level3" data-number="3.3.4">
+<h3 data-number="3.3.4" class="anchored" data-anchor-id="rna-transcripts-panel"><span class="header-section-number">3.3.4</span> RNA Transcripts panel</h3>
+<p>Visualize individual genes as point clouds overlaid on your morphology and protein layers. When <code>targets.hdf5</code> is present, this panel activates automatically.</p>
+<p><strong>Controls:</strong></p>
+<ul>
+<li><strong>Gene selector</strong> — choose your target from the dropdown</li>
+<li><strong>Color</strong> — pick from standard colors (white, red, green, blue, magenta, yellow, cyan)</li>
+<li><strong>Point size</strong> — set the rendered size of transcript dots (default 5; especially useful for 3D datasets where napari’s default sizing struggles)</li>
+</ul>
+<p><strong>Z-plane control (3D datasets only):</strong></p>
+<p>For volumetric datasets, the <strong>Z plane(s)</strong> field gives you precise control over which transcripts to display:</p>
+<div class="feat-table">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Input</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><em>(blank in 3D)</em></td>
+<td><strong>All Z planes</strong> (default) — complete volumetric view across the entire tissue section</td>
+</tr>
+<tr class="even">
+<td><code>all</code></td>
+<td>Explicit “all planes” (same behavior as blank)</td>
+</tr>
+<tr class="odd">
+<td><code>2</code></td>
+<td>Single plane (e.g.&nbsp;Z plane 2) — named <code>GeneA [3D z=2]</code> for easy identification</td>
+</tr>
+<tr class="even">
+<td><code>2-4</code></td>
+<td>Range of planes inclusive (Z 2 through 4) — named <code>GeneA [3D z=2-4]</code></td>
+</tr>
+<tr class="odd">
+<td><code>1,3,5</code></td>
+<td>Non-contiguous planes — named <code>GeneA [3D z=1,3,5]</code></td>
+</tr>
+<tr class="even">
+<td><code>current</code></td>
+<td>Locked to your currently viewed Z plane — updates dynamically as you navigate</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Layer names automatically include their Z selection for clarity, making it trivial to load multiple Z-plane overlays and toggle them independently.</p>
+<section id="sec-3d-rna-viz" class="level4" data-number="3.3.4.1">
+<h4 data-number="3.3.4.1" class="anchored" data-anchor-id="sec-3d-rna-viz"><span class="header-section-number">3.3.4.1</span> 3D RNA Visualization</h4>
+<p>For <strong>3D datasets</strong>, the RNA Transcripts panel supports volumetric exploration. You can overlay transcripts across multiple Z planes, combine them with morphology channels at different depths, and visualize the spatial organization of genes in full 3D space. This is particularly powerful for detecting spatial relationships that only emerge when viewing the complete volume.</p>
+<p>Here’s a real example of 3D RNA exploration with transcript overlays and side-view morphology:</p>
+<figure style="text-align: center;" class="figure">
+<video src="figures/rna3D_explore_3dView01_20260320.webm" controls="" autoplay="" loop="" muted="" style="max-width: 100%; height: auto;">
+Your browser does not support the video tag.
+</video>
+<figcaption>
+<b>Video 3:</b> 3D RNA data exploration with volumetric transcript overlays and morphology channels.
+</figcaption>
+</figure>
+<div class="callout callout-style-default callout-tip callout-titled" title="3D rendering for thin tissue sections">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+3D rendering for thin tissue sections
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For thin tissue sections of 5~10 µm thickness, standard 3D volumetric rendering can be difficult to visualize. Use napari’s <strong>axis reordering controls</strong> (the button labeled with cube icon in the bottom toolbar) to swap the Z, Y, and X axes and view your data from the side. This “side-view” perspective makes thin sections much easier to visualize and is demonstrated in the video above. You can toggle between standard XY view and side-view as needed during your analysis.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="color-cells-panel" class="level3" data-number="3.3.5">
+<h3 data-number="3.3.5" class="anchored" data-anchor-id="color-cells-panel"><span class="header-section-number">3.3.5</span> Color Cells panel</h3>
+<p>The <strong>Color Cells</strong> panel appears when cell labels are present. Use it to color cells by any metadata column (cell type, niche, cluster, etc.) from your cell <code>*_metadata.csv</code> file (or AtoMx-SIP exported flat file <code>*_metadata_file.csv.gz</code>) that is placed at the root of the napari-ready data folder.</p>
+<p><strong>Basic usage:</strong></p>
+<ol type="1">
+<li>Choose a <strong>metadata column</strong> from the dropdown — the viewer’s label layer is automatically updated with per-cell colors drawn from the column’s palette.</li>
+<li>Switch between columns to explore different metadata dimensions instantly.</li>
+</ol>
+<p><strong>Keep multiple colored layers (comparison mode):</strong></p>
+<p>By default, each new metadata column selection <strong>replaces</strong> the previous coloring. To compare different metadata colorings side by side (e.g., cell type vs.&nbsp;niche vs.&nbsp;cluster), check the <strong>“Keep previous colored layers”</strong> checkbox before switching columns. This creates a new colored layer for each metadata column, allowing you to:</p>
+<ul>
+<li>Select cell type → creates layer “cell_type”</li>
+<li>Switch to niche → creates layer “niche” (keeps cell_type visible)</li>
+<li>Switch to cluster → creates layer “cluster” (keeps both visible)</li>
+</ul>
+<p>Now you can show/hide each colored layer independently to compare distributions across metadata dimensions.</p>
+<section id="sec-z-plane-metadata-compare" class="level4" data-number="3.3.5.1">
+<h4 data-number="3.3.5.1" class="anchored" data-anchor-id="sec-z-plane-metadata-compare"><span class="header-section-number">3.3.5.1</span> Z-plane Comparison for Metadata</h4>
+<p>For <strong>3D datasets</strong>, you can deepen your analysis by coloring cells at different Z planes and comparing spatial distributions across depths. This workflow highlights how cell-type composition, niches, or clusters change through the tissue volume:</p>
+<ul>
+<li>Enter a value in the <strong>Z plane</strong> field in the <strong>Color Cells</strong> panel — the viewer automatically loads and colors the corresponding Z plane’s labels layer if it’s not already present.</li>
+<li>The coloring updates instantly based on your current metadata column selection.</li>
+<li>Repeat for other Z planes to compare cell-type distributions side by side—each Z plane is a separate layer you can show or hide independently.</li>
+<li>For detailed Z-plane comparisons across multiple metadata columns, the <strong>Layer Group Manager</strong> helps organize layers by plane and metadata type for cleaner navigation.</li>
+</ul>
+<p>Here’s a practical demonstration of comparing cell metadata across multiple Z planes:</p>
+<figure style="text-align: center;" class="figure">
+<video src="figures/rna3D_explore_compareZ02_20260320.webm" controls="" autoplay="" loop="" muted="" style="max-width: 100%; height: auto;">
+Your browser does not support the video tag.
+</video>
+<figcaption>
+<b>Video 4:</b> Comparing cell metadata across different Z planes to visualize spatial heterogeneity through tissue depth.
+</figcaption>
+</figure>
+</section>
+</section>
+<section id="sec-layer-group-manager" class="level3" data-number="3.3.6">
+<h3 data-number="3.3.6" class="anchored" data-anchor-id="sec-layer-group-manager"><span class="header-section-number">3.3.6</span> Layer Group Manager</h3>
+<p>Managing dozens of layers across multiple Z planes and omics modalities can become unwieldy. Click <strong>Layer Groups…</strong> in the Dataset panel to open the <strong>Layer Group Manager</strong> as a separate dock widget.</p>
+<p><strong>What it does:</strong></p>
+<ol type="1">
+<li><strong>Create a group</strong> — type a name (e.g.&nbsp;<em>immune</em>, <em>epithelial</em>, <em>tumor</em>) and click <strong>New Group</strong>.</li>
+<li><strong>Assign layers</strong> — select one or more layers in the napari layer list, then click <strong>Add selected viewer layers</strong>.</li>
+<li><strong>Toggle visibility</strong> — click <strong>Show</strong> or <strong>Hide</strong> to show or hide all layers in a group in one step.</li>
+</ol>
+<p>Groups are stored for the current session and are especially useful when switching between RNA morphology stacks and protein expression images (see example below).</p>
+<figure style="text-align: center;" class="figure">
+<video src="figures/rna3D_explore_layerGroups03_20260320.webm" controls="" autoplay="" loop="" muted="" style="max-width: 100%; height: auto;">
+Your browser does not support the video tag.
+</video>
+<figcaption>
+<b>Video 5:</b> Demonstration of how to use Layer Group Manager.
+</figcaption>
+</figure>
+</section>
+</section>
+</section>
+<section id="sec-cli" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Advanced Usage: Command-line Tools</h1>
+<p>All preprocessing steps are available as standalone console scripts, so they drop directly into shell scripts, Snakemake workflows, and Nextflow pipelines.</p>
+<section id="quick-workflow-recipes" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="quick-workflow-recipes"><span class="header-section-number">4.1</span> Quick workflow recipes</h2>
+<section id="multi-omics-typical-current-2d" class="level3" data-number="4.1.1">
+<h3 data-number="4.1.1" class="anchored" data-anchor-id="multi-omics-typical-current-2d"><span class="header-section-number">4.1.1</span> Multi-omics (typical current 2D)</h3>
+<div class="sourceCode" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">stitch-images</span> <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb8-2">   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-i</span>  /data/run/CellStatsDir <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb8-3">   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-f</span>  /data/run/RunSummary <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb8-4">   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-o</span>  /output/Liver-S2</span>
+<span id="cb8-5"></span>
+<span id="cb8-6"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">read-targets</span> /data/run/AnalysisResults/<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;</span>run-id<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> -o /output/Liver-S2</span>
+<span id="cb8-7"></span>
+<span id="cb8-8"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">stitch-expression</span> <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb8-9">   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-i</span> /data/run <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb8-10">   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-o</span> /output/Liver-S2 <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb8-11">   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--ndim</span> 2</span></code></pre></div>
+</section>
+<section id="rna-3d-full-volume" class="level3" data-number="4.1.2">
+<h3 data-number="4.1.2" class="anchored" data-anchor-id="rna-3d-full-volume"><span class="header-section-number">4.1.2</span> RNA 3D (full volume)</h3>
+<div class="sourceCode" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Full 3D output (Z × Y × X volumes per channel)</span></span>
+<span id="cb9-2"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">stitch-images</span> <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb9-3">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-i</span>  /data/run/CellStatsDir <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb9-4">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-f</span>  /data/run/RunSummary <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb9-5">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-o</span>  /output/Liver-S2 <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb9-6">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--input-ndim</span>  3 <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb9-7">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--output-ndim</span> 3 </span></code></pre></div>
+<p>The output zarr store keeps Z mapping in <code>CosMx</code> attributes, and downstream viewer/export steps read it automatically.</p>
+</section>
+<section id="d-input-to-2d-output-single-z-plane" class="level3" data-number="4.1.3">
+<h3 data-number="4.1.3" class="anchored" data-anchor-id="d-input-to-2d-output-single-z-plane"><span class="header-section-number">4.1.3</span> 3D input to 2D output (single Z plane)</h3>
+<div class="sourceCode" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">stitch-images</span> <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb10-2">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-i</span>  /data/run/CellStatsDir <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb10-3">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-f</span>  /data/run/RunSummary <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb10-4">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-o</span>  /output/Liver-S2-z2 <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb10-5">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--input-ndim</span>  3 <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb10-6">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--output-ndim</span> 2 <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb10-7">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--zslice</span>      2          <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># export only Z plane 2</span></span></code></pre></div>
+</section>
+<section id="protein-stitching-only" class="level3" data-number="4.1.4">
+<h3 data-number="4.1.4" class="anchored" data-anchor-id="protein-stitching-only"><span class="header-section-number">4.1.4</span> Protein stitching only</h3>
+<div class="sourceCode" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">stitch-expression</span> <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb11-2">   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-i</span> /data/run <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb11-3">   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-o</span> /output/Liver-S2 <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb11-4">   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--ndim</span> 2</span></code></pre></div>
+</section>
+</section>
+<section id="export-to-ome-tiff" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="export-to-ome-tiff"><span class="header-section-number">4.2</span> Export to OME-TIFF</h2>
+<p><code>export-tiff</code> command converts a stitched zarr store into pyramidal OME-TIFF for <a href="https://qupath.readthedocs.io/en/stable/docs/intro/index.html" target="_blank">QuPath</a>, <a href="https://imagej.net/software/fiji/" target="_blank">FIJI</a>, and other OME-aware tools.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Output file count is driven by a few settings:</p>
+<ul>
+<li>Selection is explicit: use <code>--channels</code>, <code>--proteins</code>, or <code>--all</code>.</li>
+<li>One file per batch by default (<code>batch_0_...</code>, <code>batch_1_...</code>, …).</li>
+<li>3D defaults to <strong>one CYX file per Z plane</strong>; use <code>--volumetrics</code> for <strong>one CZYX file</strong>.</li>
+<li>Use <code>--dry-run</code> to preview batches and estimated file count.</li>
+</ul>
+</div>
+</div>
+<div class="sourceCode" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 2D dataset → CYX OME-TIFF</span></span>
+<span id="cb12-2"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">export-tiff</span> <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-i</span> /output/Liver-S2 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-o</span> /exports/Liver-S2 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--all</span></span>
+<span id="cb12-3"></span>
+<span id="cb12-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 3D dataset → one CYX OME-TIFF per Z plane (default)</span></span>
+<span id="cb12-5"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">export-tiff</span> <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-i</span> /output/Liver-S2-3d <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-o</span> /exports/Liver-S2-3d <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--all</span></span>
+<span id="cb12-6"></span>
+<span id="cb12-7"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Export only Z planes 1 and 3 (still splits into per-Z CYX files by default)</span></span>
+<span id="cb12-8"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">export-tiff</span> <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-i</span> /output/Liver-S2-3d <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-o</span> /exports/subset <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb12-9">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--z-planes</span> 1 3</span>
+<span id="cb12-10"></span>
+<span id="cb12-11"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Volumetric export: one CZYX OME-TIFF for tools that handle full volumes</span></span>
+<span id="cb12-12"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">export-tiff</span> <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-i</span> /output/Liver-S2-3d <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-o</span> /exports/volumetric <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb12-13">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--volumetrics</span></span>
+<span id="cb12-14"></span>
+<span id="cb12-15"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Dry-run preview (no files written)</span></span>
+<span id="cb12-16"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">export-tiff</span> <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-i</span> /output/Liver-S2-3d <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-o</span> /exports/Liver-S2-3d <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb12-17">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--segmentation</span> <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--channels</span> DNA <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--proteins</span> CD3 CD8 PanCK <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb12-18">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--batchsize</span> 5 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--dry-run</span></span></code></pre></div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Practical defaults for large dataset">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Practical defaults for large dataset
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Start with <code>--dry-run</code> to confirm batch count and expected output files.</li>
+<li>Avoid <code>--all</code> on very large protein runs; use targeted <code>--channels</code> and <code>--proteins</code> lists.</li>
+<li>Use smaller <code>--batchsize</code> values (for example <code>5</code> to <code>10</code>) to reduce memory pressure.</li>
+<li>For QuPath, use the default per-Z split for 3D data (do not use <code>--volumetrics</code>); volumetric mode is for tools that support full CZYX volumes like FIJI.</li>
+<li><code>--libvips</code> is an experimental memory-optimized option and depends on compatible <code>tifffile</code> +<code>zarr</code> + <code>pyvips</code> builds. Current working baseline for <code>napari-cosmx</code> is <code>tifffile&lt;2025</code> with <code>zarr&lt;3</code>; if it does not work in your environment, rerun without <code>--libvips</code>.</li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-python" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Advanced Usage: Python API</h1>
+<p>Use the Python API when you want script-level control in notebooks or pipelines.</p>
+<section id="minimal-setup-dataset-introspection" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="minimal-setup-dataset-introspection"><span class="header-section-number">5.1</span> Minimal setup + dataset introspection</h2>
+<div class="sourceCode" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> napari</span>
+<span id="cb13-2"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> napari_cosmx.gemini <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> Gemini</span>
+<span id="cb13-3"></span>
+<span id="cb13-4">viewer <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> napari.Viewer()</span>
+<span id="cb13-5">dataset <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> Gemini(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'/output/Liver-S2-3d'</span>, viewer<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>viewer)</span>
+<span id="cb13-6"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(dataset.is_3d)          <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># True</span></span>
+<span id="cb13-7"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(dataset.z_slices)       <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># [1, 2, 3, 4, 5]  (physical Z values from the run)</span></span>
+<span id="cb13-8"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(dataset.modalities)     <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># ('rna',) or ('rna','protein')</span></span>
+<span id="cb13-9"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(dataset.is_multiomics)  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># True if both RNA and protein are present</span></span>
+<span id="cb13-10"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(dataset.channels)       <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># ['B', 'DNA', 'CK8_18', ...]</span></span>
+<span id="cb13-11"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(dataset.proteins)       <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># ['CD3', 'CD8', 'PanCK', ...]</span></span></code></pre></div>
+</section>
+<section id="common-task-patterns" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="common-task-patterns"><span class="header-section-number">5.2</span> Common task patterns</h2>
+<section id="d-labels-segmentation-and-channel-loading" class="level3" data-number="5.2.1">
+<h3 data-number="5.2.1" class="anchored" data-anchor-id="d-labels-segmentation-and-channel-loading"><span class="header-section-number">5.2.1</span> 3D labels, segmentation, and channel loading</h3>
+<div class="sourceCode" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Load the full 3D segmentation volume</span></span>
+<span id="cb14-2">full_labels <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> dataset.add_cell_labels()     <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># shape: (Z, Y, X)</span></span>
+<span id="cb14-3">full_seg    <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> dataset.add_segmentation()    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># outlines, same volume</span></span>
+<span id="cb14-4"></span>
+<span id="cb14-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Load a single Z plane as a lightweight 2D layer</span></span>
+<span id="cb14-6">z3_labels <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> dataset.add_cell_labels(z_plane<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>)   <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># name: 'Metadata [z=3]'</span></span>
+<span id="cb14-7">z3_seg    <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> dataset.add_segmentation(z_plane<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>)  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># name: 'Segmentation [z=3]'</span></span>
+<span id="cb14-8"></span>
+<span id="cb14-9"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Load morphology at a specific Z</span></span>
+<span id="cb14-10">dna_z3 <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> dataset.add_channel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'DNA'</span>, z_plane<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>)   <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># name: 'DNA [z=3]'</span></span></code></pre></div>
+</section>
+<section id="multi-omics-naming-behavior" class="level3" data-number="5.2.2">
+<h3 data-number="5.2.2" class="anchored" data-anchor-id="multi-omics-naming-behavior"><span class="header-section-number">5.2.2</span> Multi-omics naming behavior</h3>
+<div class="sourceCode" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Add a protein channel</span></span>
+<span id="cb15-2">cd3 <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> dataset.add_protein(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'CD3'</span>)</span>
+<span id="cb15-3"></span>
+<span id="cb15-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># When a gene and protein share a name, modality tags prevent collisions:</span></span>
+<span id="cb15-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#   Gene 'B' → 'B [rna]'</span></span>
+<span id="cb15-6"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#   Protein 'B' → 'B [protein]'</span></span></code></pre></div>
+</section>
+<section id="roi-based-cell-selection-across-z" class="level3" data-number="5.2.3">
+<h3 data-number="5.2.3" class="anchored" data-anchor-id="roi-based-cell-selection-across-z"><span class="header-section-number">5.2.3</span> ROI-based cell selection across Z</h3>
+<p>This is where interactive exploration becomes decision-ready analysis: draw study-relevant ROIs in the napari viewer, then convert those regions into metadata columns you can filter, summarize, and export.</p>
+<div class="sourceCode" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 1) In the napari UI, create a Shapes layer (name it 'ROI') and draw polygons.</span></span>
+<span id="cb16-2"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 2) Back in Python, retrieve that layer by name.</span></span>
+<span id="cb16-3">roi_layer <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> viewer.layers[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'ROI'</span>]</span>
+<span id="cb16-4"></span>
+<span id="cb16-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 3) Add ROI membership columns to metadata.</span></span>
+<span id="cb16-6"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># The layer name ('ROI') becomes a boolean column.</span></span>
+<span id="cb16-7">meta_with_roi <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> dataset.layers_to_metadata([<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'ROI'</span>], shape_z_plane<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'current'</span>)</span>
+<span id="cb16-8"></span>
+<span id="cb16-9"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 4) Use ROI-positive cells for downstream analysis.</span></span>
+<span id="cb16-10">roi_meta <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> meta_with_roi[meta_with_roi[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'ROI'</span>]]</span>
+<span id="cb16-11"></span>
+<span id="cb16-12"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Example: summarize cell types in the selected region.</span></span>
+<span id="cb16-13">roi_meta[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'cell_type'</span>].value_counts()</span>
+<span id="cb16-14"></span>
+<span id="cb16-15"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 3D z-plane examples (polygons are drawn in 2D, then mapped to 3D labels):</span></span>
+<span id="cb16-16"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Current displayed z plane only</span></span>
+<span id="cb16-17">meta_current <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> dataset.layers_to_metadata([<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'ROI'</span>], shape_z_plane<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'current'</span>)</span>
+<span id="cb16-18"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># All z planes</span></span>
+<span id="cb16-19">meta_all <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> dataset.layers_to_metadata([<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'ROI'</span>], shape_z_plane<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'any'</span>)</span>
+<span id="cb16-20"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Inclusive z range (by source z values)</span></span>
+<span id="cb16-21">meta_range <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> dataset.layers_to_metadata([<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'ROI'</span>], shape_z_plane<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>))</span>
+<span id="cb16-22"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Explicit z-plane list</span></span>
+<span id="cb16-23">meta_list <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> dataset.layers_to_metadata([<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'ROI'</span>], shape_z_plane<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>])</span></code></pre></div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>See <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-rois/cosmx-rois.html#more-efficient-roi-creation" target="_blank">earlier post</a> on more ways to generate ROIs.</p>
+</div>
+</div>
+</section>
+<section id="transcript-overlays-with-z-filtering" class="level3" data-number="5.2.4">
+<h3 data-number="5.2.4" class="anchored" data-anchor-id="transcript-overlays-with-z-filtering"><span class="header-section-number">5.2.4</span> Transcript overlays with Z filtering</h3>
+<div class="sourceCode" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># If z_plane is omitted in a 3D dataset, behavior follows display mode:</span></span>
+<span id="cb17-2"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 2D display -&gt; current Z only; 3D display -&gt; all Z planes.</span></span>
+<span id="cb17-3">dataset.add_points(point_size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb17-4"></span>
+<span id="cb17-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Force all transcripts across the full volume regardless of display mode</span></span>
+<span id="cb17-6">dataset.add_points(point_size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, z_plane<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'any'</span>)</span>
+<span id="cb17-7"></span>
+<span id="cb17-8"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Transcripts only at Z planes 2 and 3</span></span>
+<span id="cb17-9">dataset.add_points(point_size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, z_plane<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>))</span>
+<span id="cb17-10"></span>
+<span id="cb17-11"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Plot a single gene with the same z-plane semantics</span></span>
+<span id="cb17-12">dataset.plot_transcripts(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'KRT18'</span>, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'yellow'</span>, point_size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>, z_plane<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'any'</span>)</span></code></pre></div>
+</section>
+<section id="open-layer-group-manager" class="level3" data-number="5.2.5">
+<h3 data-number="5.2.5" class="anchored" data-anchor-id="open-layer-group-manager"><span class="header-section-number">5.2.5</span> Open Layer Group Manager</h3>
+<div class="sourceCode" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1">dataset.show_group_manager()</span></code></pre></div>
+</section>
+</section>
+</section>
+<section id="conclusions" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Conclusions</h1>
+<p>This release brings together two core workflows in one plugin: multi-omics exploration and 3D RNA exploration, providing a seamless path from interactive review in napari to reproducible analysis in scripts and notebooks.</p>
+<div class="feat-table">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Task</th>
+<th>Widget</th>
+<th>CLI</th>
+<th>Python</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Prepare raw data (stitch)</td>
+<td>Stitch Images panel</td>
+<td><code>stitch-images</code>, <code>stitch-expression</code>, <code>read-targets</code></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>Open stitched data</td>
+<td>drag-and-drop → reader prompt</td>
+<td>—</td>
+<td><code>Gemini('/out', viewer=viewer)</code></td>
+</tr>
+<tr class="odd">
+<td>View channel at Z plane</td>
+<td>Morphology Images — Z plane field</td>
+<td>—</td>
+<td><code>dataset.add_channel(name, z_plane=N)</code></td>
+</tr>
+<tr class="even">
+<td>View protein expression</td>
+<td>Protein Expression panel</td>
+<td><code>stitch-expression --ndim 2</code></td>
+<td><code>dataset.add_protein(name)</code></td>
+</tr>
+<tr class="odd">
+<td>View RNA transcripts</td>
+<td>RNA Transcripts panel</td>
+<td>—</td>
+<td><code>dataset.add_points(z_plane=...)</code></td>
+</tr>
+<tr class="even">
+<td>Color cells by metadata</td>
+<td>Color Cells panel</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td>Color cells at a specific Z plane</td>
+<td>Color Cells — Z plane field</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>Manage layer groups</td>
+<td>Layer Group Manager</td>
+<td>—</td>
+<td><code>dataset.show_group_manager()</code></td>
+</tr>
+<tr class="odd">
+<td>Select cells in ROI (RNA 3D)</td>
+<td>—</td>
+<td>—</td>
+<td><code>dataset.layers_to_metadata(['ROI'], shape_z_plane=...)</code></td>
+</tr>
+<tr class="even">
+<td>Export OME-TIFF</td>
+<td>—</td>
+<td><code>export-tiff</code></td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+</section>
+
+ ]]></description>
+  <category>napari</category>
+  <category>visualization</category>
+  <category>3D imaging</category>
+  <category>multi-omics</category>
+  <category>CosMx 2.3</category>
+  <category>how-tos</category>
+  <guid>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-3d-multiomics/</guid>
+  <pubDate>Mon, 23 Mar 2026 00:00:00 GMT</pubDate>
+  <media:content url="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-3d-multiomics/figures/fig-multiomics-thumbnail.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Data Analysis Workflow for GeoMx® NGS-Protein Data</title>
   <dc:creator>Felicia New</dc:creator>
@@ -5336,8 +6631,8 @@ font-style: inherit;">"/results.rds"</span>))</span></code></pre></div>
 </div>
 <div class="cell">
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-627491b2494c29268c61" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-627491b2494c29268c61">{"x":{"filter":"none","vertical":false,"extensions":["Buttons","Scroller","FixedColumns"],"data":[["HIF-1 alpha","TLR7","CD68","PRDM1/Blimp1","Syk (phospho Y352) +ZAP70 (phospho Y319)","Histone H3 (tri methyl K9)","Histone H3 (mono methyl K4)","Histone H3 (di methyl K79)","Histone H3","SHP1","S100A8 + S100A9","HLA-DR","Histone H3 (phospho S10)","MRP8","Histone H2A (acetyl K5)","STAT6 (phospho Y641)","Histone H3 (acetyl K14)","LAG-3","p53 (phospho S392)","Bcl-XL","SLC7A5/LAT1","RPS6","p53 (acetyl K373)","Histone H2B (acetyl K5)","Histone H3 (acetyl K18)","Histone H3 (acetyl K9)","Syndecan-1","iNOS","Topoisomerase II alpha (phospho T1343)","Histone H3 (acetyl K27)","CXCR3","GITR","CD31","PI 3 Kinase p85 alpha","CD39","S100A12/CGRP","c-Fos","Cathepsin S","FAK","IFNGR1","Cytokeratin 1","IL-1 alpha","HLA-DPB1","PI 3 Kinase catalytic subunit alpha/PIK3CA","IL22 RA2/IL-22BP","PTGES2/Gbf1","Cdk6","Progesterone Receptor (phospho S190)","NCR1","IL-15RA","PU.1/Spi1","CCR6","IL-5RA","CD16","Myeloperoxidase","LYVE1","NCAM1","Tuberin (phospho T1462)","Oct4","Insulin Receptor beta","TIM 3","CCL18","ErbB4 / HER4+ErbB2 / HER2","Tuberin","Histone H2A.X","Insulin Receptor alpha","MLH1","CD38","Sonic Hedgehog","T-bet / Tbx21","CXCL5 + CXCL6","Somatostatin Receptor 2","GSK3 beta","Histone H3 (tri methyl K36)","S100A9","ST2","Rho A + B + C","Dihydrofolate reductase (DHFR)","Urokinase","HLA E","NKG2D","MEK1 (phospho S298)","CD11c","CDK1","SOCS3","MMP8","IL-6R","IMP3","PF4","Topoisomerase I","p63","TNF alpha","CD133","CD47","Glucocorticoid Receptor (phospho S226)","CD33","Raptor","ARID3A","Rb (phospho S807)","Granzyme A","Catalase","VCAM1","STAT5 (phospho Y694)","Ms IgG2b","FOXO4/AFX","Tuberin (phospho S1254)","GGT1/GGT","CD15","CD40 Ligand","EGFR","ATG7","2B4","Oct-2","Neutrophil Elastase","SHP2","MS4A2","CDK1 + CDK2 + CDK3 + CDK5 (phospho Y15)","TNFAIP3","Indoleamine 2_3-dioxygenase","HLA A","TRAF6","YKL-40/CHI3L1","RPS6 (phospho S235 + S236)","IGF1 Receptor","Liver Arginase","Ras","p73","Cytokeratin 8 (phospho S431)","SDHA","Vimentin","APG5L/ATG5","CD99","STAT6","CD14","Histone H2A (phospho T120)","ALDH1A1","ErbB4 / HER4 (phospho Y1162)","EpCAM","JNK1 + JNK2 + JNK3 (phospho T183+T183+T221)","Glutaminase","HDAC3","TBR2 / Eomes","CD40","MMP7","SIRT1","MMP1","MMP3","Glucose Transporter GLUT1","LILRB3","Histone H3 (di methyl K4)","SIGLEC5","NQO1","TAK1","Rad51","p53","N Cadherin","IRF4","Insulin","TLR9","PI 3 Kinase catalytic subunit gamma/PI3K-gamma","CXCR5","TLR8","IDH1","Nanog","CD79a","p40 - DeltaNp63","GAPDH","HDAC6","Macrophage Inflammatory Protein 3 alpha","Bak","Cyclin E1","ICOS","Bad","HDAC9","Musashi 1 / Msi1","Thymidylate Synthase","KIR3DL1 + KIR3DS1","NFAT2","HMGB2","beta Actin","p57 Kip2","STAT3 (phospho Y705)","CD79b","AKT1 (phospho S473)","UBE2C","IKKi/IKKe","CXCR4","CXCR6","Cytokeratin 17","PLCG 2","HLA F","CD127","Wee1","Rb (phospho S608)","CCR3","Adenosine Receptor A2a","Mannose Receptor","BRCA1","HuR / ELAVL1","ETS1","PI 3 Kinase p85 beta","MelanA","CD134 / OX40L receptor","PDGF B","Osteopontin","LAMP2A","SMAD5","Hsp90","Topoisomerase II alpha (phospho S1106)","NSD3","Galectin 3","CD64","IL-1RA","Rb (phospho T252)","CD34","CD94","Carbonic Anhydrase 9/CA9","CD11b","CD74","SIRT3","Macrophage Inflammatory Protein 1 alpha / CCL3","Wnt3a","PARP1","Occludin","Syk","CD44","p53 (phospho S46)","ATM","Caspase-3","MEKK3","Cdk4","Transferrin Receptor","ErbB2 / HER2 (phospho Y877)","KDM3A / JHDM2A","Bax","Ikaros","STAT3","Poliovirus Receptor/PVR","TAP2","Src","Heme Oxygenase 1","Prostate Specific Antigen","IKK alpha","CD4","Caspase-10/CASP-10","SOX9","CD103","Interferon gamma","Smad2 (phospho S467)","CDKN2A/p16INK4a","NAK/TBK1","AMPK alpha 1","Rb (phospho T356)","Androgen Receptor","PRAS40","HDAC4 + 5 + 9","Bid","RAGE","IL-22RA1","IL3RA/CD123","Ki67","HDAC1","SIRT1 (phospho S47)","Topoisomerase II alpha","p27 KIP 1","Collagen IV","IKK beta","Melanoma gp100","TMS1/ASC","ERG","CD66b","BRAF","VEGF Receptor 1","C Reactive Protein","eNOS","RPS6 (phospho S240 + S244)","IL-12RB1","c-Maf","TRAF1","cIAP2","HLA B7","STING","15-PGDH","Beclin 1","FGFR2","HMGB1","ICAM1","ATM (phospho S1981)","Hsp27 (phospho S78)","NRF1","Lamin A + Lamin B1 + Lamin C","BTK","CD90 / Thy1","IGF2BP1/IMP1","IL-2RG","Wilms Tumor Protein","FANCI","Smac/Diablo","GRP78 BiP","IL-12A","COX2 / Cyclooxygenase 2","FBP2","p38 beta/MAPK11 + p38 alpha/MAPK14","Smad4","CDKN2A/p14ARF","STAT4","Rel B","LAMP1","p27 KIP 1 (phospho S10)","Nectin 2","Met (c-Met) (phospho Y1349)","Cyclin D1","Chk1","Rb IgG","Cathepsin G","CDK1 (phospho T161) + CDK2 / CDK3 (phospho T160)","Cyclin E2","PTCH2","ENO1 + ENO2 + ENO3","HLA G","beta glucuronidase (GUSB)","CD70","CD11a","CD73","CD177","PTEN","ASS1","S100A4","Cleaved PARP1","ERK1","c-Kit","Lactate Dehydrogenase","Actin","Rho","IL-1 beta","CD86","PAK1+PAK2+PAK3 (phospho S141 + S144 + S154)","Axl","CD28","Aldolase B+Aldolase C","CTLA4","Cytokeratin 8","Rb","VEGFD","SCF","S100P","CD27","CD83","IL-18","KIR2DL1 + KIR2DL2","PAK1","KMT6 / EZH2","Bcl6","Pro Caspase-8","NKG2A + NKG2E + NKG2C","Rt IgG2a","RSK1 p90","ERK1 (phospho T202) + ERK2 (phospho T185)","CREB","IRF3","Cyclophilin A","AKT3 + AKT2 + AKT1","Wee1 (phospho S642)","MDM2 (phospho S166)","PRAME","Hmr IgG","AKR1B10","beta 2 Microglobulin","Histone H3 (phospho S28)","VEGF Receptor 2","Dnmt1","CPT1A","Hexokinase 1","CD3D","ERK2","Cytokeratin 19","CD44v6","Granzyme K","Integrin alpha 5","SMAD1 + SMAD5 + SMAD9 (phospho S463 + S465 + S467)","E Cadherin","FADD","FABP4","Cytokeratin 14","ROS1","ATR (phospho S428)","Cyclin A2","ZAP70","Retinoic Acid Receptor beta","SOD2/MnSOD (acetyl K68)","IL-2 Receptor alpha","Calreticulin","Lck","Fibronectin","alpha smooth muscle Actin","STAT1","JAK3","STAT1 (phospho S727)","IRF5","Chk2","GLB1/Beta-galactosidase","TEF1/TEAD-1","ACE2","Ms IgG1","Von Willebrand Factor","GNLY/Granulysin","DUSP6","SFRP1","CD3 epsilon","Cyclin B1","Carbonic Anhydrase 3/CA3","S100 beta","MEK2","C4a","NFkB p105 / p50","TROP2","RSK1 p90 (phospho T359)","FOXP3","Granzyme B","VISTA","uPA Receptor/U-PAR","KMT6/EZH2 (phospho T487)","Nectin-4","Sumo 1","Cytokeratin 5","S6K1","JunD","MyD88","Podoplanin / gp36","Collagen I","CD63","MMP14","CD163","Glucose 6 Phosphate Dehydrogenase","APC","ALK","SOD2/MnSOD","IKK gamma/NEMO","Fatty Acid Synthase","c-Jun (phospho S63)","MEK4/MKK4 (phospho S80)","Fos B","SQSTM1 / p62","AIF","GLP-1R","TOMM20","PCNA","ErbB3 / HER3","c-Myb (phospho S11)","CD18","c-Myc (phospho S62)","Scavenging Receptor SR-BI","Hsp27","p38 (phospho T180)","CD276","GSK3 beta (phospho S9)","PKC beta 1","CD3G","STAT5a","MSH2","Glutathione Peroxidase 4","PDGFR alpha + PDGFR beta","Progesterone Receptor","CD45","Histone H3 (tri methyl K27)","ERK1 (phospho T202 + Y204) + ERK2 (phospho T185 + Y187)","Smad2 (phospho S255)","BRG1","active YAP1","Rb (phospho T780)","Notch1","beta Catenin","PSMA","pan Cytokeratin","Ret","Pan Trk","Cullin 1/CUL-1","DR5","CD20","ROCK2 + ROCK1","NF-kB p65","FOXO1A","CCR7","Integrin beta 1","Integrin alpha 6","Syk (phospho Y323)","Smad2","Cathepsin K","Bim","STAT5b","Ubiquitin","EGFR (phospho Y1068)","IFIT1","CXCL10/IP-10","Brd4","M-CSF","LEF1","IDH2","Argonaute-2","IL-33","15 Lipoxygenase 1","ATF2","YAP1 (phospho S127)","VEGFA","C5 / C5b","Caspase-3 p12","Hsp70","Periostin","CCR5","FGF2","IL4","ATF3","gamma H2A.X (phospho S139)","mTOR","Rb (phospho T373)","MX1","PD-L2","LC3B","mTOR (phospho S2448)","ATG12","ROCK1","GATA3","beta Tubulin","CREB (phospho S133)","AKT1 (phospho T450)","PD-L1","SFRP4","Aurora A","MICA + MICB","CD8 alpha","c-Jun","Tissue Factor","PDGFR alpha","c-Myc","MUC1","CD22","CD36","MEK1","HDAC2","ErbB2 / HER2","Met (c-Met)","EMR1/ADGRE1","Cdk2","SIRT2","BFL-1/GRS","ISG15","GLP-1","Hexokinase II","MSH6","Aldolase","CREBBP","TGF beta 1","PP2A alpha + beta","5 Lipoxygenase/5-LO","beta Arrestin 1","STAT2","Bcl-2","KIR2DL3","TMPRSS2","TRAF2","CD45RA","LDL Receptor","RUNX1 / AML1 + RUNX3 + RUNX2","CD272/BTLA","ARID1A","Smad3 (phospho S423 + S425)","PD1","Smad3","HLA-C","Fas","Caveolin-1","IKB alpha","Survivin","CSF-1-R","Mucin 5AC","CDK1 + Cdk2 + Cdk3 (phospho T14)","Monoamine Oxidase A/MAO-A","MMP9","PTEN (phospho T366)","YAP1"],["No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes"],[0.6611207754493321,0.4063802434960061,0.801108211617142,0.2503537162683815,0.2981994748665276,1.059430856734876,0.8264992080772733,0.8525453167572088,0.6031747933129367,0.2780353357335477,1.458980088072234,1.529845760608016,1.100751404331,2.090149800480897,0.875016754966534,0.3813821328325142,0.9358025752493909,0.5338855824525087,0.6422059297352777,0.5470630595579358,0.6163051271025128,0.3893147239873748,0.5837248889018072,0.5400349949434959,0.6995746494854306,1.173557188125007,1.52517666795677,0.696267905458094,0.5101531405058584,0.5970839115685861,0.4506172803836964,0.5941731818311772,0.487000642544647,0.414992430549255,0.4862752452629211,0.7096559628882039,0.3261205682762813,0.983611325466066,1.309165216593301,0.3639841819752231,0.320243390792643,1.11814428972961,0.8853777650513588,0.6143173650779766,0.2873647587674098,0.4169274138672563,0.6947405256665959,0.377851862111298,0.3539518437723115,0.5126892101710415,0.3954002229667518,0.7384186453641758,0.3248501703481297,1.076698146909489,0.2583678108136199,0.3746174750958853,0.3090045041951373,0.2483569058734132,0.3420513892359823,0.4807492164161655,0.3896484286046538,0.2988883560267738,0.3934520385455633,1.014440704131324,0.6917974613916209,0.4356512367638897,0.3952156168432663,1.051808939358483,1.070059146268154,0.3223442709046447,0.363344428820141,0.3090924220595924,0.3865162681525688,0.3569372697021697,0.8759956953925342,0.2347859691103093,0.3426731032779705,0.714736245304143,0.3766598085947905,0.6614529644335673,0.2484043609528421,0.3262073512254265,0.3702440300176859,0.5969211171929162,0.3251590631002373,0.2633125236163727,0.2436950845231167,0.2560488381583353,0.2675067544788792,0.3733822314692042,-0.3687286183345732,0.2708975767448453,0.507314175063744,0.3860848526061013,0.372343826164518,0.3322170804465169,0.2752478366786451,0.2971479284427015,0.3306748127744324,0.2620460694877796,0.588721944608888,0.3657814278424805,0.4574445446676403,0.07571573851070877,0.2388630397900357,0.5585619175529816,0.3332718814219012,-0.5146003948777734,0.2071825487507813,0.3910292018642901,0.5251507343943804,0.2335675058599201,0.2705443719101355,0.2347422507347381,0.2596528608891097,0.3188875703640469,-0.2289915924441373,0.3875194637074704,0.4985162945415785,0.9496318711031071,0.2545186469199519,0.2259707940346386,0.5224339202071654,0.2839508799700628,0.1865464138560672,0.2999145720551998,0.25674310932496,-0.5201096045030209,0.3141463191909361,0.7550060972507426,0.1880106466234951,0.2388143609133363,0.462521033971672,0.3933086580155028,0.3760151376754904,0.2798837016472128,0.2641134628057177,-0.7988024950279691,0.2189260959428848,0.6696164034310036,0.2688470112405651,0.2262701428327917,0.5014430246483041,0.2557740256119637,0.2458456734027595,0.1803798770837597,0.2704950231410339,-0.6296353108683508,0.2487633684459481,0.4636313645426101,0.2645226685088564,0.5782810123594742,0.1899113242056886,0.2267403224263966,0.2214911702075115,0.2184798452525123,0.3267471695609942,0.2204561834439543,0.2342200876845875,0.2980726016178446,0.2613380384010473,0.2593875088181912,0.3704126414340834,0.1800511384867812,0.2439074824557407,0.2115830328696549,-0.3905868625430045,0.3619785670728617,0.2002532590505321,0.6637169011547523,0.3208487124822199,0.243072127762589,0.2646977389811755,0.335553979886363,0.1170424492127879,0.284825248256126,0.2145264519035529,0.6000393395805329,0.4329690722210218,0.3517644694746358,0.3009333383810445,0.2645891188845575,0.3395704048544039,0.2353603839326599,0.1927162061995996,0.461460375926366,0.2211092965458355,0.2072775947566081,0.1585995222126484,0.2748875118904003,0.1424646183092159,0.2201864734333262,0.254152661229447,0.273640187990866,0.1878619965059014,0.2800224363489603,0.4997015963938379,0.2369285129532804,0.2964651885720548,0.2152877503403829,0.1762608863465273,0.1881803029246116,0.2444483750319216,0.4840140928339645,-0.3588842950208981,0.34618872376743,0.2711443793095283,0.2043328636798865,0.186122470907622,0.2682415878821493,0.6430817664385824,0.2538446864507237,0.1582584229179302,0.2187447245107896,0.2835169922975136,0.1717189564043499,-0.3118546137552302,0.1559827974315673,0.5549041230427262,0.2087277030667908,0.1642107806255544,0.1088436267702086,0.2557526943112788,0.1383082981985598,0.2248233607326344,0.3633521781226555,0.2138662782065762,0.2213672115891216,0.2447072451225126,0.1786089125350002,0.2198152352395236,0.2346051338472279,0.202373003130577,0.1396715715052371,0.2878542306732227,0.4859149900460588,0.2492432967822046,0.2030326732449208,0.8399030456524708,0.2376413636537645,0.3915364650672782,0.1577299357701743,0.2817757237102555,0.2658284697768623,0.2666382760744213,0.2827685950981214,0.158030939798471,0.1300906995524344,0.2897149477367857,-0.1740527914278348,0.2431100814915534,0.1753906903811254,0.1650321190456085,-0.3411433486577142,0.1651779056979582,0.3099874180331064,0.2338231862358491,0.141153287404925,0.1604355265671726,0.1967523962286649,0.1931049065380444,0.1480777244183566,0.2502480314974256,0.2377855839840341,0.4400162076994395,0.1564753422965113,0.147845514593569,0.1464953294982892,0.5542481693405173,0.2405447250989259,0.2318399994380467,0.2102544599837384,-0.2806523430133966,-0.1533935169259328,0.228606018719903,0.3483832274527814,0.2302151948661577,0.1204864230128621,0.2691607831085494,-0.1473708580044384,-0.3094032303707837,0.3875527438968631,-0.245092470895429,-0.201626227807541,0.1398738666200524,0.3662105235270547,0.1518029767209569,0.2485145212258362,-0.3469674138212699,0.4495029083053995,0.3164864771915233,0.1646156981420853,0.3160365546061102,0.1206235782749046,0.1913566391127973,0.08508915387508972,0.1472679184507549,0.2082341788537648,0.1092868792889259,0.150468542186996,0.07787014135175213,0.09973501687252316,0.09952016750116656,0.1408377600080212,-0.1199621952208774,0.2011060310048744,0.235336827532711,0.2166681594355362,0.1841253628204321,0.1555617551992186,0.2218721721371815,0.1306842427676562,0.1208064845242763,0.09580078907624276,0.3695761020623664,0.3665190329494137,0.1038277085378029,0.1870749576934109,-0.127103444253995,0.2229303416769793,0.5092349010702023,0.1078919143342565,0.1644952144072356,0.1927358343774131,0.1303268378604147,0.1527132898236154,0.1439569508125654,0.2847067249042102,0.1099216302317061,0.2586528697591192,0.1318953580960342,-0.2138175211648528,-0.1713486145424601,-0.1684017614977467,0.2241054530214206,0.1226095789329733,0.2496820465998434,-0.2047736699899232,0.1020716713776804,0.1102623227316995,-0.09923313383483161,-0.2781977766564893,0.09620625951688357,0.1061819122489787,0.1355063306724123,0.08567642321726621,0.2046696667522278,0.1063351680286763,0.1357217767296339,0.1051261064881273,0.1440666906661054,0.1594689627805664,0.09584881607417751,0.1223889134984669,0.1180247620481135,0.06954180984996834,0.1054742228289941,0.08577723983087306,0.1707174506330416,0.2651052976089389,-0.2407564489654498,0.1959409786183495,0.107496872750607,0.1513201475856141,0.1020680147033129,-0.1647652217945831,-0.113849692003514,0.511240639112569,0.2894369292905088,0.1437576169181825,0.09807329340635093,0.1105851690345196,0.174845827742082,0.2507133639610955,0.2845541417766144,-0.3449737738109118,0.138060972321995,0.07747658465902897,-0.2034602049460529,0.1962729262624477,0.3833233674752749,0.1097653239886961,-0.2080081349764023,0.08320464873726659,0.06511137812230688,0.1196820498800921,0.08453699908766796,0.2432701509747909,-0.0741088291036455,0.204846046142154,0.08425121812084606,0.1768632549096263,0.1698969620892861,-0.5803211271804183,-0.3741918696467527,0.3984795635623501,0.06970437897965996,0.3276217791915582,0.07666718486632292,0.1954692023105089,0.2727713900052515,0.08421641584284553,-0.1967989874560089,-0.04766546944256835,0.1523640649499595,0.08779553800320851,0.06934648229523639,0.1045012248635073,0.1859623974148101,-0.08016930803957246,0.1009972766762631,0.1918651854905557,0.1926941870849958,-0.1976958443259795,0.2920223890947448,0.1962279136661107,0.1350692200942802,-0.05917561863657374,0.07506789770089203,0.1718936295846905,0.1235017989451681,0.1505007719465417,0.08152239413743276,0.09862847641804202,-0.2241703506254126,0.1285920420388992,0.1499635771736707,0.09571851838470817,0.1304023224799259,-0.3820390500421316,0.1503519193324136,0.07968264152735642,0.07740987230617398,-0.1186655541374918,0.07404714114807297,0.06257422152999659,0.1804540876663084,-0.07210965633153901,-0.189037672475997,0.05824807992444954,0.1231962302748421,0.06835680002247894,0.239101778528457,0.09231476852394725,0.07278250532284332,0.1383066949730552,-0.163868373994617,-0.09605768249515508,0.1089598231344294,-0.04386459836051232,0.06368206141914635,0.06614291054477428,-0.1638583317116601,0.1081872670685859,-0.2228211694358843,0.05217897152069795,0.06740047440082701,-0.1268456440169886,0.201654489250103,0.08908118122433453,0.09242673839245749,0.1218943891569391,-0.08417231348519881,0.08866626467047162,0.04102235350751094,0.1173743544343772,0.07544035396898757,0.06764562884419094,-0.1329166473351556,0.08466727381708646,0.05095736612403616,0.1600501322484576,0.1203509875985795,0.06887248374055137,0.04083676120542599,0.06926659999394739,0.04969120992067235,-0.05728677430793325,0.2675296983109366,0.06326735435259857,0.09882667405410578,-0.07167141436825399,0.05529101810545854,-0.0540083611952237,-0.06717780280087676,0.05964324495148499,0.06548836179829315,0.04952409687797633,0.04251166346891094,0.1565008628276663,0.05398255420129239,-0.124006524617687,-0.1221563092656626,0.04002762006962609,0.1289280139478512,0.05511951915075902,0.04410025203143405,-0.09511642642531148,-0.05305592702854776,0.04963973250072419,-0.04344965838361698,0.05179354901223202,-0.0636527413490425,-0.06403346597433306,-0.05186610977163927,-0.03605107859971941,0.04686448942910844,-0.1433083557986625,0.0503725827571467,-0.03163612139257563,-0.06108918103918796,-0.04838055317196344,0.05178748386201899,0.03277962892827337,0.03761972968180687,0.1238799357080468,0.02786788244956926,0.03392772808897554,0.04622179026973147,0.04467211279811032,0.05093404543987923,0.03751402534624352,0.05977429172985631,0.08006219257652179,0.03302031613873639,-0.02588419161909808,0.09240823637353454,0.0354230636956353,-0.01251667027941855,0.03863806642117843,-0.03535305983109263,0.02366267169065592,-0.04075153671986891,0.02494396936307729,-0.06719583403933033,-0.02691318408190224,-0.02673304441581857,0.03972598895381791,0.04936863265311226,0.1014367572007782,-0.02593315434928361,-0.02540881170847065,-0.02553015361231586,0.0169175451747052,-0.02315930550884062,-0.03329694487747632,0.011577376423488,0.009381669069421002,0.02418235194317854,-0.0200197410135064,0.0259894027991663,-0.009377476024069379,-0.02367728905517069,0.01671496250764277,-0.01629615539163025,-0.01569015297738431,-0.01964702411119663,-0.0129382093458606,0.007199411755434077,0.01060544335608019,0.01246812728881315,-0.0149034885481886,-0.02221804432439081,0.01323883428352591,0.01403638122723559,0.01259067674587019,-0.01067567804867535,-0.009499665954761392,-0.02934982075053132,-0.004655150774308912,-0.01695720503376364,0.008530164990706966,-0.003007544322027126,0.007345368999063638,0.002371118741552133,0.002752349110520746,-0.004786821753800637,0.001289569604860186,-0.001149018118406728,0.0008069056834506879],[8.253907865882999e-07,4.356055074431498e-06,2.395394249303221e-05,0.0008405693219355069,0.003849063283017301,0.01940777788048553,0.0326598162028711,0.04103069114624449,0.04107731251020114,0.04397006893883364,0.04679354573686929,0.05596371487617147,0.075242877871967,0.07525226274630711,0.07538467718866361,0.07642015023026966,0.07980949537565796,0.08897219560378621,0.08967419146873315,0.09231775022001415,0.09300223456308722,0.09307702408398803,0.09827199890950977,0.09975623906154364,0.1003309462771187,0.1009244118974138,0.1017846801692339,0.1067698917061961,0.1074601082236949,0.1105606138761503,0.1167167877561992,0.1233392335573399,0.124621735984204,0.1271634198090999,0.1318865229210586,0.1324597570307968,0.1333922567348344,0.1344541672694249,0.1368721419225838,0.1369157979626655,0.1411179192647149,0.1457433017951265,0.1461052596345198,0.1465652113989398,0.1487398274002805,0.1492562189933584,0.1547261364838134,0.1550547141050011,0.1590358072930989,0.1624466059853099,0.1653656920463664,0.1671728193407855,0.168227303091967,0.1689658647831241,0.1805817765318972,0.1809054014647609,0.1824535313348958,0.1843188478244256,0.1907528920103198,0.1922117852428037,0.1938652157380856,0.1948141802330094,0.1954854521343173,0.1965080062416971,0.1982101540804746,0.1990560042749212,0.1993233775489432,0.202341613925523,0.2110435235388718,0.2174566447369809,0.2186821259135988,0.2195553158337383,0.220502283248202,0.222139164214146,0.2225420973700383,0.2232446062089606,0.2244169769787878,0.2327774506990082,0.2356963665904668,0.2384811972924115,0.2422524480479346,0.250938413887314,0.2519959439089235,0.2543084485523937,0.2545163827581403,0.2634249129155245,0.2658862314023338,0.266076963295345,0.26671032183841,0.2680363657540854,0.2682014382691137,0.2686661961105934,0.2697774585583923,0.270017109685061,0.2753842761703305,0.279024304004625,0.2803816087149213,0.2807364197953215,0.2826177646767407,0.2832435481598863,0.2836703766738087,0.2843785993465262,0.2847674187475301,0.2890205802631129,0.2897012544134029,0.2922927523622777,0.293998390715266,0.2969931251116102,0.2976519088305853,0.2980555911567648,0.2994255412310627,0.3001540270510539,0.3025944503824214,0.3030489011351628,0.3042591225188526,0.3053107086905596,0.3060793183916632,0.3086165948128725,0.3126620594205187,0.3183501194453107,0.3216591025520797,0.3217153873957991,0.3245874473633672,0.3258509640239542,0.3263069116935605,0.3264886009507298,0.3301734119560312,0.3310718071380773,0.3349374243641121,0.3357237276813601,0.3363193930671623,0.3390990020142181,0.3396910639184018,0.3420357627994181,0.3424533511789892,0.3433511106270437,0.3461779469770102,0.3479869189984884,0.3482890543254262,0.3488407925517154,0.3510670781783521,0.3555560575837872,0.362496292652207,0.368737733044415,0.3695803693722774,0.3723276418273625,0.3734078345278914,0.374133030708202,0.3741659493799555,0.3750220486178661,0.3767469286552986,0.3799250385348377,0.3805399645228412,0.3829940284479599,0.3862940036041933,0.3864317879929425,0.386556360049681,0.386696114562669,0.3874419354380714,0.388246173700407,0.3883267129073854,0.3893580360916399,0.3902761277223328,0.3983148857101633,0.3984248385648325,0.399250670458366,0.3995111080061663,0.4013512199492934,0.4019815750437943,0.4044662769419042,0.4051414349795806,0.4052822981908253,0.4060640636733032,0.4112819917678002,0.4160169460906795,0.4161243185700079,0.4161679409725707,0.4164738962910441,0.4178445539927914,0.4196683564594127,0.4198279953076918,0.4205690760273892,0.4210991515994138,0.4227305552171706,0.422883506676368,0.4231669378581369,0.4236634558181532,0.4237364637876344,0.4249716079952796,0.4267917468583213,0.4280037965708219,0.4291271426576558,0.4293929499575073,0.4304130371606338,0.4304824930508689,0.4314732279533403,0.4334543881217155,0.4341014917626108,0.4342637547036665,0.435498919586149,0.4358182021784635,0.4360676389466543,0.4363489735254126,0.4415109921642733,0.4416577301527359,0.4425862159484288,0.4484724887624797,0.4522038979000675,0.4603099113953978,0.4607233277498751,0.4612218762343154,0.4616576993779254,0.4638261938380622,0.4650982559675215,0.4653629119811786,0.4653909626576818,0.4655143084484215,0.4667428470423064,0.4688820019672272,0.473169930649574,0.4732478092835192,0.4735017834296681,0.4735629312614515,0.4737894778710252,0.4753833989069817,0.4754913845909451,0.4797676438425507,0.4803244554607872,0.480373231721083,0.4813134028531985,0.4813952907132538,0.4830870693085684,0.4850549170541631,0.4856699546111666,0.4861893919217333,0.4868355450614434,0.4882565502535554,0.4908490006647881,0.4930822048492572,0.4938475051212629,0.4948618817922239,0.4949055794272872,0.4956507797742402,0.4957552575708673,0.5011061995439462,0.5036909092404422,0.5041818600751601,0.5063818363512373,0.5069262459541061,0.5070995193129902,0.5099550246054603,0.5103043583710168,0.510617412492629,0.5126120443847652,0.5134527547924698,0.5153770669246746,0.5156804424267729,0.5172095579928161,0.5173440229876576,0.5193953488266553,0.5212485203095414,0.5217204020683475,0.5220321412121569,0.5238707420995321,0.5261625669296027,0.5275011854548235,0.5314832366714193,0.5317143487976977,0.532128067984818,0.532345651040346,0.5360210135641027,0.5371161193708566,0.5383735375771125,0.5393743333300355,0.543065626317862,0.5446718539717357,0.54761314248382,0.5490554664594677,0.5516836735207782,0.552017297332059,0.5530368069113518,0.5575114619018773,0.5589109561479304,0.5622275191571595,0.5653223005330106,0.5686371357394259,0.5748734922310379,0.5822854548406716,0.5867354879805926,0.5874029255666822,0.591265353744113,0.5945844713518009,0.59473801380158,0.5984802554582254,0.5991045551898772,0.5994275362606072,0.6010674463202824,0.6017724300165241,0.6018089271847777,0.6020331428224042,0.6022624608538354,0.6024923287667059,0.6051331378542252,0.6056319782510823,0.607236942609768,0.6077484214608286,0.6082657985745386,0.6089282342098723,0.609209771511417,0.6095733479359886,0.6122259801859511,0.6124432013085628,0.6130010701747708,0.6191899046455011,0.6195212924365986,0.620191532423606,0.6216103973955924,0.6231092370997833,0.6250646729367509,0.6256764525413305,0.6274265759263371,0.630147437151106,0.6314244689923278,0.6315165217588468,0.6320880993772836,0.6323495744087588,0.6353899192884694,0.6363866715482015,0.6366095467675672,0.6380170897040653,0.6381109281516071,0.6401726582304106,0.6412346420533295,0.6448073184968569,0.6494779364787506,0.6511153940917813,0.6512767450551664,0.65170911634831,0.6517964516248553,0.6528181782745978,0.6537924369817556,0.6550433378219251,0.6561007243978706,0.6568447818894479,0.6570339166747079,0.6570341735555041,0.6600651828961758,0.6633883339574629,0.6659491071690806,0.6664500528522209,0.6668373970538665,0.6689806492709882,0.669519192707189,0.6722953658527739,0.6735101014551922,0.6754981305494476,0.6782957518393475,0.6796822805783609,0.6797112597875095,0.6800555832943247,0.6801107330369296,0.6806926726388181,0.6824008189797874,0.6824917085920043,0.6827319101774162,0.684580217865715,0.6847586268312102,0.6857910707080574,0.6864282286470033,0.6882502884146625,0.69119255631583,0.6930476322562856,0.6935127906569589,0.6935855227145007,0.6963595528377342,0.6964876574483897,0.6970383823524197,0.6975593685423352,0.700968418224624,0.7026554677067305,0.7036257591366859,0.7038307686610792,0.7055948911842272,0.7073487821604523,0.7075065842746739,0.710089056225931,0.7121510008943268,0.7141371652697148,0.7145420155819369,0.7153410669507592,0.7160021944970129,0.7173059898619626,0.7188083955828791,0.719386262933341,0.7199320239200582,0.7265315209374166,0.7268709823730045,0.7272739374350811,0.7290872995913833,0.7302123387998192,0.7315686026886129,0.7328830421956996,0.7336757167643172,0.737225498352042,0.7384804779990234,0.7405289302365077,0.7441348291782071,0.7455540915156516,0.7485104844346122,0.7530884517423222,0.75474014202958,0.7551708609756087,0.7582514658540472,0.762530424502877,0.7651817614139227,0.765783294754907,0.7662487582167479,0.7662902738389885,0.7665448462596693,0.7683568641779406,0.7693946800695851,0.7694984247854697,0.7697447135069835,0.7706917859260781,0.7727669118109888,0.7730735479794156,0.7736643815373169,0.7737423838505955,0.7737876988121902,0.7741413960231778,0.7742689484712775,0.7784222210126386,0.7809589708736406,0.7836190765337256,0.7850355096239844,0.7853015369186344,0.7937544326301933,0.794014350066953,0.797741949615286,0.8010724303950993,0.8040948984275134,0.8045614993927517,0.8048623462491397,0.805596430558296,0.8080597700329017,0.8084335742145894,0.8090011051201825,0.8096621662743952,0.8104307243086032,0.8108581072603689,0.8122882324708051,0.815518731489106,0.8162041329559775,0.8183318645594312,0.8189464233529206,0.8197724956308987,0.8221697908801544,0.8238473662188505,0.8247110882490876,0.8268189079750923,0.8271213389967174,0.8277768732973928,0.8307285678462719,0.8314503020174119,0.8419207659607935,0.8419736579075086,0.8424318992159582,0.8432301714735367,0.8441187571249125,0.8442744102119922,0.8448375080142584,0.8457480724319377,0.8478463057921035,0.848975716602909,0.8494067035653894,0.8507680697178284,0.852424559594577,0.8570439618432705,0.8609100085352859,0.8616072765003222,0.8620531532357459,0.8637259252141698,0.864371530408812,0.8644911028561356,0.8649907414915124,0.865712035058574,0.8675658010328244,0.8693615667842323,0.8716750423181312,0.872106559359128,0.8725688593228056,0.8764805736010083,0.8785759968614935,0.8797683879422241,0.8822387410954706,0.885593068759949,0.885792341604842,0.88730511234607,0.8883426515012358,0.889869584828708,0.8899768628709125,0.8905001040863582,0.8907670839891528,0.8908378123534438,0.8943519530198935,0.894954288278067,0.8957642576126225,0.8964083178192064,0.8972586026168966,0.8973083054136686,0.8999791311329383,0.9006301425992134,0.9033371299937933,0.9034326730282806,0.9042549906201188,0.9048035512792262,0.90638577312387,0.9068970892985556,0.9070223796862823,0.9090704748368598,0.9099149025225896,0.9107499250231736,0.9178575628654616,0.9178765521577654,0.9181789547956851,0.9204228581576052,0.9205378882786726,0.9248882905101045,0.9268437135642885,0.9291788605577278,0.9295132474839907,0.9320899140503964,0.9339470502427062,0.9340447693691427,0.9357790449663665,0.9357880639172933,0.9378362937966813,0.9385106113806434,0.9419460264483479,0.9435824964044039,0.944723570942656,0.9462154637121627,0.950767895720494,0.951574965253846,0.9541844615738355,0.9557421237690407,0.9557689263261803,0.9562334006657176,0.9572046614103871,0.9587651164104521,0.9594995574823789,0.9601087142766813,0.9608582338276317,0.9633262110072029,0.966631700155518,0.9682749988613152,0.9683023338899421,0.969593493125578,0.9726004354808423,0.9726372743414865,0.9727940435841254,0.9727965434226473,0.9729153381950107,0.9733875216071542,0.9742688925726883,0.9766046416170575,0.9780709784334094,0.9784383089647872,0.9795280528040801,0.9812971755656376,0.9815797817998061,0.9827343088036202,0.9877478248745364,0.9894266278706182,0.9896688777849489,0.9903412213452722,0.9905317310158708,0.9960557140996535,0.9976727071399817,0.9989937653917627],[0.0004787266562212139,0.001263255971585134,0.004631095548652894,0.1218825516806485,0.446491340830007,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9989937653917627,0.9989937653917627,0.9989937653917627]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Feature<\/th>\n      <th>Comparison<\/th>\n      <th>Estimate<\/th>\n      <th>P<\/th>\n      <th>FDR<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"targets":3,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatSignif(data, 2, 3, \",\", \".\", null);\n  }"},{"targets":4,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatSignif(data, 2, 3, \",\", \".\", null);\n  }"},{"targets":2,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 3, 3, \",\", \".\", null);\n  }"},{"className":"dt-right","targets":[2,3,4]},{"name":"Feature","targets":0},{"name":"Comparison","targets":1},{"name":"Estimate","targets":2},{"name":"P","targets":3},{"name":"FDR","targets":4}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":["options.columnDefs.0.render","options.columnDefs.1.render","options.columnDefs.2.render"],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-9d818e4a2ea3c7a1993a" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-9d818e4a2ea3c7a1993a">{"x":{"filter":"none","vertical":false,"extensions":["Buttons","Scroller","FixedColumns"],"data":[["HIF-1 alpha","TLR7","CD68","PRDM1/Blimp1","Syk (phospho Y352) +ZAP70 (phospho Y319)","Histone H3 (tri methyl K9)","Histone H3 (mono methyl K4)","Histone H3 (di methyl K79)","Histone H3","SHP1","S100A8 + S100A9","HLA-DR","Histone H3 (phospho S10)","MRP8","Histone H2A (acetyl K5)","STAT6 (phospho Y641)","Histone H3 (acetyl K14)","LAG-3","p53 (phospho S392)","Bcl-XL","SLC7A5/LAT1","RPS6","p53 (acetyl K373)","Histone H2B (acetyl K5)","Histone H3 (acetyl K18)","Histone H3 (acetyl K9)","Syndecan-1","iNOS","Topoisomerase II alpha (phospho T1343)","Histone H3 (acetyl K27)","CXCR3","GITR","CD31","PI 3 Kinase p85 alpha","CD39","S100A12/CGRP","c-Fos","Cathepsin S","FAK","IFNGR1","Cytokeratin 1","IL-1 alpha","HLA-DPB1","PI 3 Kinase catalytic subunit alpha/PIK3CA","IL22 RA2/IL-22BP","PTGES2/Gbf1","Cdk6","Progesterone Receptor (phospho S190)","NCR1","IL-15RA","PU.1/Spi1","CCR6","IL-5RA","CD16","Myeloperoxidase","LYVE1","NCAM1","Tuberin (phospho T1462)","Oct4","Insulin Receptor beta","TIM 3","CCL18","ErbB4 / HER4+ErbB2 / HER2","Tuberin","Histone H2A.X","Insulin Receptor alpha","MLH1","CD38","Sonic Hedgehog","T-bet / Tbx21","CXCL5 + CXCL6","Somatostatin Receptor 2","GSK3 beta","Histone H3 (tri methyl K36)","S100A9","ST2","Rho A + B + C","Dihydrofolate reductase (DHFR)","Urokinase","HLA E","NKG2D","MEK1 (phospho S298)","CD11c","CDK1","SOCS3","MMP8","IL-6R","IMP3","PF4","Topoisomerase I","p63","TNF alpha","CD133","CD47","Glucocorticoid Receptor (phospho S226)","CD33","Raptor","ARID3A","Rb (phospho S807)","Granzyme A","Catalase","VCAM1","STAT5 (phospho Y694)","Ms IgG2b","FOXO4/AFX","Tuberin (phospho S1254)","GGT1/GGT","CD15","CD40 Ligand","EGFR","ATG7","2B4","Oct-2","Neutrophil Elastase","SHP2","MS4A2","CDK1 + CDK2 + CDK3 + CDK5 (phospho Y15)","TNFAIP3","Indoleamine 2_3-dioxygenase","HLA A","TRAF6","YKL-40/CHI3L1","RPS6 (phospho S235 + S236)","IGF1 Receptor","Liver Arginase","Ras","p73","Cytokeratin 8 (phospho S431)","SDHA","Vimentin","APG5L/ATG5","CD99","STAT6","CD14","Histone H2A (phospho T120)","ALDH1A1","ErbB4 / HER4 (phospho Y1162)","EpCAM","JNK1 + JNK2 + JNK3 (phospho T183+T183+T221)","Glutaminase","HDAC3","TBR2 / Eomes","CD40","MMP7","SIRT1","MMP1","MMP3","Glucose Transporter GLUT1","LILRB3","Histone H3 (di methyl K4)","SIGLEC5","NQO1","TAK1","Rad51","p53","N Cadherin","IRF4","Insulin","TLR9","PI 3 Kinase catalytic subunit gamma/PI3K-gamma","CXCR5","TLR8","IDH1","Nanog","CD79a","p40 - DeltaNp63","GAPDH","HDAC6","Macrophage Inflammatory Protein 3 alpha","Bak","Cyclin E1","ICOS","Bad","HDAC9","Musashi 1 / Msi1","Thymidylate Synthase","KIR3DL1 + KIR3DS1","NFAT2","HMGB2","beta Actin","p57 Kip2","STAT3 (phospho Y705)","CD79b","AKT1 (phospho S473)","UBE2C","IKKi/IKKe","CXCR4","CXCR6","Cytokeratin 17","PLCG 2","HLA F","CD127","Wee1","Rb (phospho S608)","CCR3","Adenosine Receptor A2a","Mannose Receptor","BRCA1","HuR / ELAVL1","ETS1","PI 3 Kinase p85 beta","MelanA","CD134 / OX40L receptor","PDGF B","Osteopontin","LAMP2A","SMAD5","Hsp90","Topoisomerase II alpha (phospho S1106)","NSD3","Galectin 3","CD64","IL-1RA","Rb (phospho T252)","CD34","CD94","Carbonic Anhydrase 9/CA9","CD11b","CD74","SIRT3","Macrophage Inflammatory Protein 1 alpha / CCL3","Wnt3a","PARP1","Occludin","Syk","CD44","p53 (phospho S46)","ATM","Caspase-3","MEKK3","Cdk4","Transferrin Receptor","ErbB2 / HER2 (phospho Y877)","KDM3A / JHDM2A","Bax","Ikaros","STAT3","Poliovirus Receptor/PVR","TAP2","Src","Heme Oxygenase 1","Prostate Specific Antigen","IKK alpha","CD4","Caspase-10/CASP-10","SOX9","CD103","Interferon gamma","Smad2 (phospho S467)","CDKN2A/p16INK4a","NAK/TBK1","AMPK alpha 1","Rb (phospho T356)","Androgen Receptor","PRAS40","HDAC4 + 5 + 9","Bid","RAGE","IL-22RA1","IL3RA/CD123","Ki67","HDAC1","SIRT1 (phospho S47)","Topoisomerase II alpha","p27 KIP 1","Collagen IV","IKK beta","Melanoma gp100","TMS1/ASC","ERG","CD66b","BRAF","VEGF Receptor 1","C Reactive Protein","eNOS","RPS6 (phospho S240 + S244)","IL-12RB1","c-Maf","TRAF1","cIAP2","HLA B7","STING","15-PGDH","Beclin 1","FGFR2","HMGB1","ICAM1","ATM (phospho S1981)","Hsp27 (phospho S78)","NRF1","Lamin A + Lamin B1 + Lamin C","BTK","CD90 / Thy1","IGF2BP1/IMP1","IL-2RG","Wilms Tumor Protein","FANCI","Smac/Diablo","GRP78 BiP","IL-12A","COX2 / Cyclooxygenase 2","FBP2","p38 beta/MAPK11 + p38 alpha/MAPK14","Smad4","CDKN2A/p14ARF","STAT4","Rel B","LAMP1","p27 KIP 1 (phospho S10)","Nectin 2","Met (c-Met) (phospho Y1349)","Cyclin D1","Chk1","Rb IgG","Cathepsin G","CDK1 (phospho T161) + CDK2 / CDK3 (phospho T160)","Cyclin E2","PTCH2","ENO1 + ENO2 + ENO3","HLA G","beta glucuronidase (GUSB)","CD70","CD11a","CD73","CD177","PTEN","ASS1","S100A4","Cleaved PARP1","ERK1","c-Kit","Lactate Dehydrogenase","Actin","Rho","IL-1 beta","CD86","PAK1+PAK2+PAK3 (phospho S141 + S144 + S154)","Axl","CD28","Aldolase B+Aldolase C","CTLA4","Cytokeratin 8","Rb","VEGFD","SCF","S100P","CD27","CD83","IL-18","KIR2DL1 + KIR2DL2","PAK1","KMT6 / EZH2","Bcl6","Pro Caspase-8","NKG2A + NKG2E + NKG2C","Rt IgG2a","RSK1 p90","ERK1 (phospho T202) + ERK2 (phospho T185)","CREB","IRF3","Cyclophilin A","AKT3 + AKT2 + AKT1","Wee1 (phospho S642)","MDM2 (phospho S166)","PRAME","Hmr IgG","AKR1B10","beta 2 Microglobulin","Histone H3 (phospho S28)","VEGF Receptor 2","Dnmt1","CPT1A","Hexokinase 1","CD3D","ERK2","Cytokeratin 19","CD44v6","Granzyme K","Integrin alpha 5","SMAD1 + SMAD5 + SMAD9 (phospho S463 + S465 + S467)","E Cadherin","FADD","FABP4","Cytokeratin 14","ROS1","ATR (phospho S428)","Cyclin A2","ZAP70","Retinoic Acid Receptor beta","SOD2/MnSOD (acetyl K68)","IL-2 Receptor alpha","Calreticulin","Lck","Fibronectin","alpha smooth muscle Actin","STAT1","JAK3","STAT1 (phospho S727)","IRF5","Chk2","GLB1/Beta-galactosidase","TEF1/TEAD-1","ACE2","Ms IgG1","Von Willebrand Factor","GNLY/Granulysin","DUSP6","SFRP1","CD3 epsilon","Cyclin B1","Carbonic Anhydrase 3/CA3","S100 beta","MEK2","C4a","NFkB p105 / p50","TROP2","RSK1 p90 (phospho T359)","FOXP3","Granzyme B","VISTA","uPA Receptor/U-PAR","KMT6/EZH2 (phospho T487)","Nectin-4","Sumo 1","Cytokeratin 5","S6K1","JunD","MyD88","Podoplanin / gp36","Collagen I","CD63","MMP14","CD163","Glucose 6 Phosphate Dehydrogenase","APC","ALK","SOD2/MnSOD","IKK gamma/NEMO","Fatty Acid Synthase","c-Jun (phospho S63)","MEK4/MKK4 (phospho S80)","Fos B","SQSTM1 / p62","AIF","GLP-1R","TOMM20","PCNA","ErbB3 / HER3","c-Myb (phospho S11)","CD18","c-Myc (phospho S62)","Scavenging Receptor SR-BI","Hsp27","p38 (phospho T180)","CD276","GSK3 beta (phospho S9)","PKC beta 1","CD3G","STAT5a","MSH2","Glutathione Peroxidase 4","PDGFR alpha + PDGFR beta","Progesterone Receptor","CD45","Histone H3 (tri methyl K27)","ERK1 (phospho T202 + Y204) + ERK2 (phospho T185 + Y187)","Smad2 (phospho S255)","BRG1","active YAP1","Rb (phospho T780)","Notch1","beta Catenin","PSMA","pan Cytokeratin","Ret","Pan Trk","Cullin 1/CUL-1","DR5","CD20","ROCK2 + ROCK1","NF-kB p65","FOXO1A","CCR7","Integrin beta 1","Integrin alpha 6","Syk (phospho Y323)","Smad2","Cathepsin K","Bim","STAT5b","Ubiquitin","EGFR (phospho Y1068)","IFIT1","CXCL10/IP-10","Brd4","M-CSF","LEF1","IDH2","Argonaute-2","IL-33","15 Lipoxygenase 1","ATF2","YAP1 (phospho S127)","VEGFA","C5 / C5b","Caspase-3 p12","Hsp70","Periostin","CCR5","FGF2","IL4","ATF3","gamma H2A.X (phospho S139)","mTOR","Rb (phospho T373)","MX1","PD-L2","LC3B","mTOR (phospho S2448)","ATG12","ROCK1","GATA3","beta Tubulin","CREB (phospho S133)","AKT1 (phospho T450)","PD-L1","SFRP4","Aurora A","MICA + MICB","CD8 alpha","c-Jun","Tissue Factor","PDGFR alpha","c-Myc","MUC1","CD22","CD36","MEK1","HDAC2","ErbB2 / HER2","Met (c-Met)","EMR1/ADGRE1","Cdk2","SIRT2","BFL-1/GRS","ISG15","GLP-1","Hexokinase II","MSH6","Aldolase","CREBBP","TGF beta 1","PP2A alpha + beta","5 Lipoxygenase/5-LO","beta Arrestin 1","STAT2","Bcl-2","KIR2DL3","TMPRSS2","TRAF2","CD45RA","LDL Receptor","RUNX1 / AML1 + RUNX3 + RUNX2","CD272/BTLA","ARID1A","Smad3 (phospho S423 + S425)","PD1","Smad3","HLA-C","Fas","Caveolin-1","IKB alpha","Survivin","CSF-1-R","Mucin 5AC","CDK1 + Cdk2 + Cdk3 (phospho T14)","Monoamine Oxidase A/MAO-A","MMP9","PTEN (phospho T366)","YAP1"],["No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes","No vs Yes"],[0.6611207754493321,0.4063802434960061,0.801108211617142,0.2503537162683815,0.2981994748665276,1.059430856734876,0.8264992080772733,0.8525453167572088,0.6031747933129367,0.2780353357335477,1.458980088072234,1.529845760608016,1.100751404331,2.090149800480897,0.875016754966534,0.3813821328325142,0.9358025752493909,0.5338855824525087,0.6422059297352777,0.5470630595579358,0.6163051271025128,0.3893147239873748,0.5837248889018072,0.5400349949434959,0.6995746494854306,1.173557188125007,1.52517666795677,0.696267905458094,0.5101531405058584,0.5970839115685861,0.4506172803836964,0.5941731818311772,0.487000642544647,0.414992430549255,0.4862752452629211,0.7096559628882039,0.3261205682762813,0.983611325466066,1.309165216593301,0.3639841819752231,0.320243390792643,1.11814428972961,0.8853777650513588,0.6143173650779766,0.2873647587674098,0.4169274138672563,0.6947405256665959,0.377851862111298,0.3539518437723115,0.5126892101710415,0.3954002229667518,0.7384186453641758,0.3248501703481297,1.076698146909489,0.2583678108136199,0.3746174750958853,0.3090045041951373,0.2483569058734132,0.3420513892359823,0.4807492164161655,0.3896484286046538,0.2988883560267738,0.3934520385455633,1.014440704131324,0.6917974613916209,0.4356512367638897,0.3952156168432663,1.051808939358483,1.070059146268154,0.3223442709046447,0.363344428820141,0.3090924220595924,0.3865162681525688,0.3569372697021697,0.8759956953925342,0.2347859691103093,0.3426731032779705,0.714736245304143,0.3766598085947905,0.6614529644335673,0.2484043609528421,0.3262073512254265,0.3702440300176859,0.5969211171929162,0.3251590631002373,0.2633125236163727,0.2436950845231167,0.2560488381583353,0.2675067544788792,0.3733822314692042,-0.3687286183345732,0.2708975767448453,0.507314175063744,0.3860848526061013,0.372343826164518,0.3322170804465169,0.2752478366786451,0.2971479284427015,0.3306748127744324,0.2620460694877796,0.588721944608888,0.3657814278424805,0.4574445446676403,0.07571573851070877,0.2388630397900357,0.5585619175529816,0.3332718814219012,-0.5146003948777734,0.2071825487507813,0.3910292018642901,0.5251507343943804,0.2335675058599201,0.2705443719101355,0.2347422507347381,0.2596528608891097,0.3188875703640469,-0.2289915924441373,0.3875194637074704,0.4985162945415785,0.9496318711031071,0.2545186469199519,0.2259707940346386,0.5224339202071654,0.2839508799700628,0.1865464138560672,0.2999145720551998,0.25674310932496,-0.5201096045030209,0.3141463191909361,0.7550060972507426,0.1880106466234951,0.2388143609133363,0.462521033971672,0.3933086580155028,0.3760151376754904,0.2798837016472128,0.2641134628057177,-0.7988024950279691,0.2189260959428848,0.6696164034310036,0.2688470112405651,0.2262701428327917,0.5014430246483041,0.2557740256119637,0.2458456734027595,0.1803798770837597,0.2704950231410339,-0.6296353108683508,0.2487633684459481,0.4636313645426101,0.2645226685088564,0.5782810123594742,0.1899113242056886,0.2267403224263966,0.2214911702075115,0.2184798452525123,0.3267471695609942,0.2204561834439543,0.2342200876845875,0.2980726016178446,0.2613380384010473,0.2593875088181912,0.3704126414340834,0.1800511384867812,0.2439074824557407,0.2115830328696549,-0.3905868625430045,0.3619785670728617,0.2002532590505321,0.6637169011547523,0.3208487124822199,0.243072127762589,0.2646977389811755,0.335553979886363,0.1170424492127879,0.284825248256126,0.2145264519035529,0.6000393395805329,0.4329690722210218,0.3517644694746358,0.3009333383810445,0.2645891188845575,0.3395704048544039,0.2353603839326599,0.1927162061995996,0.461460375926366,0.2211092965458355,0.2072775947566081,0.1585995222126484,0.2748875118904003,0.1424646183092159,0.2201864734333262,0.254152661229447,0.273640187990866,0.1878619965059014,0.2800224363489603,0.4997015963938379,0.2369285129532804,0.2964651885720548,0.2152877503403829,0.1762608863465273,0.1881803029246116,0.2444483750319216,0.4840140928339645,-0.3588842950208981,0.34618872376743,0.2711443793095283,0.2043328636798865,0.186122470907622,0.2682415878821493,0.6430817664385824,0.2538446864507237,0.1582584229179302,0.2187447245107896,0.2835169922975136,0.1717189564043499,-0.3118546137552302,0.1559827974315673,0.5549041230427262,0.2087277030667908,0.1642107806255544,0.1088436267702086,0.2557526943112788,0.1383082981985598,0.2248233607326344,0.3633521781226555,0.2138662782065762,0.2213672115891216,0.2447072451225126,0.1786089125350002,0.2198152352395236,0.2346051338472279,0.202373003130577,0.1396715715052371,0.2878542306732227,0.4859149900460588,0.2492432967822046,0.2030326732449208,0.8399030456524708,0.2376413636537645,0.3915364650672782,0.1577299357701743,0.2817757237102555,0.2658284697768623,0.2666382760744213,0.2827685950981214,0.158030939798471,0.1300906995524344,0.2897149477367857,-0.1740527914278348,0.2431100814915534,0.1753906903811254,0.1650321190456085,-0.3411433486577142,0.1651779056979582,0.3099874180331064,0.2338231862358491,0.141153287404925,0.1604355265671726,0.1967523962286649,0.1931049065380444,0.1480777244183566,0.2502480314974256,0.2377855839840341,0.4400162076994395,0.1564753422965113,0.147845514593569,0.1464953294982892,0.5542481693405173,0.2405447250989259,0.2318399994380467,0.2102544599837384,-0.2806523430133966,-0.1533935169259328,0.228606018719903,0.3483832274527814,0.2302151948661577,0.1204864230128621,0.2691607831085494,-0.1473708580044384,-0.3094032303707837,0.3875527438968631,-0.245092470895429,-0.201626227807541,0.1398738666200524,0.3662105235270547,0.1518029767209569,0.2485145212258362,-0.3469674138212699,0.4495029083053995,0.3164864771915233,0.1646156981420853,0.3160365546061102,0.1206235782749046,0.1913566391127973,0.08508915387508972,0.1472679184507549,0.2082341788537648,0.1092868792889259,0.150468542186996,0.07787014135175213,0.09973501687252316,0.09952016750116656,0.1408377600080212,-0.1199621952208774,0.2011060310048744,0.235336827532711,0.2166681594355362,0.1841253628204321,0.1555617551992186,0.2218721721371815,0.1306842427676562,0.1208064845242763,0.09580078907624276,0.3695761020623664,0.3665190329494137,0.1038277085378029,0.1870749576934109,-0.127103444253995,0.2229303416769793,0.5092349010702023,0.1078919143342565,0.1644952144072356,0.1927358343774131,0.1303268378604147,0.1527132898236154,0.1439569508125654,0.2847067249042102,0.1099216302317061,0.2586528697591192,0.1318953580960342,-0.2138175211648528,-0.1713486145424601,-0.1684017614977467,0.2241054530214206,0.1226095789329733,0.2496820465998434,-0.2047736699899232,0.1020716713776804,0.1102623227316995,-0.09923313383483161,-0.2781977766564893,0.09620625951688357,0.1061819122489787,0.1355063306724123,0.08567642321726621,0.2046696667522278,0.1063351680286763,0.1357217767296339,0.1051261064881273,0.1440666906661054,0.1594689627805664,0.09584881607417751,0.1223889134984669,0.1180247620481135,0.06954180984996834,0.1054742228289941,0.08577723983087306,0.1707174506330416,0.2651052976089389,-0.2407564489654498,0.1959409786183495,0.107496872750607,0.1513201475856141,0.1020680147033129,-0.1647652217945831,-0.113849692003514,0.511240639112569,0.2894369292905088,0.1437576169181825,0.09807329340635093,0.1105851690345196,0.174845827742082,0.2507133639610955,0.2845541417766144,-0.3449737738109118,0.138060972321995,0.07747658465902897,-0.2034602049460529,0.1962729262624477,0.3833233674752749,0.1097653239886961,-0.2080081349764023,0.08320464873726659,0.06511137812230688,0.1196820498800921,0.08453699908766796,0.2432701509747909,-0.0741088291036455,0.204846046142154,0.08425121812084606,0.1768632549096263,0.1698969620892861,-0.5803211271804183,-0.3741918696467527,0.3984795635623501,0.06970437897965996,0.3276217791915582,0.07666718486632292,0.1954692023105089,0.2727713900052515,0.08421641584284553,-0.1967989874560089,-0.04766546944256835,0.1523640649499595,0.08779553800320851,0.06934648229523639,0.1045012248635073,0.1859623974148101,-0.08016930803957246,0.1009972766762631,0.1918651854905557,0.1926941870849958,-0.1976958443259795,0.2920223890947448,0.1962279136661107,0.1350692200942802,-0.05917561863657374,0.07506789770089203,0.1718936295846905,0.1235017989451681,0.1505007719465417,0.08152239413743276,0.09862847641804202,-0.2241703506254126,0.1285920420388992,0.1499635771736707,0.09571851838470817,0.1304023224799259,-0.3820390500421316,0.1503519193324136,0.07968264152735642,0.07740987230617398,-0.1186655541374918,0.07404714114807297,0.06257422152999659,0.1804540876663084,-0.07210965633153901,-0.189037672475997,0.05824807992444954,0.1231962302748421,0.06835680002247894,0.239101778528457,0.09231476852394725,0.07278250532284332,0.1383066949730552,-0.163868373994617,-0.09605768249515508,0.1089598231344294,-0.04386459836051232,0.06368206141914635,0.06614291054477428,-0.1638583317116601,0.1081872670685859,-0.2228211694358843,0.05217897152069795,0.06740047440082701,-0.1268456440169886,0.201654489250103,0.08908118122433453,0.09242673839245749,0.1218943891569391,-0.08417231348519881,0.08866626467047162,0.04102235350751094,0.1173743544343772,0.07544035396898757,0.06764562884419094,-0.1329166473351556,0.08466727381708646,0.05095736612403616,0.1600501322484576,0.1203509875985795,0.06887248374055137,0.04083676120542599,0.06926659999394739,0.04969120992067235,-0.05728677430793325,0.2675296983109366,0.06326735435259857,0.09882667405410578,-0.07167141436825399,0.05529101810545854,-0.0540083611952237,-0.06717780280087676,0.05964324495148499,0.06548836179829315,0.04952409687797633,0.04251166346891094,0.1565008628276663,0.05398255420129239,-0.124006524617687,-0.1221563092656626,0.04002762006962609,0.1289280139478512,0.05511951915075902,0.04410025203143405,-0.09511642642531148,-0.05305592702854776,0.04963973250072419,-0.04344965838361698,0.05179354901223202,-0.0636527413490425,-0.06403346597433306,-0.05186610977163927,-0.03605107859971941,0.04686448942910844,-0.1433083557986625,0.0503725827571467,-0.03163612139257563,-0.06108918103918796,-0.04838055317196344,0.05178748386201899,0.03277962892827337,0.03761972968180687,0.1238799357080468,0.02786788244956926,0.03392772808897554,0.04622179026973147,0.04467211279811032,0.05093404543987923,0.03751402534624352,0.05977429172985631,0.08006219257652179,0.03302031613873639,-0.02588419161909808,0.09240823637353454,0.0354230636956353,-0.01251667027941855,0.03863806642117843,-0.03535305983109263,0.02366267169065592,-0.04075153671986891,0.02494396936307729,-0.06719583403933033,-0.02691318408190224,-0.02673304441581857,0.03972598895381791,0.04936863265311226,0.1014367572007782,-0.02593315434928361,-0.02540881170847065,-0.02553015361231586,0.0169175451747052,-0.02315930550884062,-0.03329694487747632,0.011577376423488,0.009381669069421002,0.02418235194317854,-0.0200197410135064,0.0259894027991663,-0.009377476024069379,-0.02367728905517069,0.01671496250764277,-0.01629615539163025,-0.01569015297738431,-0.01964702411119663,-0.0129382093458606,0.007199411755434077,0.01060544335608019,0.01246812728881315,-0.0149034885481886,-0.02221804432439081,0.01323883428352591,0.01403638122723559,0.01259067674587019,-0.01067567804867535,-0.009499665954761392,-0.02934982075053132,-0.004655150774308912,-0.01695720503376364,0.008530164990706966,-0.003007544322027126,0.007345368999063638,0.002371118741552133,0.002752349110520746,-0.004786821753800637,0.001289569604860186,-0.001149018118406728,0.0008069056834506879],[8.253907865882999e-07,4.356055074431498e-06,2.395394249303221e-05,0.0008405693219355069,0.003849063283017301,0.01940777788048553,0.0326598162028711,0.04103069114624449,0.04107731251020114,0.04397006893883364,0.04679354573686929,0.05596371487617147,0.075242877871967,0.07525226274630711,0.07538467718866361,0.07642015023026966,0.07980949537565796,0.08897219560378621,0.08967419146873315,0.09231775022001415,0.09300223456308722,0.09307702408398803,0.09827199890950977,0.09975623906154364,0.1003309462771187,0.1009244118974138,0.1017846801692339,0.1067698917061961,0.1074601082236949,0.1105606138761503,0.1167167877561992,0.1233392335573399,0.124621735984204,0.1271634198090999,0.1318865229210586,0.1324597570307968,0.1333922567348344,0.1344541672694249,0.1368721419225838,0.1369157979626655,0.1411179192647149,0.1457433017951265,0.1461052596345198,0.1465652113989398,0.1487398274002805,0.1492562189933584,0.1547261364838134,0.1550547141050011,0.1590358072930989,0.1624466059853099,0.1653656920463664,0.1671728193407855,0.168227303091967,0.1689658647831241,0.1805817765318972,0.1809054014647609,0.1824535313348958,0.1843188478244256,0.1907528920103198,0.1922117852428037,0.1938652157380856,0.1948141802330094,0.1954854521343173,0.1965080062416971,0.1982101540804746,0.1990560042749212,0.1993233775489432,0.202341613925523,0.2110435235388718,0.2174566447369809,0.2186821259135988,0.2195553158337383,0.220502283248202,0.222139164214146,0.2225420973700383,0.2232446062089606,0.2244169769787878,0.2327774506990082,0.2356963665904668,0.2384811972924115,0.2422524480479346,0.250938413887314,0.2519959439089235,0.2543084485523937,0.2545163827581403,0.2634249129155245,0.2658862314023338,0.266076963295345,0.26671032183841,0.2680363657540854,0.2682014382691137,0.2686661961105934,0.2697774585583923,0.270017109685061,0.2753842761703305,0.279024304004625,0.2803816087149213,0.2807364197953215,0.2826177646767407,0.2832435481598863,0.2836703766738087,0.2843785993465262,0.2847674187475301,0.2890205802631129,0.2897012544134029,0.2922927523622777,0.293998390715266,0.2969931251116102,0.2976519088305853,0.2980555911567648,0.2994255412310627,0.3001540270510539,0.3025944503824214,0.3030489011351628,0.3042591225188526,0.3053107086905596,0.3060793183916632,0.3086165948128725,0.3126620594205187,0.3183501194453107,0.3216591025520797,0.3217153873957991,0.3245874473633672,0.3258509640239542,0.3263069116935605,0.3264886009507298,0.3301734119560312,0.3310718071380773,0.3349374243641121,0.3357237276813601,0.3363193930671623,0.3390990020142181,0.3396910639184018,0.3420357627994181,0.3424533511789892,0.3433511106270437,0.3461779469770102,0.3479869189984884,0.3482890543254262,0.3488407925517154,0.3510670781783521,0.3555560575837872,0.362496292652207,0.368737733044415,0.3695803693722774,0.3723276418273625,0.3734078345278914,0.374133030708202,0.3741659493799555,0.3750220486178661,0.3767469286552986,0.3799250385348377,0.3805399645228412,0.3829940284479599,0.3862940036041933,0.3864317879929425,0.386556360049681,0.386696114562669,0.3874419354380714,0.388246173700407,0.3883267129073854,0.3893580360916399,0.3902761277223328,0.3983148857101633,0.3984248385648325,0.399250670458366,0.3995111080061663,0.4013512199492934,0.4019815750437943,0.4044662769419042,0.4051414349795806,0.4052822981908253,0.4060640636733032,0.4112819917678002,0.4160169460906795,0.4161243185700079,0.4161679409725707,0.4164738962910441,0.4178445539927914,0.4196683564594127,0.4198279953076918,0.4205690760273892,0.4210991515994138,0.4227305552171706,0.422883506676368,0.4231669378581369,0.4236634558181532,0.4237364637876344,0.4249716079952796,0.4267917468583213,0.4280037965708219,0.4291271426576558,0.4293929499575073,0.4304130371606338,0.4304824930508689,0.4314732279533403,0.4334543881217155,0.4341014917626108,0.4342637547036665,0.435498919586149,0.4358182021784635,0.4360676389466543,0.4363489735254126,0.4415109921642733,0.4416577301527359,0.4425862159484288,0.4484724887624797,0.4522038979000675,0.4603099113953978,0.4607233277498751,0.4612218762343154,0.4616576993779254,0.4638261938380622,0.4650982559675215,0.4653629119811786,0.4653909626576818,0.4655143084484215,0.4667428470423064,0.4688820019672272,0.473169930649574,0.4732478092835192,0.4735017834296681,0.4735629312614515,0.4737894778710252,0.4753833989069817,0.4754913845909451,0.4797676438425507,0.4803244554607872,0.480373231721083,0.4813134028531985,0.4813952907132538,0.4830870693085684,0.4850549170541631,0.4856699546111666,0.4861893919217333,0.4868355450614434,0.4882565502535554,0.4908490006647881,0.4930822048492572,0.4938475051212629,0.4948618817922239,0.4949055794272872,0.4956507797742402,0.4957552575708673,0.5011061995439462,0.5036909092404422,0.5041818600751601,0.5063818363512373,0.5069262459541061,0.5070995193129902,0.5099550246054603,0.5103043583710168,0.510617412492629,0.5126120443847652,0.5134527547924698,0.5153770669246746,0.5156804424267729,0.5172095579928161,0.5173440229876576,0.5193953488266553,0.5212485203095414,0.5217204020683475,0.5220321412121569,0.5238707420995321,0.5261625669296027,0.5275011854548235,0.5314832366714193,0.5317143487976977,0.532128067984818,0.532345651040346,0.5360210135641027,0.5371161193708566,0.5383735375771125,0.5393743333300355,0.543065626317862,0.5446718539717357,0.54761314248382,0.5490554664594677,0.5516836735207782,0.552017297332059,0.5530368069113518,0.5575114619018773,0.5589109561479304,0.5622275191571595,0.5653223005330106,0.5686371357394259,0.5748734922310379,0.5822854548406716,0.5867354879805926,0.5874029255666822,0.591265353744113,0.5945844713518009,0.59473801380158,0.5984802554582254,0.5991045551898772,0.5994275362606072,0.6010674463202824,0.6017724300165241,0.6018089271847777,0.6020331428224042,0.6022624608538354,0.6024923287667059,0.6051331378542252,0.6056319782510823,0.607236942609768,0.6077484214608286,0.6082657985745386,0.6089282342098723,0.609209771511417,0.6095733479359886,0.6122259801859511,0.6124432013085628,0.6130010701747708,0.6191899046455011,0.6195212924365986,0.620191532423606,0.6216103973955924,0.6231092370997833,0.6250646729367509,0.6256764525413305,0.6274265759263371,0.630147437151106,0.6314244689923278,0.6315165217588468,0.6320880993772836,0.6323495744087588,0.6353899192884694,0.6363866715482015,0.6366095467675672,0.6380170897040653,0.6381109281516071,0.6401726582304106,0.6412346420533295,0.6448073184968569,0.6494779364787506,0.6511153940917813,0.6512767450551664,0.65170911634831,0.6517964516248553,0.6528181782745978,0.6537924369817556,0.6550433378219251,0.6561007243978706,0.6568447818894479,0.6570339166747079,0.6570341735555041,0.6600651828961758,0.6633883339574629,0.6659491071690806,0.6664500528522209,0.6668373970538665,0.6689806492709882,0.669519192707189,0.6722953658527739,0.6735101014551922,0.6754981305494476,0.6782957518393475,0.6796822805783609,0.6797112597875095,0.6800555832943247,0.6801107330369296,0.6806926726388181,0.6824008189797874,0.6824917085920043,0.6827319101774162,0.684580217865715,0.6847586268312102,0.6857910707080574,0.6864282286470033,0.6882502884146625,0.69119255631583,0.6930476322562856,0.6935127906569589,0.6935855227145007,0.6963595528377342,0.6964876574483897,0.6970383823524197,0.6975593685423352,0.700968418224624,0.7026554677067305,0.7036257591366859,0.7038307686610792,0.7055948911842272,0.7073487821604523,0.7075065842746739,0.710089056225931,0.7121510008943268,0.7141371652697148,0.7145420155819369,0.7153410669507592,0.7160021944970129,0.7173059898619626,0.7188083955828791,0.719386262933341,0.7199320239200582,0.7265315209374166,0.7268709823730045,0.7272739374350811,0.7290872995913833,0.7302123387998192,0.7315686026886129,0.7328830421956996,0.7336757167643172,0.737225498352042,0.7384804779990234,0.7405289302365077,0.7441348291782071,0.7455540915156516,0.7485104844346122,0.7530884517423222,0.75474014202958,0.7551708609756087,0.7582514658540472,0.762530424502877,0.7651817614139227,0.765783294754907,0.7662487582167479,0.7662902738389885,0.7665448462596693,0.7683568641779406,0.7693946800695851,0.7694984247854697,0.7697447135069835,0.7706917859260781,0.7727669118109888,0.7730735479794156,0.7736643815373169,0.7737423838505955,0.7737876988121902,0.7741413960231778,0.7742689484712775,0.7784222210126386,0.7809589708736406,0.7836190765337256,0.7850355096239844,0.7853015369186344,0.7937544326301933,0.794014350066953,0.797741949615286,0.8010724303950993,0.8040948984275134,0.8045614993927517,0.8048623462491397,0.805596430558296,0.8080597700329017,0.8084335742145894,0.8090011051201825,0.8096621662743952,0.8104307243086032,0.8108581072603689,0.8122882324708051,0.815518731489106,0.8162041329559775,0.8183318645594312,0.8189464233529206,0.8197724956308987,0.8221697908801544,0.8238473662188505,0.8247110882490876,0.8268189079750923,0.8271213389967174,0.8277768732973928,0.8307285678462719,0.8314503020174119,0.8419207659607935,0.8419736579075086,0.8424318992159582,0.8432301714735367,0.8441187571249125,0.8442744102119922,0.8448375080142584,0.8457480724319377,0.8478463057921035,0.848975716602909,0.8494067035653894,0.8507680697178284,0.852424559594577,0.8570439618432705,0.8609100085352859,0.8616072765003222,0.8620531532357459,0.8637259252141698,0.864371530408812,0.8644911028561356,0.8649907414915124,0.865712035058574,0.8675658010328244,0.8693615667842323,0.8716750423181312,0.872106559359128,0.8725688593228056,0.8764805736010083,0.8785759968614935,0.8797683879422241,0.8822387410954706,0.885593068759949,0.885792341604842,0.88730511234607,0.8883426515012358,0.889869584828708,0.8899768628709125,0.8905001040863582,0.8907670839891528,0.8908378123534438,0.8943519530198935,0.894954288278067,0.8957642576126225,0.8964083178192064,0.8972586026168966,0.8973083054136686,0.8999791311329383,0.9006301425992134,0.9033371299937933,0.9034326730282806,0.9042549906201188,0.9048035512792262,0.90638577312387,0.9068970892985556,0.9070223796862823,0.9090704748368598,0.9099149025225896,0.9107499250231736,0.9178575628654616,0.9178765521577654,0.9181789547956851,0.9204228581576052,0.9205378882786726,0.9248882905101045,0.9268437135642885,0.9291788605577278,0.9295132474839907,0.9320899140503964,0.9339470502427062,0.9340447693691427,0.9357790449663665,0.9357880639172933,0.9378362937966813,0.9385106113806434,0.9419460264483479,0.9435824964044039,0.944723570942656,0.9462154637121627,0.950767895720494,0.951574965253846,0.9541844615738355,0.9557421237690407,0.9557689263261803,0.9562334006657176,0.9572046614103871,0.9587651164104521,0.9594995574823789,0.9601087142766813,0.9608582338276317,0.9633262110072029,0.966631700155518,0.9682749988613152,0.9683023338899421,0.969593493125578,0.9726004354808423,0.9726372743414865,0.9727940435841254,0.9727965434226473,0.9729153381950107,0.9733875216071542,0.9742688925726883,0.9766046416170575,0.9780709784334094,0.9784383089647872,0.9795280528040801,0.9812971755656376,0.9815797817998061,0.9827343088036202,0.9877478248745364,0.9894266278706182,0.9896688777849489,0.9903412213452722,0.9905317310158708,0.9960557140996535,0.9976727071399817,0.9989937653917627],[0.0004787266562212139,0.001263255971585134,0.004631095548652894,0.1218825516806485,0.446491340830007,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9956818093400434,0.9989937653917627,0.9989937653917627,0.9989937653917627]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Feature<\/th>\n      <th>Comparison<\/th>\n      <th>Estimate<\/th>\n      <th>P<\/th>\n      <th>FDR<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"targets":3,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatSignif(data, 2, 3, \",\", \".\", null);\n  }"},{"targets":4,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatSignif(data, 2, 3, \",\", \".\", null);\n  }"},{"targets":2,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 3, 3, \",\", \".\", null);\n  }"},{"className":"dt-right","targets":[2,3,4]},{"name":"Feature","targets":0},{"name":"Comparison","targets":1},{"name":"Estimate","targets":2},{"name":"P","targets":3},{"name":"FDR","targets":4}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":["options.columnDefs.0.render","options.columnDefs.1.render","options.columnDefs.2.render"],"jsHooks":[]}</script>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -41312,168 +42607,6 @@ Slawski, Martin, and Matthias Hein. 2013. <span>“<span class="nocase">Non-nega
   <guid>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/immune-cell-typing-smooth/</guid>
   <pubDate>Fri, 20 Jun 2025 00:00:00 GMT</pubDate>
   <media:content url="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/immune-cell-typing-smooth/figures/hm_tsubtype.png" medium="image" type="image/png" height="56" width="144"/>
-</item>
-<item>
-  <title>smiDE: an open-source package for differential expression analysis with spatially correlated data</title>
-  <dc:creator>Dan McGuire</dc:creator>
-  <link>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/smiDE/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<section id="differential-expression-analysis-with-spatially-correlated-data" class="level1">
-<h1>Differential Expression Analysis With Spatially Correlated Data</h1>
-<p>Spatially-resolved transcriptomic (SRT) data offers unprecedented insights into gene expression patterns, but analyzing this data requires specialized approaches. Traditional differential expression (DE) methods often falter when applied to spatially correlated data, leading to unreliable results and significant rates of false discovery. To address this challenge, <span class="citation" data-cites="Vasconcelos2024">(Vasconcelos et al. 2024)</span> present a comprehensive analysis of DE methodologies in their preprint, <a href="https://www.biorxiv.org/content/10.1101/2024.08.02.606405v1.full" target="_blank">“Differential Expression Analysis for Spatially Correlated Data”</a> . This work systematically evaluates the performance of various modeling strategies, providing clear recommendations for researchers.</p>
-<p>The rest of this post aims to summarize some of the key findings from the paper and provide practical guidance on how to conduct robust DE analysis with spatial data. The accompanying <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/smiDE" target="_blank">smiDE</a> R package offers readily accessible tools for implementing these recommendations.</p>
-<section id="opportunities" class="level2">
-<h2 class="anchored" data-anchor-id="opportunities">Opportunities</h2>
-<p>While DE analysis has long been a core component of gene expression studies, SRT data presents new opportunities for addressing fundamental questions regarding how cells respond to their local environment and interact with other cell types.</p>
-<p>As a motivating example, suppose I have annotated cell type and spatial context in my dataset; I might be broadly interested in T cells, cancer cells, and how they behave within different spatial contexts.</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/smiDE/figures/fig1_ab.PNG" class="img-fluid figure-img" width="506"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Tons of interesting questions along these lines can be phrased as DE problems, for example</p>
-<ul>
-<li>How does the expression of genes in T cells differ when located in stroma vs.&nbsp;tumor bed? (Left panel, blue vs.&nbsp;purple points)</li>
-<li>How does expression of genes in cancer cells in the tumor bed differ based on distance to the nearest T-cell? (middle panel, cancer cells with arrow drawn to nearest T cell and colored by distance)</li>
-<li>How is gene expression for T-cells in stroma modulated by distance to the tumor bed? (Right panel, rings highlight benchmarks of “distance from tumor bed”)</li>
-</ul>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/smiDE/figures/fig1_thumbnail.PNG" class="img-fluid figure-img" width="790"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="unique-challenges-for-de-analyis-with-srt-data" class="level2">
-<h2 class="anchored" data-anchor-id="unique-challenges-for-de-analyis-with-srt-data">Unique challenges for DE analyis with SRT data</h2>
-<p>While the types of questions we can tackle with DE are limitless, there are unique challenges associated with SRT technologies that can lead to false discoveries when not properly addressed.</p>
-<p>Two primary issues include:</p>
-<ul>
-<li>segmentation errors<br>
-</li>
-<li>unmodeled auto-correlation in expression amongst spatially neighboring cells</li>
-</ul>
-<p>Below, we’ll give a very brief overview of how these problems can lead to biased effects estimates and incorrect inferences in DE.</p>
-<section id="segmentation-error" class="level4">
-<h4 class="anchored" data-anchor-id="segmentation-error">Segmentation error</h4>
-<p>Even minor segmentation errors can distort DE results if the analysis doesn’t properly account for them. For example, suppose I want to analyze the behavior of macrophage cells, and how gene expression differs for macrophages in tumor-infiltrated regions of tissue.</p>
-<p>The picture below shows KRT17 transcripts from neighboring epithelial (cancer) cells falsely assigned to the macrophage cell inside a tumor region.</p>
-<p>A naiive DE analysis may identify KRT17 as DE in the tumor, while an experienced bioinformatician may immediately recognize that this gene should not be expressed in the macrophage cell type at all (the very presence of the gene would challenge the cell type identity).</p>
-<!-- The picture below shows KRT17 transcripts from neighboring epithelial cells falsely assigned to the <span style="color: DeepPink;"> macrophage cell </span>inside a tumor region. -->
-<p>The picture below shows KRT17 transcripts from neighboring cancer cells falsely assigned to the macrophage cell inside a tumor region.</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/smiDE/figures/napari_contam_example.png" class="img-fluid figure-img" width="1102"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Even if the number of falsely assigned transcripts is small, these errors are correlated with our DE question in a way that confounds the analysis. Namely, the false positive KRT17 transcripts are more likely than not to occur in tumor regions compared to elsewhere because they come from the cancer cells!</p>
-<p>We could describe this dilemma for a DE analysis through a directed-acyclic graph, where the neighboring KRT17 expression in cancer cells acts as a confounder.</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/smiDE/figures/contam_example_dag.png" class="img-fluid figure-img" width="250"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>In the paper, we propose two approaches to deal with this issue.</p>
-<ol type="1">
-<li><p>A ‘overlapping cells metric’: Used to identify genes which may be expressed within specific cell types due primarily due to overlapping cells / segmentation errors , and exclude them from cell-type specific DE analysis. The metric computes the average expression in “macrophage cells”, and the average expression in <em>spatial neighbors</em> of macrophage cells among all non-macrophage cell types. The ratio of these two average expression vectors is a quick and useful way to discard implausible genes.</p></li>
-<li><p>Covariate adjustment: We can compute the total expression of ‘KRT17’ in the spatial neighbors of macrophage cells among all non-macrophage neighbors, and include this as a control variable in the regression model.</p></li>
-</ol>
-<p>Below is a side-by-side summary of volcano plots before and after implementing these approaches, where genes are colored by their plausible cell type annotation from the Human Protein Atlas, and marked by whether or not the gene passes the overlapping cells metric.</p>
-<p>On the left, a number of implausible brown genes which should be “Not detected in immune cells” are falsely identified as being upregulated in macrophages in the tumor region. Nearly all of these genes could be pre-filtered before DE is conducted, by nature of “failing the filter” metric.<br>
-On the right-hand side, we see the significance and fold change for a large number of genes is largely attenuated if we employ the covariate-adjustment approach; controlling for expression in neighboring cells of other cell types.</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/smiDE/figures/contamination_volcano.png" class="img-fluid figure-img" width="1452"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="spatial-correlation" class="level4">
-<h4 class="anchored" data-anchor-id="spatial-correlation">Spatial Correlation</h4>
-<p>Spatial auto-correlation is another way in which gene expression could inflate statistical significance in DE. Intuitively, neighboring cells may have more similar gene expression profiles compared to cells located at greater distances, due to factors which may be unrelated to our covariate of interest. A solution we propose is to include a spatially correlated random effect (SRE) in the DE model, which can account for the un-modeled spatial correlations in expression.</p>
-<p>For example, suppose I am working with a colon-cancer dataset, and am interested in researching how gene expression changes in B cells as they approach the center of tertiary lymphoid structures.</p>
-<p>I may count the number of immune cells neighboring the B-cells as a continuous measurement of how close the B cell is to the center of the TLS.</p>
-<p>Below, the left hand plot highlights two densely packed clusters of B cells in TLS regions, and on the right, these B cells are annotated by the covariate (# of immune cell neighbors).</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/smiDE/figures/colon_cancer_sre.png" class="img-fluid figure-img" width="1888"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Below, we show how inference can change from a naiive DE analysis (left), to a ‘segmentation-aware’ analysis (middle), to a DE analysis which also includes the spatial random effect (right). The model with SRE identifies a set of 9 high-confidence DE genes with up-regulated expression in TLS interior, down from 141 DE genes identified through the naiive approach.</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/smiDE/figures/colon_cancer_volcanos.png" class="img-fluid figure-img" width="1976"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>The ability to visually assess the behavior of the random effects can provide further context for the analysis. For example, CD79A retains significance in the SRE model, showing several concentrated regions of high expression captured by the random effect. For WNT7A, numerous small regions of autocorrelated expression reduce the significance of the gene when taken into context of the model.</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/smiDE/figures/visual_sre.png" class="img-fluid figure-img" width="1444"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-</section>
-</section>
-<section id="conclusions" class="level1">
-<h1>Conclusions</h1>
-<p>Here we’ve discussed opportunities for DE analysis with SRT datasets, along with unique challenges this data type poses. All of the analysis tools described here are implemented in the <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/smiDE" target="_blank">smiDE R package</a>, with syntax examples and vignettes which can be found on the github page. We hope the reader will also check out the <a href="https://www.biorxiv.org/content/10.1101/2024.08.02.606405v1.full" target="_blank">preprint</a> for more thorough detail on the our study of DE with spatially correlated data.</p>
-</section>
-<section id="resources" class="level1">
-<h1>Resources</h1>
-<ul>
-<li><a href="https://www.biorxiv.org/content/10.1101/2024.08.02.606405v1.full" target="_blank">preprint</a></li>
-<li><a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/smiDE" target="_blank">smiDE R package</a></li>
-</ul>
-
-
-
-</section>
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0">
-<div id="ref-Vasconcelos2024" class="csl-entry">
-Vasconcelos, Ana Gabriela, Daniel McGuire, Noah Simon, Patrick Danaher, and Ali Shojaie. 2024. <span>“Differential Expression Analysis for Spatially Correlated Data.”</span> <em>bioRxiv</em>. <a href="https://doi.org/10.1101/2024.08.02.606405">https://doi.org/10.1101/2024.08.02.606405</a>.
-</div>
-</div></section></div> ]]></description>
-  <category>differential expression</category>
-  <category>DE</category>
-  <guid>https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/smiDE/</guid>
-  <pubDate>Wed, 21 May 2025 00:00:00 GMT</pubDate>
-  <media:content url="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/smiDE/figures/fig1_thumbnail.PNG" medium="image"/>
 </item>
 </channel>
 </rss>
