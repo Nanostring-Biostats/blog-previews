@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.30">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Lidan Wu">
+<meta name="dcterms.date" content="2025-03-23">
+<meta name="description" content="Supercharge your CosMx data analysis with the latest napari-CosMx release v0.5.0, now featuring seamless multi-omics integration and true 3D RNA workflows. Move from raw data to spatial discoveries faster, with interactive visualization and streamlined scripting for reproducible results.">
+
+<title>Unlocking Spatial Insights: Multi-Omics &amp; 3D RNA Analysis with napari-CosMx v0.5.0 – Blog</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../assets/logo_Bruker_black.png" rel="icon" type="image/png">
+<script src="../../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-3a01e2046221230fdceeea94b1ec5d67.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-a4a11d514c7d463668e07712114998e6.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-c1091440317a9281743ded74104a8a94.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-29W4MW0Y2W"></script>
+
+<script type="text/plain" cookie-consent="tracking">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-29W4MW0Y2W', { 'anonymize_ip': true});
+</script>
+
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({
+  "notice_banner_type":"simple",
+  "consent_type":"implied",
+  "palette":"light",
+  "language":"en",
+  "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
+  "notice_banner_reject_button_hide":false,
+  "preferences_center_close_button_hide":false,
+  "website_name":""
+  ,
+"language":"en"
+  });
+});
+</script> 
+  
+
+
+</head>
+
+<body class="floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../.././assets/logo_Bruker_white.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">Topics</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../guides/index.html"> 
+<span class="menu-text">Guides (new!)</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../bbytes/index.html"> 
+<span class="menu-text">Browser Bytes (new!)</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../link-to-code.html"> 
+<span class="menu-text">Source Code</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/company/bruker-spatial"> <i class="bi bi-linkedin" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../index.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Unlocking Spatial Insights: Multi-Omics &amp; 3D RNA Analysis with <code>napari-CosMx v0.5.0</code></h1>
+                  <div>
+        <div class="description">
+          Supercharge your CosMx data analysis with the latest <code>napari-CosMx</code> release <code>v0.5.0</code>, now featuring seamless multi-omics integration and true 3D RNA workflows. Move from raw data to spatial discoveries faster, with interactive visualization and streamlined scripting for reproducible results.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">napari</div>
+                <div class="quarto-category">visualization</div>
+                <div class="quarto-category">3D imaging</div>
+                <div class="quarto-category">multi-omics</div>
+                <div class="quarto-category">CosMx 2.3</div>
+                <div class="quarto-category">how-tos</div>
+              </div>
+                  </div>
+  </div>
+    
+  <div class="quarto-title-meta-author">
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-heading">Affiliations</div>
+    
+      <div class="quarto-title-meta-contents">
+      <p class="author">Lidan Wu <a href="https://orcid.org/0000-0003-3150-6170" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+    </div>
+    <div class="quarto-title-meta-contents">
+          <p class="affiliation">
+              Bruker Spatial Biology
+            </p>
+          <p class="affiliation">
+              Github: <a href="https://github.com/lidanwu" target="_blank">lidanwu</a>
+            </p>
+        </div>
+    </div>
+
+  <div class="quarto-title-meta">
+
+        
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">March 23, 2025</p>
+      </div>
+    </div>
+    
+      <div>
+      <div class="quarto-title-meta-heading">Modified</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date-modified">March 23, 2026</p>
+      </div>
+    </div>
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="2">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a>
+  <ul class="collapse">
+  <li><a href="#quick-install-upgrade" id="toc-quick-install-upgrade" class="nav-link" data-scroll-target="#quick-install-upgrade"><span class="header-section-number">1.1</span> Quick install / upgrade</a></li>
+  </ul></li>
+  <li><a href="#sec-new-features" id="toc-sec-new-features" class="nav-link" data-scroll-target="#sec-new-features"><span class="header-section-number">2</span> What’s New at a Glance</a></li>
+  <li><a href="#sec-widget-flow" id="toc-sec-widget-flow" class="nav-link" data-scroll-target="#sec-widget-flow"><span class="header-section-number">3</span> How to Use in <code>napari</code> GUI</a>
+  <ul class="collapse">
+  <li><a href="#new-capability-highlights" id="toc-new-capability-highlights" class="nav-link" data-scroll-target="#new-capability-highlights"><span class="header-section-number">3.1</span> New capability highlights</a></li>
+  <li><a href="#reader-widget-flow" id="toc-reader-widget-flow" class="nav-link" data-scroll-target="#reader-widget-flow"><span class="header-section-number">3.2</span> Reader + Widget flow</a>
+  <ul class="collapse">
+  <li><a href="#sec-stitch-panel" id="toc-sec-stitch-panel" class="nav-link" data-scroll-target="#sec-stitch-panel"><span class="header-section-number">3.2.1</span> Step 1: Stitch Images panel</a></li>
+  <li><a href="#sec-explore-panels" id="toc-sec-explore-panels" class="nav-link" data-scroll-target="#sec-explore-panels"><span class="header-section-number">3.2.2</span> Step 2: Opening stitched data in the viewer</a></li>
+  </ul></li>
+  <li><a href="#data-exploration-widget" id="toc-data-exploration-widget" class="nav-link" data-scroll-target="#data-exploration-widget"><span class="header-section-number">3.3</span> Data Exploration widget</a>
+  <ul class="collapse">
+  <li><a href="#dataset-panel" id="toc-dataset-panel" class="nav-link" data-scroll-target="#dataset-panel"><span class="header-section-number">3.3.1</span> Dataset panel</a></li>
+  <li><a href="#morphology-images-panel" id="toc-morphology-images-panel" class="nav-link" data-scroll-target="#morphology-images-panel"><span class="header-section-number">3.3.2</span> Morphology Images panel</a></li>
+  <li><a href="#protein-expression-panel" id="toc-protein-expression-panel" class="nav-link" data-scroll-target="#protein-expression-panel"><span class="header-section-number">3.3.3</span> Protein Expression panel</a></li>
+  <li><a href="#rna-transcripts-panel" id="toc-rna-transcripts-panel" class="nav-link" data-scroll-target="#rna-transcripts-panel"><span class="header-section-number">3.3.4</span> RNA Transcripts panel</a></li>
+  <li><a href="#color-cells-panel" id="toc-color-cells-panel" class="nav-link" data-scroll-target="#color-cells-panel"><span class="header-section-number">3.3.5</span> Color Cells panel</a></li>
+  <li><a href="#sec-layer-group-manager" id="toc-sec-layer-group-manager" class="nav-link" data-scroll-target="#sec-layer-group-manager"><span class="header-section-number">3.3.6</span> Layer Group Manager</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#sec-cli" id="toc-sec-cli" class="nav-link" data-scroll-target="#sec-cli"><span class="header-section-number">4</span> Advanced Usage: Command-line Tools</a>
+  <ul class="collapse">
+  <li><a href="#quick-workflow-recipes" id="toc-quick-workflow-recipes" class="nav-link" data-scroll-target="#quick-workflow-recipes"><span class="header-section-number">4.1</span> Quick workflow recipes</a>
+  <ul class="collapse">
+  <li><a href="#multi-omics-typical-current-2d" id="toc-multi-omics-typical-current-2d" class="nav-link" data-scroll-target="#multi-omics-typical-current-2d"><span class="header-section-number">4.1.1</span> Multi-omics (typical current 2D)</a></li>
+  <li><a href="#rna-3d-full-volume" id="toc-rna-3d-full-volume" class="nav-link" data-scroll-target="#rna-3d-full-volume"><span class="header-section-number">4.1.2</span> RNA 3D (full volume)</a></li>
+  <li><a href="#d-input-to-2d-output-single-z-plane" id="toc-d-input-to-2d-output-single-z-plane" class="nav-link" data-scroll-target="#d-input-to-2d-output-single-z-plane"><span class="header-section-number">4.1.3</span> 3D input to 2D output (single Z plane)</a></li>
+  <li><a href="#protein-stitching-only" id="toc-protein-stitching-only" class="nav-link" data-scroll-target="#protein-stitching-only"><span class="header-section-number">4.1.4</span> Protein stitching only</a></li>
+  </ul></li>
+  <li><a href="#export-to-ome-tiff" id="toc-export-to-ome-tiff" class="nav-link" data-scroll-target="#export-to-ome-tiff"><span class="header-section-number">4.2</span> Export to OME-TIFF</a></li>
+  </ul></li>
+  <li><a href="#sec-python" id="toc-sec-python" class="nav-link" data-scroll-target="#sec-python"><span class="header-section-number">5</span> Advanced Usage: Python API</a>
+  <ul class="collapse">
+  <li><a href="#minimal-setup-dataset-introspection" id="toc-minimal-setup-dataset-introspection" class="nav-link" data-scroll-target="#minimal-setup-dataset-introspection"><span class="header-section-number">5.1</span> Minimal setup + dataset introspection</a></li>
+  <li><a href="#common-task-patterns" id="toc-common-task-patterns" class="nav-link" data-scroll-target="#common-task-patterns"><span class="header-section-number">5.2</span> Common task patterns</a>
+  <ul class="collapse">
+  <li><a href="#d-labels-segmentation-and-channel-loading" id="toc-d-labels-segmentation-and-channel-loading" class="nav-link" data-scroll-target="#d-labels-segmentation-and-channel-loading"><span class="header-section-number">5.2.1</span> 3D labels, segmentation, and channel loading</a></li>
+  <li><a href="#multi-omics-naming-behavior" id="toc-multi-omics-naming-behavior" class="nav-link" data-scroll-target="#multi-omics-naming-behavior"><span class="header-section-number">5.2.2</span> Multi-omics naming behavior</a></li>
+  <li><a href="#roi-based-cell-selection-across-z" id="toc-roi-based-cell-selection-across-z" class="nav-link" data-scroll-target="#roi-based-cell-selection-across-z"><span class="header-section-number">5.2.3</span> ROI-based cell selection across Z</a></li>
+  <li><a href="#transcript-overlays-with-z-filtering" id="toc-transcript-overlays-with-z-filtering" class="nav-link" data-scroll-target="#transcript-overlays-with-z-filtering"><span class="header-section-number">5.2.4</span> Transcript overlays with Z filtering</a></li>
+  <li><a href="#open-layer-group-manager" id="toc-open-layer-group-manager" class="nav-link" data-scroll-target="#open-layer-group-manager"><span class="header-section-number">5.2.5</span> Open Layer Group Manager</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#conclusions" id="toc-conclusions" class="nav-link" data-scroll-target="#conclusions"><span class="header-section-number">6</span> Conclusions</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<style>
+.feat-table table {
+  table-layout: fixed;
+  width: 100%;
+}
+.feat-table table th:first-child,
+.feat-table table td:first-child {
+  width: 22ch;
+  white-space: normal;
+}
+</style>
+<section id="introduction" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
+<p>Are you ready to accelerate your spatial biology discoveries? The latest <code>napari-CosMx</code> update empowers research teams to go beyond 2D, unlocking multi-omics (RNA + protein) exploration and volumetric 3D RNA analysis—all within a single, intuitive platform. Whether you’re visualizing complex datasets or building robust pipelines, these new features are designed to help you turn instrument output into actionable insights quickly, reproducibly, and at scale.</p>
+<ul>
+<li><a href="#sec-new-features" class="quarto-xref">Section&nbsp;2</a> What’s new at a glance</li>
+<li><a href="#sec-widget-flow" class="quarto-xref">Section&nbsp;3</a> How to use new features in <code>napari</code> GUI (widget flow, recommended for most users)</li>
+<li>Advanced usage with CLI (<a href="#sec-cli" class="quarto-xref">Section&nbsp;4</a>) and Python API (<a href="#sec-python" class="quarto-xref">Section&nbsp;5</a>)</li>
+</ul>
+<p>Like other items in our <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/about.html" target="_blank">Analysis Scratch Space</a>, the usual <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/about.html" target="_blank">caveats</a> and <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/license.html" target="_blank">license</a> applies.</p>
+<section id="quick-install-upgrade" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="quick-install-upgrade"><span class="header-section-number">1.1</span> Quick install / upgrade</h2>
+<ol type="1">
+<li>Download the latest <code>whl</code> file for <code>napari-CosMx v0.5.0</code> from <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/assets/napari-cosmx%20releases" target="_blank">assets/napari-cosmx releases</a>.</li>
+</ol>
+<blockquote class="blockquote">
+<p>Known supported versions for this release:</p>
+<ul>
+<li><a href="https://www.python.org/downloads/" target="_blank">Python</a>: <code>3.8</code> to <code>3.11</code></li>
+<li><a href="https://napari.org/" target="_blank">napari</a>: originally developed for <code>0.4.17</code>; tested with <code>0.5.4</code> and <code>0.6.6</code></li>
+</ul>
+</blockquote>
+<ol start="2" type="1">
+<li><strong>Upgrade an existing environment</strong> (recommended when earlier version of <code>napari-cosmx</code> is already working):</li>
+</ol>
+<p>Install the new wheel <strong>without dependencies</strong> to avoid unnecessary resolver conflicts (especially around vaex-related packages)</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">--no-deps</span> /path/to/napari_CosMx-0.5.0.0-py3-none-any.whl</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="3" type="1">
+<li><strong>Install in a brand-new virtual environment</strong>:</li>
+</ol>
+<p>You could use the latest <code>napari==0.6.6</code>. If needed, <code>napari==0.5.4</code> is also a tested option.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Linux / macOS</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python3.11</span> <span class="at">-m</span> venv .venv</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install napari==0.6.6</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install /path/to/napari_CosMx-0.5.0.0-py3-none-any.whl</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Windows PowerShell</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>py <span class="op">-</span><span class="dv">3.11</span> <span class="op">-</span>m venv <span class="op">.</span><span class="fu">venv</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">.</span><span class="fu">venv</span>\Scripts\Activate<span class="op">.</span><span class="fu">ps1</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>pip install napari<span class="op">==</span><span class="dv">0.6</span><span class="op">.</span><span class="dv">6</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="dt">pip</span> install C<span class="op">:</span>\path\to\napari_cosmx-<span class="op">&lt;</span>version<span class="op">&gt;-</span>py3-none-any<span class="op">.</span><span class="fu">whl</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This post spotlights what’s new and how to get the most out of these features. For more details on installation and the basic 2D workflow, see our earlier <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/#category=napari" target="_blank">posts</a>.</p>
+</section>
+</section>
+<section id="sec-new-features" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> What’s New at a Glance</h1>
+<div class="feat-table">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>3D cell segmentation</strong></td>
+<td>Volumetric cell labels and segmentation outlines across Z planes for richer spatial context</td>
+</tr>
+<tr class="even">
+<td><strong>Z-plane navigation</strong></td>
+<td>Instantly view any channel, segmentation, or transcript layer for a single Z plane as a 2D image—perfect for side-by-side comparison</td>
+</tr>
+<tr class="odd">
+<td><strong>Multi-omics (RNA + Protein)</strong></td>
+<td>Seamlessly load and explore RNA transcripts alongside protein expression images from a single dataset</td>
+</tr>
+<tr class="even">
+<td><strong>Layer Group Manager</strong></td>
+<td>Organize napari layers into named groups; show/hide entire groups with one click for streamlined visualization</td>
+</tr>
+<tr class="odd">
+<td><strong>OME-TIFF export</strong></td>
+<td>Export OME-TIFF pyramids from the command line; 3D data is split into one CYX file per Z plane by default (QuPath-ready); use <code>--volumetrics</code> for full CZYX volume output</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="sec-widget-flow" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> How to Use in <code>napari</code> GUI</h1>
+<section id="new-capability-highlights" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="new-capability-highlights"><span class="header-section-number">3.1</span> New capability highlights</h2>
+<ol type="1">
+<li><strong>Multi-omics in one workspace (RNA + Protein):</strong> Explore both modalities in a unified, interactive environment (<a href="#fig-multiomics-overview" class="quarto-xref">Figure&nbsp;1</a>).</li>
+<li><strong>3D RNA workflows:</strong> Leverage volumetric labels, Z-aware loading, and Z-filtered transcript overlays for advanced spatial analysis (<a href="#fig-rna3d-overview" class="quarto-xref">Figure&nbsp;2</a>).</li>
+<li><strong>Layer Group Manager:</strong> Effortlessly organize layers into named groups and toggle visibility for efficient data review (<a href="#sec-layer-group-manager" class="quarto-xref">Section&nbsp;3.3.6</a>).</li>
+</ol>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Multi-Omics View</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">3D RNA View</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-multiomics-overview" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-multiomics-overview-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./figures/fig-multiomics-overview.png" class="img-fluid figure-img" width="2021">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-multiomics-overview-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Multi-omics visualization in <code>napari-CosMx</code> with unified workspace showing aligned RNA and protein panels for the same sample, enabling side-by-side modality review.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-rna3d-overview" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-rna3d-overview-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./figures/fig-rna3d-overview.png" class="img-fluid figure-img" width="2024">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-rna3d-overview-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: 3D RNA view with volumetric cell segmentation and z-aware plotting across selected Z planes. Use <code>Roll Dimensions</code> button on lower left of the viewer to see the side-view of tissue section.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="reader-widget-flow" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="reader-widget-flow"><span class="header-section-number">3.2</span> Reader + Widget flow</h2>
+<p>Using <code>napari-CosMx</code> from the GUI is a simple two-step workflow:</p>
+<ol type="1">
+<li><strong>Step 1 — Stitch Images</strong> (<a href="#sec-stitch-panel">Stitch Images panel</a>): prepare your raw CosMx output into the <code>napari-CosMx</code> zarr format that is ready for <code>napari</code> viewer exploration.</li>
+<li><strong>Step 2 — Explore</strong> (<a href="#sec-explore-panels">Exploration panels</a>): drag the prepared output folder into the napari viewer; the plugin reader is invoked automatically and opens the data exploration widget.</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>When you open a <strong>preprocessed folder</strong> through drag-and-drop, the exploration widget focuses on viewing panels and does <strong>not</strong> show the Stitch Images panel. If you want to process a <strong>new raw dataset</strong>, launch <code>Stitch Images</code> directly from the napari menu.</p>
+</div>
+</div>
+<section id="sec-stitch-panel" class="level3" data-number="3.2.1">
+<h3 data-number="3.2.1" class="anchored" data-anchor-id="sec-stitch-panel"><span class="header-section-number">3.2.1</span> Step 1: Stitch Images panel</h3>
+<p>Open a terminal, activate your environment, and launch <code>napari</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">napari</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>From the <code>napari</code> menu, choose <strong>Plugins → Stitch Images (napari CosMx)</strong>. The plugin opens with the <strong>Stitch Images</strong> panel. Use it to turn raw data output exported from AtoMx<sup>®</sup> Spatial Informatics Portal (SIP) into a napari-ready dataset.</p>
+<div id="fig-stitch-panel" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-stitch-panel-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/fig-stitch-widget.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-stitch-panel-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: <strong>Stitch Images panel</strong> used to configure inputs, dimensionality, and output location before preprocessing raw data into napari-ready folder. (A) Launch <code>Stitch Images (napari CosMx)</code> widget under <code>napari</code> plugins menu. (B) <code>Stitch Images</code> widget layout. (C) Example setup and log messages for stitching RNA 3D data. (D) Example setup and log messages for stitching multiomics (Protein + RNA) 2D data.
+</figcaption>
+</figure>
+</div>
+<p><strong>How it works:</strong></p>
+<ol type="1">
+<li><p>Export raw data for your study from AtoMx SIP (see (earlier post)<span target="_blank">https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-cosmx-intro/#sec-export-raw-data</span>) and organize them by slide. Each slide folder (<a href="#fig-raw-inputs" class="quarto-xref">Figure&nbsp;4</a>) should contain</p>
+<ul>
+<li><code>CellStatsDir</code>: contains per-FOV cell segmentation outcomes (<code>FOV*/CellLabels_F*.tif</code>) and morphological images (<code>Morphology2D</code> for 2D data or <code>Morphology3D</code> for 3D data).</li>
+<li><code>RunSummary</code>: contains fov position csv file, <code>*FOV_Locations.csv</code> or <code>*fov_positions_file.csv.gz</code> (flat file).</li>
+<li><code>AnalysisResults/&lt;guid&gt;</code>: contains per-FOV organized data for RNA transcripts (<code>FOV*/*FOV*__complete_code_cell_target_call_coord.csv</code>) or Protein images (<code>FOV*/ProteinImages/*_F*_&lt;ProbeID&gt;.TIF</code>).</li>
+<li><code>plex*.csv</code>: required if it’s protein data; csv file listing the protein names (<code>ProbID</code> &amp; <code>DisplayName</code>) included in your protein data.</li>
+</ul></li>
+<li><p>Click <strong>Browse Primary Folder</strong> and select your primary CosMx exported data folder. The folder must contain <code>CellStatsDir</code> and <code>RunSummary</code> sub-directories as mentioned above.</p>
+<blockquote class="blockquote">
+<p>For <strong>multi-omics</strong> runs where RNA and protein data live in separate source folders, choose the <strong>protein run folder</strong> as the primary input. Then use the <strong>Browse Additional RNA Folder (Optional)</strong> button (Step 2) to point to the RNA run folder; the widget will auto-detect the correct <code>AnalysisResults</code> path inside it.</p>
+</blockquote></li>
+<li><p>The plugin <strong>auto-detects</strong> whether the <code>CellLabels_F*.TIF</code> files carry a Z-index suffix (e.g.&nbsp;<code>CellLabels_F00001_Z003.TIF</code>) and sets <strong>Input ndim</strong> and <strong>Output ndim</strong> accordingly:</p>
+<pre><code>Detected input ndim: 3 (example: CellLabels_F001_Z001.TIF).
+Default plan set to 3D -&gt; 3D. You can override before stitching.</code></pre>
+<p>The widget also <strong>auto-detects RNA and protein inputs</strong> and pre-checks the corresponding workflow checkboxes. You can manually override either checkbox before clicking <strong>Stitch</strong>.</p></li>
+<li><p>Review the <strong>Planned stitch mode</strong> preview and adjust as needed:</p></li>
+</ol>
+<div class="feat-table">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Setting</th>
+<th>What it controls</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Input ndim</strong></td>
+<td>Whether the raw files are 2D or 3D (Z-stack) tiles</td>
+</tr>
+<tr class="even">
+<td><strong>Output ndim</strong></td>
+<td>Whether to write a volumetric (3D) or flat (2D) zarr store</td>
+</tr>
+<tr class="odd">
+<td><strong>Z slice</strong></td>
+<td>Which Z plane to extract when collapsing 3D → 2D</td>
+</tr>
+<tr class="even">
+<td><strong>Z step (µm)</strong></td>
+<td>Physical Z spacing, e.g.&nbsp;<code>0.8</code> for CosMx standard RNA 3D runs; leave blank to read it from raw data</td>
+</tr>
+<tr class="odd">
+<td><strong>Run read-targets for RNA</strong></td>
+<td>Parse transcript coordinates into <code>targets.hdf5</code></td>
+</tr>
+<tr class="even">
+<td><strong>Run stitch-expression for protein</strong></td>
+<td>Stitch protein expression images into the same store</td>
+</tr>
+</tbody>
+</table>
+</div>
+<ol start="5" type="1">
+<li>Click <strong>Choose Output Folder</strong> to set the destination, then click <strong>Stitch</strong>. High-level status messages appear in real time in the widget as each stage completes (reading labels, writing morphology, running RNA/protein steps).</li>
+</ol>
+<p>When stitching finishes, all morphological channels, segmentation masks, transcript tables (if RNA), and protein images (if protein) are written to an output directory that’s instantly ready for <code>napari-CosMx</code> data exploration.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Raw Data Inputs</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Stitched Outputs</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-raw-inputs" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-raw-inputs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./figures/fig-raw-inputs.jpg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-raw-inputs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Raw data inputs for <code>Stitch Images (napari CosMx)</code> plugin.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-stitch-outocmes" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-stitch-outocmes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./figures/fig-stitch-outocmes.png" class="img-fluid figure-img" width="1631">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-stitch-outocmes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Napari-ready data generated by <code>Stitch Images (napari CosMx)</code> plugin. Output folder examples for RNA-only (A) and multiomics (B).
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<strong>See it in action</strong>: Here’s how to stitch a multi-omics dataset.
+<figure style="text-align: center;" class="figure">
+<video src="figures/multiOmics_stitch_20260320.webm" controls="" autoplay="" loop="" muted="" style="max-width: 100%; height: auto;">
+Your browser does not support the video tag.
+</video>
+<figcaption>
+<b>Video 1:</b> Demonstration of the Stitch Images widget in <code>napari-CosMx</code> with a multi-omics dataset.
+</figcaption>
+</figure>
+</section>
+<section id="sec-explore-panels" class="level3" data-number="3.2.2">
+<h3 data-number="3.2.2" class="anchored" data-anchor-id="sec-explore-panels"><span class="header-section-number">3.2.2</span> Step 2: Opening stitched data in the viewer</h3>
+<p>Drag and drop your <strong>stitched output folder</strong> (which contains an <code>images</code> sub-folder) into the napari viewer canvas, or use <strong>File → Open Folder</strong>. Napari instantly detects the data and prompts you to choose a reader. Select <strong>napari-CosMx</strong>, check “Remember this choice,” and watch as the plugin loads your dataset and opens an interactive exploration environment tailored to your data.</p>
+<p>Each exploration panel is designed for a specific analysis task. Here’s what you get:</p>
+<div class="feat-table">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Panel</th>
+<th>Shown when…</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Dataset</strong></td>
+<td>Always — displays summary info and quick access to <a href="#sec-layer-group-manager">Layer Group Manager</a></td>
+</tr>
+<tr class="even">
+<td><strong>Morphology Images</strong></td>
+<td>Always — channel images (<code>DNA</code>, <code>PanCK</code>, etc.) with Z-plane navigation for 3D</td>
+</tr>
+<tr class="odd">
+<td><strong>RNA Transcripts</strong></td>
+<td>When transcript data is present — overlay genes as point clouds with Z-filtering</td>
+</tr>
+<tr class="even">
+<td><strong>Protein Expression</strong></td>
+<td>When protein images are present — visualize expression across channels</td>
+</tr>
+<tr class="odd">
+<td><strong>Color Cells</strong></td>
+<td>When cell labels are present — color cells by any metadata column</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Color by cell metadata">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Color by cell metadata
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>To enable cell coloring, include your metadata file before opening the dataset: either a custom <code>*_metadata.csv</code> (with <code>cell_ID</code> column following the <code>c_[slide]_[fov]_[CellId]</code> pattern) or the AtoMX SIP-exported <code>*_metadata_file.csv.gz</code> placed at the root of your napari-ready data folder.</p>
+</div>
+</div>
+<p><strong>See it in action:</strong> Here’s a multi-omics dataset being explored interactively—loading RNA transcripts, overlaying protein expression images, and switching between modalities seamlessly in one workspace:</p>
+<figure style="text-align: center;" class="figure">
+<video src="figures/multiOmics_breast_20260320.webm" controls="" autoplay="" loop="" muted="" style="max-width: 100%; height: auto;">
+Your browser does not support the video tag.
+</video>
+<figcaption>
+<b>Video 2:</b> Interactive multi-omics data exploration: RNA transcripts and protein expression visualized side-by-side in a unified napari workspace.
+</figcaption>
+</figure>
+<div class="callout callout-style-default callout-note callout-titled" title="Smart panel detection">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Smart panel detection
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The exploration widget automatically enables only the panels relevant to your data. If your dataset has RNA-only data, you’ll see Morphology Images and RNA Transcripts panels. For multi-omics (RNA + protein), all relevant panels appear. Each panel supports 3D datasets with full Z-plane filtering.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="data-exploration-widget" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="data-exploration-widget"><span class="header-section-number">3.3</span> Data Exploration widget</h2>
+<section id="dataset-panel" class="level3" data-number="3.3.1">
+<h3 data-number="3.3.1" class="anchored" data-anchor-id="dataset-panel"><span class="header-section-number">3.3.1</span> Dataset panel</h3>
+<p>At the top of the exploration widget, the <strong>Dataset</strong> panel provides a quick at-a-glance summary of your loaded data:</p>
+<pre><code>name:        Breast-multiomics
+folder:      /data/Breast-multiomics
+modalities:  rna, protein
+dimensions:  2D</code></pre>
+<p>This panel also contains the <strong>Layer Groups…</strong> button, giving you instant access to the <a href="#sec-layer-group-manager">Layer Group Manager</a> for organizing and toggling your layers as you explore.</p>
+</section>
+<section id="morphology-images-panel" class="level3" data-number="3.3.2">
+<h3 data-number="3.3.2" class="anchored" data-anchor-id="morphology-images-panel"><span class="header-section-number">3.3.2</span> Morphology Images panel</h3>
+<p>Browse and display all available morphology channels (e.g.&nbsp;<code>DNA</code>, <code>PanCK</code>, <code>CD45</code>). Simply select a channel, pick your preferred colormap, and click <strong>Add layer</strong> to overlay it on your canvas.</p>
+<p><strong>For 3D datasets</strong>, a <strong>Z plane</strong> field unlocks depth-specific exploration:</p>
+<ul>
+<li>Leave blank → loads the <strong>full 3D volume</strong> (Z × Y × X) as a single multiscale layer for volumetric rendering</li>
+<li>Enter a Z value (e.g.&nbsp;<code>3</code>) → loads <strong>that plane only</strong> as a lightweight 2D layer named <code>DNA [z=3]</code> — perfect for rapid comparisons without reloading the entire stack</li>
+<li>Enter <code>current</code> → locks to whichever Z plane you’re currently viewing, automatically updating as you scroll</li>
+</ul>
+<p>This makes side-by-side depth comparisons effortless, as illustrated in the <a href="#sec-z-plane-metadata-compare">Z-plane Comparison for Metadata</a> video below.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Visualize 3D data in `napari`">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Visualize 3D data in <code>napari</code>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In napari’s <strong>Dimensions</strong> controls (bottom-left), click on <strong>arrow</strong> sign to step through Z planes with the Z slider, or <strong>change the order of visual axes (roll dimensions)</strong> for side-view rendering (see <a href="#fig-rna3d-overview" class="quarto-xref">Figure&nbsp;2</a>).</p>
+</div>
+</div>
+</section>
+<section id="protein-expression-panel" class="level3" data-number="3.3.3">
+<h3 data-number="3.3.3" class="anchored" data-anchor-id="protein-expression-panel"><span class="header-section-number">3.3.3</span> Protein Expression panel</h3>
+<p>When protein data is present, this panel appears automatically. Select a protein channel, pick a colormap, and click <strong>Add layer</strong> to visualize expression patterns.</p>
+<p>The same <strong>Z plane</strong> field available in Morphology Images also applies here, giving you identical control for exploring protein expression across tissue depth:</p>
+<pre><code>Protein:   CD3
+Colormap:  red
+Z plane:   2     ← loads only the Z=2 plane as 'CD3 [z=2]'</code></pre>
+<p>When a gene and protein share the same name (e.g.&nbsp;<strong>B</strong>), <code>napari-CosMx</code> automatically assigns distinct layer names—<strong>B [rna]</strong> and <strong>B [protein]</strong>, so you can load both and compare their spatial distributions side-by-side without confusion.</p>
+</section>
+<section id="rna-transcripts-panel" class="level3" data-number="3.3.4">
+<h3 data-number="3.3.4" class="anchored" data-anchor-id="rna-transcripts-panel"><span class="header-section-number">3.3.4</span> RNA Transcripts panel</h3>
+<p>Visualize individual genes as point clouds overlaid on your morphology and protein layers. When <code>targets.hdf5</code> is present, this panel activates automatically.</p>
+<p><strong>Controls:</strong></p>
+<ul>
+<li><strong>Gene selector</strong> — choose your target from the dropdown</li>
+<li><strong>Color</strong> — pick from standard colors (white, red, green, blue, magenta, yellow, cyan)</li>
+<li><strong>Point size</strong> — set the rendered size of transcript dots (default 5; especially useful for 3D datasets where napari’s default sizing struggles)</li>
+</ul>
+<p><strong>Z-plane control (3D datasets only):</strong></p>
+<p>For volumetric datasets, the <strong>Z plane(s)</strong> field gives you precise control over which transcripts to display:</p>
+<div class="feat-table">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Input</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><em>(blank in 3D)</em></td>
+<td><strong>All Z planes</strong> (default) — complete volumetric view across the entire tissue section</td>
+</tr>
+<tr class="even">
+<td><code>all</code></td>
+<td>Explicit “all planes” (same behavior as blank)</td>
+</tr>
+<tr class="odd">
+<td><code>2</code></td>
+<td>Single plane (e.g.&nbsp;Z plane 2) — named <code>GeneA [3D z=2]</code> for easy identification</td>
+</tr>
+<tr class="even">
+<td><code>2-4</code></td>
+<td>Range of planes inclusive (Z 2 through 4) — named <code>GeneA [3D z=2-4]</code></td>
+</tr>
+<tr class="odd">
+<td><code>1,3,5</code></td>
+<td>Non-contiguous planes — named <code>GeneA [3D z=1,3,5]</code></td>
+</tr>
+<tr class="even">
+<td><code>current</code></td>
+<td>Locked to your currently viewed Z plane — updates dynamically as you navigate</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Layer names automatically include their Z selection for clarity, making it trivial to load multiple Z-plane overlays and toggle them independently.</p>
+<section id="sec-3d-rna-viz" class="level4" data-number="3.3.4.1">
+<h4 data-number="3.3.4.1" class="anchored" data-anchor-id="sec-3d-rna-viz"><span class="header-section-number">3.3.4.1</span> 3D RNA Visualization</h4>
+<p>For <strong>3D datasets</strong>, the RNA Transcripts panel supports volumetric exploration. You can overlay transcripts across multiple Z planes, combine them with morphology channels at different depths, and visualize the spatial organization of genes in full 3D space. This is particularly powerful for detecting spatial relationships that only emerge when viewing the complete volume.</p>
+<p>Here’s a real example of 3D RNA exploration with transcript overlays and side-view morphology:</p>
+<figure style="text-align: center;" class="figure">
+<video src="figures/rna3D_explore_3dView01_20260320.webm" controls="" autoplay="" loop="" muted="" style="max-width: 100%; height: auto;">
+Your browser does not support the video tag.
+</video>
+<figcaption>
+<b>Video 3:</b> 3D RNA data exploration with volumetric transcript overlays and morphology channels.
+</figcaption>
+</figure>
+<div class="callout callout-style-default callout-tip callout-titled" title="3D rendering for thin tissue sections">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+3D rendering for thin tissue sections
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For thin tissue sections of 5~10 µm thickness, standard 3D volumetric rendering can be difficult to visualize. Use napari’s <strong>axis reordering controls</strong> (the button labeled with cube icon in the bottom toolbar) to swap the Z, Y, and X axes and view your data from the side. This “side-view” perspective makes thin sections much easier to visualize and is demonstrated in the video above. You can toggle between standard XY view and side-view as needed during your analysis.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="color-cells-panel" class="level3" data-number="3.3.5">
+<h3 data-number="3.3.5" class="anchored" data-anchor-id="color-cells-panel"><span class="header-section-number">3.3.5</span> Color Cells panel</h3>
+<p>The <strong>Color Cells</strong> panel appears when cell labels are present. Use it to color cells by any metadata column (cell type, niche, cluster, etc.) from your cell <code>*_metadata.csv</code> file (or AtoMx-SIP exported flat file <code>*_metadata_file.csv.gz</code>) that is placed at the root of the napari-ready data folder.</p>
+<p><strong>Basic usage:</strong></p>
+<ol type="1">
+<li>Choose a <strong>metadata column</strong> from the dropdown — the viewer’s label layer is automatically updated with per-cell colors drawn from the column’s palette.</li>
+<li>Switch between columns to explore different metadata dimensions instantly.</li>
+</ol>
+<p><strong>Keep multiple colored layers (comparison mode):</strong></p>
+<p>By default, each new metadata column selection <strong>replaces</strong> the previous coloring. To compare different metadata colorings side by side (e.g., cell type vs.&nbsp;niche vs.&nbsp;cluster), check the <strong>“Keep previous colored layers”</strong> checkbox before switching columns. This creates a new colored layer for each metadata column, allowing you to:</p>
+<ul>
+<li>Select cell type → creates layer “cell_type”</li>
+<li>Switch to niche → creates layer “niche” (keeps cell_type visible)</li>
+<li>Switch to cluster → creates layer “cluster” (keeps both visible)</li>
+</ul>
+<p>Now you can show/hide each colored layer independently to compare distributions across metadata dimensions.</p>
+<section id="sec-z-plane-metadata-compare" class="level4" data-number="3.3.5.1">
+<h4 data-number="3.3.5.1" class="anchored" data-anchor-id="sec-z-plane-metadata-compare"><span class="header-section-number">3.3.5.1</span> Z-plane Comparison for Metadata</h4>
+<p>For <strong>3D datasets</strong>, you can deepen your analysis by coloring cells at different Z planes and comparing spatial distributions across depths. This workflow highlights how cell-type composition, niches, or clusters change through the tissue volume:</p>
+<ul>
+<li>Enter a value in the <strong>Z plane</strong> field in the <strong>Color Cells</strong> panel — the viewer automatically loads and colors the corresponding Z plane’s labels layer if it’s not already present.</li>
+<li>The coloring updates instantly based on your current metadata column selection.</li>
+<li>Repeat for other Z planes to compare cell-type distributions side by side—each Z plane is a separate layer you can show or hide independently.</li>
+<li>For detailed Z-plane comparisons across multiple metadata columns, the <a href="#sec-layer-group-manager"><strong>Layer Group Manager</strong></a> helps organize layers by plane and metadata type for cleaner navigation.</li>
+</ul>
+<p>Here’s a practical demonstration of comparing cell metadata across multiple Z planes:</p>
+<figure style="text-align: center;" class="figure">
+<video src="figures/rna3D_explore_compareZ02_20260320.webm" controls="" autoplay="" loop="" muted="" style="max-width: 100%; height: auto;">
+Your browser does not support the video tag.
+</video>
+<figcaption>
+<b>Video 4:</b> Comparing cell metadata across different Z planes to visualize spatial heterogeneity through tissue depth.
+</figcaption>
+</figure>
+</section>
+</section>
+<section id="sec-layer-group-manager" class="level3" data-number="3.3.6">
+<h3 data-number="3.3.6" class="anchored" data-anchor-id="sec-layer-group-manager"><span class="header-section-number">3.3.6</span> Layer Group Manager</h3>
+<p>Managing dozens of layers across multiple Z planes and omics modalities can become unwieldy. Click <strong>Layer Groups…</strong> in the Dataset panel to open the <strong>Layer Group Manager</strong> as a separate dock widget.</p>
+<p><strong>What it does:</strong></p>
+<ol type="1">
+<li><strong>Create a group</strong> — type a name (e.g.&nbsp;<em>immune</em>, <em>epithelial</em>, <em>tumor</em>) and click <strong>New Group</strong>.</li>
+<li><strong>Assign layers</strong> — select one or more layers in the napari layer list, then click <strong>Add selected viewer layers</strong>.</li>
+<li><strong>Toggle visibility</strong> — click <strong>Show</strong> or <strong>Hide</strong> to show or hide all layers in a group in one step.</li>
+</ol>
+<p>Groups are stored for the current session and are especially useful when switching between RNA morphology stacks and protein expression images (see example below).</p>
+<figure style="text-align: center;" class="figure">
+<video src="figures/rna3D_explore_layerGroups03_20260320.webm" controls="" autoplay="" loop="" muted="" style="max-width: 100%; height: auto;">
+Your browser does not support the video tag.
+</video>
+<figcaption>
+<b>Video 5:</b> Demonstration of how to use Layer Group Manager.
+</figcaption>
+</figure>
+</section>
+</section>
+</section>
+<section id="sec-cli" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Advanced Usage: Command-line Tools</h1>
+<p>All preprocessing steps are available as standalone console scripts, so they drop directly into shell scripts, Snakemake workflows, and Nextflow pipelines.</p>
+<section id="quick-workflow-recipes" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="quick-workflow-recipes"><span class="header-section-number">4.1</span> Quick workflow recipes</h2>
+<section id="multi-omics-typical-current-2d" class="level3" data-number="4.1.1">
+<h3 data-number="4.1.1" class="anchored" data-anchor-id="multi-omics-typical-current-2d"><span class="header-section-number">4.1.1</span> Multi-omics (typical current 2D)</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">stitch-images</span> <span class="dt">\</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>   <span class="at">-i</span>  /data/run/CellStatsDir <span class="dt">\</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>   <span class="at">-f</span>  /data/run/RunSummary <span class="dt">\</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>   <span class="at">-o</span>  /output/Liver-S2</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="ex">read-targets</span> /data/run/AnalysisResults/<span class="op">&lt;</span>run-id<span class="op">&gt;</span> -o /output/Liver-S2</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="ex">stitch-expression</span> <span class="dt">\</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>   <span class="at">-i</span> /data/run <span class="dt">\</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>   <span class="at">-o</span> /output/Liver-S2 <span class="dt">\</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>   <span class="at">--ndim</span> 2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="rna-3d-full-volume" class="level3" data-number="4.1.2">
+<h3 data-number="4.1.2" class="anchored" data-anchor-id="rna-3d-full-volume"><span class="header-section-number">4.1.2</span> RNA 3D (full volume)</h3>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Full 3D output (Z × Y × X volumes per channel)</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">stitch-images</span> <span class="dt">\</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">-i</span>  /data/run/CellStatsDir <span class="dt">\</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">-f</span>  /data/run/RunSummary <span class="dt">\</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">-o</span>  /output/Liver-S2 <span class="dt">\</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">--input-ndim</span>  3 <span class="dt">\</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">--output-ndim</span> 3 </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The output zarr store keeps Z mapping in <code>CosMx</code> attributes, and downstream viewer/export steps read it automatically.</p>
+</section>
+<section id="d-input-to-2d-output-single-z-plane" class="level3" data-number="4.1.3">
+<h3 data-number="4.1.3" class="anchored" data-anchor-id="d-input-to-2d-output-single-z-plane"><span class="header-section-number">4.1.3</span> 3D input to 2D output (single Z plane)</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">stitch-images</span> <span class="dt">\</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">-i</span>  /data/run/CellStatsDir <span class="dt">\</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">-f</span>  /data/run/RunSummary <span class="dt">\</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">-o</span>  /output/Liver-S2-z2 <span class="dt">\</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">--input-ndim</span>  3 <span class="dt">\</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">--output-ndim</span> 2 <span class="dt">\</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">--zslice</span>      2          <span class="co"># export only Z plane 2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="protein-stitching-only" class="level3" data-number="4.1.4">
+<h3 data-number="4.1.4" class="anchored" data-anchor-id="protein-stitching-only"><span class="header-section-number">4.1.4</span> Protein stitching only</h3>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">stitch-expression</span> <span class="dt">\</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>   <span class="at">-i</span> /data/run <span class="dt">\</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>   <span class="at">-o</span> /output/Liver-S2 <span class="dt">\</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>   <span class="at">--ndim</span> 2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="export-to-ome-tiff" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="export-to-ome-tiff"><span class="header-section-number">4.2</span> Export to OME-TIFF</h2>
+<p><code>export-tiff</code> command converts a stitched zarr store into pyramidal OME-TIFF for <a href="https://qupath.readthedocs.io/en/stable/docs/intro/index.html" target="_blank">QuPath</a>, <a href="https://imagej.net/software/fiji/" target="_blank">FIJI</a>, and other OME-aware tools.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Output file count is driven by a few settings:</p>
+<ul>
+<li>Selection is explicit: use <code>--channels</code>, <code>--proteins</code>, or <code>--all</code>.</li>
+<li>One file per batch by default (<code>batch_0_...</code>, <code>batch_1_...</code>, …).</li>
+<li>3D defaults to <strong>one CYX file per Z plane</strong>; use <code>--volumetrics</code> for <strong>one CZYX file</strong>.</li>
+<li>Use <code>--dry-run</code> to preview batches and estimated file count.</li>
+</ul>
+</div>
+</div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2D dataset → CYX OME-TIFF</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">export-tiff</span> <span class="at">-i</span> /output/Liver-S2 <span class="at">-o</span> /exports/Liver-S2 <span class="at">--all</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 3D dataset → one CYX OME-TIFF per Z plane (default)</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ex">export-tiff</span> <span class="at">-i</span> /output/Liver-S2-3d <span class="at">-o</span> /exports/Liver-S2-3d <span class="at">--all</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Export only Z planes 1 and 3 (still splits into per-Z CYX files by default)</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="ex">export-tiff</span> <span class="at">-i</span> /output/Liver-S2-3d <span class="at">-o</span> /exports/subset <span class="dt">\</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">--z-planes</span> 1 3</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Volumetric export: one CZYX OME-TIFF for tools that handle full volumes</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="ex">export-tiff</span> <span class="at">-i</span> /output/Liver-S2-3d <span class="at">-o</span> /exports/volumetric <span class="dt">\</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">--volumetrics</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Dry-run preview (no files written)</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="ex">export-tiff</span> <span class="at">-i</span> /output/Liver-S2-3d <span class="at">-o</span> /exports/Liver-S2-3d <span class="dt">\</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">--segmentation</span> <span class="at">--channels</span> DNA <span class="at">--proteins</span> CD3 CD8 PanCK <span class="dt">\</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">--batchsize</span> 5 <span class="at">--dry-run</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Practical defaults for large dataset">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Practical defaults for large dataset
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Start with <code>--dry-run</code> to confirm batch count and expected output files.</li>
+<li>Avoid <code>--all</code> on very large protein runs; use targeted <code>--channels</code> and <code>--proteins</code> lists.</li>
+<li>Use smaller <code>--batchsize</code> values (for example <code>5</code> to <code>10</code>) to reduce memory pressure.</li>
+<li>For QuPath, use the default per-Z split for 3D data (do not use <code>--volumetrics</code>); volumetric mode is for tools that support full CZYX volumes like FIJI.</li>
+<li><code>--libvips</code> is an experimental memory-optimized option and depends on compatible <code>tifffile</code> +<code>zarr</code> + <code>pyvips</code> builds. Current working baseline for <code>napari-cosmx</code> is <code>tifffile&lt;2025</code> with <code>zarr&lt;3</code>; if it does not work in your environment, rerun without <code>--libvips</code>.</li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-python" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Advanced Usage: Python API</h1>
+<p>Use the Python API when you want script-level control in notebooks or pipelines.</p>
+<section id="minimal-setup-dataset-introspection" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="minimal-setup-dataset-introspection"><span class="header-section-number">5.1</span> Minimal setup + dataset introspection</h2>
+<div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> napari</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> napari_cosmx.gemini <span class="im">import</span> Gemini</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>viewer <span class="op">=</span> napari.Viewer()</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> Gemini(<span class="st">'/output/Liver-S2-3d'</span>, viewer<span class="op">=</span>viewer)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dataset.is_3d)          <span class="co"># True</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dataset.z_slices)       <span class="co"># [1, 2, 3, 4, 5]  (physical Z values from the run)</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dataset.modalities)     <span class="co"># ('rna',) or ('rna','protein')</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dataset.is_multiomics)  <span class="co"># True if both RNA and protein are present</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dataset.channels)       <span class="co"># ['B', 'DNA', 'CK8_18', ...]</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dataset.proteins)       <span class="co"># ['CD3', 'CD8', 'PanCK', ...]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="common-task-patterns" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="common-task-patterns"><span class="header-section-number">5.2</span> Common task patterns</h2>
+<section id="d-labels-segmentation-and-channel-loading" class="level3" data-number="5.2.1">
+<h3 data-number="5.2.1" class="anchored" data-anchor-id="d-labels-segmentation-and-channel-loading"><span class="header-section-number">5.2.1</span> 3D labels, segmentation, and channel loading</h3>
+<div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the full 3D segmentation volume</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>full_labels <span class="op">=</span> dataset.add_cell_labels()     <span class="co"># shape: (Z, Y, X)</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>full_seg    <span class="op">=</span> dataset.add_segmentation()    <span class="co"># outlines, same volume</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Load a single Z plane as a lightweight 2D layer</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>z3_labels <span class="op">=</span> dataset.add_cell_labels(z_plane<span class="op">=</span><span class="dv">3</span>)   <span class="co"># name: 'Metadata [z=3]'</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>z3_seg    <span class="op">=</span> dataset.add_segmentation(z_plane<span class="op">=</span><span class="dv">3</span>)  <span class="co"># name: 'Segmentation [z=3]'</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Load morphology at a specific Z</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>dna_z3 <span class="op">=</span> dataset.add_channel(<span class="st">'DNA'</span>, z_plane<span class="op">=</span><span class="dv">3</span>)   <span class="co"># name: 'DNA [z=3]'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="multi-omics-naming-behavior" class="level3" data-number="5.2.2">
+<h3 data-number="5.2.2" class="anchored" data-anchor-id="multi-omics-naming-behavior"><span class="header-section-number">5.2.2</span> Multi-omics naming behavior</h3>
+<div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add a protein channel</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>cd3 <span class="op">=</span> dataset.add_protein(<span class="st">'CD3'</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># When a gene and protein share a name, modality tags prevent collisions:</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   Gene 'B' → 'B [rna]'</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   Protein 'B' → 'B [protein]'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="roi-based-cell-selection-across-z" class="level3" data-number="5.2.3">
+<h3 data-number="5.2.3" class="anchored" data-anchor-id="roi-based-cell-selection-across-z"><span class="header-section-number">5.2.3</span> ROI-based cell selection across Z</h3>
+<p>This is where interactive exploration becomes decision-ready analysis: draw study-relevant ROIs in the napari viewer, then convert those regions into metadata columns you can filter, summarize, and export.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1) In the napari UI, create a Shapes layer (name it 'ROI') and draw polygons.</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 2) Back in Python, retrieve that layer by name.</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>roi_layer <span class="op">=</span> viewer.layers[<span class="st">'ROI'</span>]</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 3) Add ROI membership columns to metadata.</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># The layer name ('ROI') becomes a boolean column.</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>meta_with_roi <span class="op">=</span> dataset.layers_to_metadata([<span class="st">'ROI'</span>], shape_z_plane<span class="op">=</span><span class="st">'current'</span>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 4) Use ROI-positive cells for downstream analysis.</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>roi_meta <span class="op">=</span> meta_with_roi[meta_with_roi[<span class="st">'ROI'</span>]]</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Example: summarize cell types in the selected region.</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>roi_meta[<span class="st">'cell_type'</span>].value_counts()</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 3D z-plane examples (polygons are drawn in 2D, then mapped to 3D labels):</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Current displayed z plane only</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>meta_current <span class="op">=</span> dataset.layers_to_metadata([<span class="st">'ROI'</span>], shape_z_plane<span class="op">=</span><span class="st">'current'</span>)</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="co"># All z planes</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>meta_all <span class="op">=</span> dataset.layers_to_metadata([<span class="st">'ROI'</span>], shape_z_plane<span class="op">=</span><span class="st">'any'</span>)</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Inclusive z range (by source z values)</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>meta_range <span class="op">=</span> dataset.layers_to_metadata([<span class="st">'ROI'</span>], shape_z_plane<span class="op">=</span>(<span class="dv">1</span>, <span class="dv">3</span>))</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Explicit z-plane list</span></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>meta_list <span class="op">=</span> dataset.layers_to_metadata([<span class="st">'ROI'</span>], shape_z_plane<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>See <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-rois/cosmx-rois.html#more-efficient-roi-creation" target="_blank">earlier post</a> on more ways to generate ROIs.</p>
+</div>
+</div>
+</section>
+<section id="transcript-overlays-with-z-filtering" class="level3" data-number="5.2.4">
+<h3 data-number="5.2.4" class="anchored" data-anchor-id="transcript-overlays-with-z-filtering"><span class="header-section-number">5.2.4</span> Transcript overlays with Z filtering</h3>
+<div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># If z_plane is omitted in a 3D dataset, behavior follows display mode:</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 2D display -&gt; current Z only; 3D display -&gt; all Z planes.</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>dataset.add_points(point_size<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Force all transcripts across the full volume regardless of display mode</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>dataset.add_points(point_size<span class="op">=</span><span class="dv">2</span>, z_plane<span class="op">=</span><span class="st">'any'</span>)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Transcripts only at Z planes 2 and 3</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>dataset.add_points(point_size<span class="op">=</span><span class="dv">2</span>, z_plane<span class="op">=</span>(<span class="dv">2</span>, <span class="dv">3</span>))</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot a single gene with the same z-plane semantics</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>dataset.plot_transcripts(<span class="st">'KRT18'</span>, color<span class="op">=</span><span class="st">'yellow'</span>, point_size<span class="op">=</span><span class="dv">3</span>, z_plane<span class="op">=</span><span class="st">'any'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="open-layer-group-manager" class="level3" data-number="5.2.5">
+<h3 data-number="5.2.5" class="anchored" data-anchor-id="open-layer-group-manager"><span class="header-section-number">5.2.5</span> Open Layer Group Manager</h3>
+<div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>dataset.show_group_manager()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+</section>
+<section id="conclusions" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Conclusions</h1>
+<p>This release brings together two core workflows in one plugin: multi-omics exploration and 3D RNA exploration, providing a seamless path from interactive review in napari to reproducible analysis in scripts and notebooks.</p>
+<div class="feat-table">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Task</th>
+<th>Widget</th>
+<th>CLI</th>
+<th>Python</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Prepare raw data (stitch)</td>
+<td>Stitch Images panel</td>
+<td><code>stitch-images</code>, <code>stitch-expression</code>, <code>read-targets</code></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>Open stitched data</td>
+<td>drag-and-drop → reader prompt</td>
+<td>—</td>
+<td><code>Gemini('/out', viewer=viewer)</code></td>
+</tr>
+<tr class="odd">
+<td>View channel at Z plane</td>
+<td>Morphology Images — Z plane field</td>
+<td>—</td>
+<td><code>dataset.add_channel(name, z_plane=N)</code></td>
+</tr>
+<tr class="even">
+<td>View protein expression</td>
+<td>Protein Expression panel</td>
+<td><code>stitch-expression --ndim 2</code></td>
+<td><code>dataset.add_protein(name)</code></td>
+</tr>
+<tr class="odd">
+<td>View RNA transcripts</td>
+<td>RNA Transcripts panel</td>
+<td>—</td>
+<td><code>dataset.add_points(z_plane=...)</code></td>
+</tr>
+<tr class="even">
+<td>Color cells by metadata</td>
+<td>Color Cells panel</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td>Color cells at a specific Z plane</td>
+<td>Color Cells — Z plane field</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>Manage layer groups</td>
+<td>Layer Group Manager</td>
+<td>—</td>
+<td><code>dataset.show_group_manager()</code></td>
+</tr>
+<tr class="odd">
+<td>Select cells in ROI (RNA 3D)</td>
+<td>—</td>
+<td>—</td>
+<td><code>dataset.layers_to_metadata(['ROI'], shape_z_plane=...)</code></td>
+</tr>
+<tr class="even">
+<td>Export OME-TIFF</td>
+<td>—</td>
+<td><code>export-tiff</code></td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/nanostring-biostats\.github\.io\/CosMx-Analysis-Scratch-Space");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Bruker Spatial Biology, Inc.&nbsp;All rights reserved.</p>
+</div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="../../license.html">
+<p>License</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../cookie_policy.html">
+<p>Cookie Policy</p>
+</a>
+  </li>  
+</ul>
+    <div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
