@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Lidan Wu">
-<meta name="dcterms.date" content="2026-03-23">
+<meta name="dcterms.date" content="2026-03-24">
 <meta name="description" content="Supercharge your CosMx data analysis with the latest napari-CosMx release v0.5.0, now featuring seamless multi-omics integration and true 3D RNA workflows. Move from raw data to spatial discoveries faster, with interactive visualization and streamlined scripting for reproducible results.">
 
 <title>Unlocking Spatial Insights: Multi-Omics &amp; 3D RNA Analysis with napari-CosMx v0.5.0 – Blog</title>
@@ -243,14 +243,14 @@ cookieconsent.run({
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">March 23, 2026</p>
+        <p class="date">March 24, 2026</p>
       </div>
     </div>
     
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">March 23, 2026</p>
+        <p class="date-modified">March 24, 2026</p>
       </div>
     </div>
       
@@ -326,14 +326,24 @@ cookieconsent.run({
 
 
 <style>
-.feat-table table {
-  table-layout: fixed;
-  width: 100%;
+.feat-table table.table {
+  table-layout: auto !important;
+  width: 100% !important;
 }
-.feat-table table th:first-child,
-.feat-table table td:first-child {
-  width: 22ch;
-  white-space: normal;
+
+/* First column strict width */
+.feat-table table.table th:first-child,
+.feat-table table.table td:first-child {
+  width: 22ch !important;
+  max-width: 22ch !important;
+  white-space: normal !important;
+}
+
+/* Remaining columns behave naturally */
+.feat-table table.table th:not(:first-child),
+.feat-table table.table td:not(:first-child) {
+  width: auto !important;
+  white-space: normal !important;
 }
 </style>
 <section id="introduction" class="level1" data-number="1">
@@ -502,12 +512,12 @@ Figure&nbsp;3: <strong>Stitch Images panel</strong> used to configure inputs, di
 </div>
 <p><strong>How it works:</strong></p>
 <ol type="1">
-<li><p>Export raw data for your study from AtoMx SIP (see (earlier post)<span target="_blank">https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-cosmx-intro/#sec-export-raw-data</span>) and organize them by slide. Each slide folder (<a href="#fig-raw-inputs" class="quarto-xref">Figure&nbsp;4</a>) should contain</p>
+<li><p>Export raw data for your study from AtoMx SIP (see <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/napari-cosmx-intro/#sec-export-raw-data" target="_blank">earlier post</a>) and organize them by slide. Each slide folder (<a href="#fig-raw-inputs" class="quarto-xref">Figure&nbsp;4</a>) should contain</p>
 <ul>
 <li><code>CellStatsDir</code>: contains per-FOV cell segmentation outcomes (<code>FOV*/CellLabels_F*.tif</code>) and morphological images (<code>Morphology2D</code> for 2D data or <code>Morphology3D</code> for 3D data).</li>
 <li><code>RunSummary</code>: contains fov position csv file, <code>*FOV_Locations.csv</code> or <code>*fov_positions_file.csv.gz</code> (flat file).</li>
 <li><code>AnalysisResults/&lt;guid&gt;</code>: contains per-FOV organized data for RNA transcripts (<code>FOV*/*FOV*__complete_code_cell_target_call_coord.csv</code>) or Protein images (<code>FOV*/ProteinImages/*_F*_&lt;ProbeID&gt;.TIF</code>).</li>
-<li><code>plex*.csv</code>: required if it’s protein data; csv file listing the protein names (<code>ProbID</code> &amp; <code>DisplayName</code>) included in your protein data.</li>
+<li><code>plex*.csv</code>: required if it’s protein data; csv file listing the protein names (<code>ProbeID</code> &amp; <code>DisplayName</code>) included in your protein data.</li>
 </ul></li>
 <li><p>Click <strong>Browse Primary Folder</strong> and select your primary CosMx exported data folder. The folder must contain <code>CellStatsDir</code> and <code>RunSummary</code> sub-directories as mentioned above.</p>
 <blockquote class="blockquote">
@@ -575,7 +585,7 @@ Default plan set to 3D -&gt; 3D. You can override before stitching.</code></pre>
 <img src="./figures/fig-raw-inputs.jpg" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-raw-inputs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4: Raw data inputs for <code>Stitch Images (napari CosMx)</code> plugin.
+Figure&nbsp;4: Raw data inputs for <code>Stitch Images (napari CosMx)</code> plugin in case of RNA 3D data (left), RNA 2D data (middle) and Protein 2D data (right).
 </figcaption>
 </figure>
 </div>
@@ -725,7 +735,7 @@ Visualize 3D data in <code>napari</code>
 <pre><code>Protein:   CD3
 Colormap:  red
 Z plane:   2     ← loads only the Z=2 plane as 'CD3 [z=2]'</code></pre>
-<p>When a gene and protein share the same name (e.g.&nbsp;<strong>B</strong>), <code>napari-CosMx</code> automatically assigns distinct layer names—<strong>B [rna]</strong> and <strong>B [protein]</strong>, so you can load both and compare their spatial distributions side-by-side without confusion.</p>
+<p>When a gene and protein share the same name (e.g.&nbsp;<strong>B</strong>), <code>napari-CosMx</code> automatically assigns distinct layer name to the newly added layer—<strong>B [rna]</strong> or <strong>B [protein]</strong>, so you can load both and compare their spatial distributions side-by-side without confusion.</p>
 </section>
 <section id="rna-transcripts-panel" class="level3" data-number="3.3.4">
 <h3 data-number="3.3.4" class="anchored" data-anchor-id="rna-transcripts-panel"><span class="header-section-number">3.3.4</span> RNA Transcripts panel</h3>
