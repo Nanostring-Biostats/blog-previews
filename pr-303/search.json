@@ -1033,7 +1033,7 @@
     "href": "about.html#viewing-cosmx-smi-data-with-napari",
     "title": "Browse Posts by Topic",
     "section": "Viewing CosMx® SMI data with Napari",
-    "text": "Viewing CosMx® SMI data with Napari\n\nIntro: using Napari to view and analyze CosMx data and creating napari-ready files from AtoMx exports\nNapari-CosMx plugin essentials\nProgrammatic stitching with napari-cosmx\nProgrammatic stitching of CosMx SMI protein with napari-cosmx\nExporting Zarr Stores to OME-TIFF\nAdvanced plugin tips: creating regions of interests to select cells\nAdvanced plugin tips: reproducibility of images and creating animations\nAligning H&E and CosMx Images in napari\nUnlocking Spatial Insights: Multi-Omics & 3D RNA Analysis with napari-CosMx v0.5.0"
+    "text": "Viewing CosMx® SMI data with Napari\n\nIntro: using Napari to view and analyze CosMx data and creating napari-ready files from AtoMx exports\nNapari-CosMx plugin essentials\nProgrammatic stitching with napari-cosmx\nProgrammatic stitching of CosMx SMI protein with napari-cosmx\nExporting Zarr Stores to OME-TIFF\nAdvanced plugin tips: creating regions of interests to select cells\nAdvanced plugin tips: reproducibility of images and creating animations\nAligning H&E and CosMx Images in napari\nUnlocking Spatial Insights: Multi-Omics & 3D RNA Analysis with napari-CosMx"
   },
   {
     "objectID": "about.html#tissue-specific-solutions",
