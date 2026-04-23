@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Lidan Wu">
-<meta name="dcterms.date" content="2026-04-15">
+<meta name="dcterms.date" content="2026-04-27">
 <meta name="description" content="Supercharge your CosMx data analysis with the latest napari-CosMx release v0.5.0.0, now featuring seamless multi-omics integration and true 3D RNA workflows. Move from raw data to spatial discoveries faster, with interactive visualization and streamlined scripting for reproducible results.">
 
 <title>Unlocking Spatial Insights: Multi-Omics &amp; 3D RNA Analysis with napari-CosMx – Blog</title>
@@ -78,7 +78,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-a4a11d514c7d463668e07712114998e6.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-bac40ea90f416f203d35a692f143664c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-25e73342112ed8c36bc342971a1b736d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
 <link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
@@ -243,14 +243,14 @@ cookieconsent.run({
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">April 15, 2026</p>
+        <p class="date">April 27, 2026</p>
       </div>
     </div>
     
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">April 8, 2026</p>
+        <p class="date-modified">April 23, 2026</p>
       </div>
     </div>
       
@@ -355,6 +355,20 @@ cookieconsent.run({
 <li>Advanced usage with CLI (<a href="#sec-cli" class="quarto-xref">Section&nbsp;4</a>) and Python API (<a href="#sec-python" class="quarto-xref">Section&nbsp;5</a>)</li>
 </ul>
 <p>Like other items in our <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/about.html" target="_blank">Analysis Scratch Space</a>, the usual <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/about.html" target="_blank">caveats</a> and <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/license.html" target="_blank">license</a> apply.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Enable 3D cell segmentation for CosMx<sup>®</sup> RNA assays">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Enable 3D cell segmentation for CosMx<sup>®</sup> RNA assays
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Make sure you’re running <strong>Control Center 2.3 or higher</strong> and <strong>AtoMx<sup>®</sup> Spatial Informatics Portal (SIP) 2.3 or higher</strong>. CosMx instruments produce 2D cell segmentation by default, but upgrading enables 3D cell re-segmentation in AtoMx. Once reprocessed, these 3D segmentation results are fully supported by downstream AtoMx data analysis pipeline and the latest <code>napari-Cosmx</code> for interactive visualization.</p>
+<p>More details can be found in the relevant manuals available through <a href="https://university.nanostring.com/" target="_blank">NanoU</a>.</p>
+</div>
+</div>
 <section id="quick-install-upgrade" class="level2" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="quick-install-upgrade"><span class="header-section-number">1.1</span> Quick install / upgrade</h2>
 <ol type="1">
