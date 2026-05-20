@@ -450,7 +450,8 @@ Under the hood: scoring and routing math
 <p><code>HierAnnot</code> uses two complementary scores at each node in the hierarchy: a <strong>raw enrichment score</strong> that measures how strongly a cluster expresses a node’s marker genes, and a <strong>decision score</strong> that measures how clearly one sibling wins over the others.</p>
 <section id="raw-enrichment-score" class="level3" data-number="2.3.1">
 <h3 data-number="2.3.1" class="anchored" data-anchor-id="raw-enrichment-score"><span class="header-section-number">2.3.1</span> Raw enrichment score</h3>
-<p>For cluster <span class="math inline">\(c\)</span> and marker program/node <span class="math inline">\(n\)</span>, <code>HierAnnot</code> computes an raw enrichment score:</p>
+<p><code>HierAnnot</code> performs LogNormalized-style of preprocessing on the input raw cluster-mean gene expression profiles to get the normalized expression <span class="math inline">\(x\)</span>; <span class="math inline">\(\overline{x}_S\)</span> denotes the mean of <span class="math inline">\(x\)</span> across a gene set <span class="math inline">\(S\)</span> within the cluster.</p>
+<p>For cluster <span class="math inline">\(c\)</span> and marker program/node <span class="math inline">\(n\)</span>, <code>HierAnnot</code> computes an raw enrichment score as:</p>
 <p><span class="math display">\[
 R_{c,n}=\overline{x}_{\text{markers}}-\overline{x}_{\text{matched-controls}}-w_{\text{neg}}\,\overline{x}_{\text{negative markers}}
 \]</span></p>
