@@ -299,7 +299,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">May 20, 2026</p>
+        <p class="date-modified">May 21, 2026</p>
       </div>
     </div>
       
@@ -622,7 +622,7 @@ Illustration Dataset
 </section>
 <section id="step-2-hierannot-scoring-and-export-summary" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="step-2-hierannot-scoring-and-export-summary"><span class="header-section-number">4.2</span> Step 2: HierAnnot scoring and export summary</h2>
-<p>See the later <a href="#sec-choose-hierarhcy" class="quarto-xref">Section&nbsp;6</a> for the full exploration and comparison workflow around hierarchies. For a quick start, <code>match_builtin_hierarchy("your tissue description")</code> is usually a strong first-pass choice before deeper hierarchy comparison.</p>
+<p>See the later <a href="#sec-choose-hierarhcy" class="quarto-xref">Section&nbsp;6</a> for the full exploration and comparison workflow around hierarchies. For a quick start, <code>match_builtin_hierarchy("tissue description")</code> is usually a strong first-pass choice before deeper hierarchy comparison. Here, the <code>"tissue description"</code> is a free-form text string describing the tissue type or biological context of your dataset (e.g., “breast tumor”, “colorectal cancer”, “pancreatic cancer”). You can use natural language, and the function will try to match your input to the most appropriate built-in hierarchy. This makes it easy to get started even if you are not sure of the exact hierarchy name.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1220,7 +1220,7 @@ Figure&nbsp;9: Spatial projection of HierAnnot labels from embedding-derived clu
 <section id="sec-choose-hierarhcy" class="level1" data-number="6">
 <h1 data-number="6"><span class="header-section-number">6</span> Choosing A Hierarchy</h1>
 <p>The annotation result depends on hierarchy choice, so selecting a tissue-appropriate hierarchy is a key practical step.</p>
-<p><code>HierAnnot</code> ships with rich tissue-flavored built-in hierarchies. These built-ins are intentionally designed to work across RNA panels of different sizes, so they tend to focus on critical broad cell types rather than pushing too deeply into very fine-grained subtypes. Users can discover options with <code>list_builtin_hierarchies()</code>, get a direct automatic suggestion with <code>match_builtin_hierarchy(description)</code>, or inspect ranked candidates with <code>suggest_builtin_hierarchies(description)</code>. For a complete and maintained catalog of built-ins, plus additional usage guidance, refer to the package <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/HierAnnot" target="_blank">README</a>.</p>
+<p><code>HierAnnot</code> ships with rich tissue-flavored built-in hierarchies. These built-ins are intentionally designed to work across RNA panels of different sizes, so they tend to focus on critical broad cell types rather than pushing too deeply into very fine-grained subtypes. Users can discover options with <code>list_builtin_hierarchies()</code>, get a direct automatic suggestion with <code>match_builtin_hierarchy("description")</code>, or inspect ranked candidates with <code>suggest_builtin_hierarchies("description")</code>. Note that the <code>"description"</code> here is a free-form text string describing the tissue type (e.g., “brain cortex”). For a complete and maintained catalog of built-ins, plus additional usage guidance, refer to the package <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/HierAnnot" target="_blank">README</a>.</p>
 <p>As a practical rule of thumb:</p>
 <ul>
 <li>If you have a small or very targeted panel, the more immediate question is often whether enough marker separation remains after intersecting the hierarchy with your measured genes; for that, see <a href="#sec-compile-hierarchy-panel" class="quarto-xref">Section&nbsp;6.1</a>.</li>
@@ -1229,7 +1229,7 @@ Figure&nbsp;9: Spatial projection of HierAnnot labels from embedding-derived clu
 <p>A typical workflow for choosing a built-in hierarchy is:</p>
 <ol type="1">
 <li>Call <code>list_builtin_hierarchies()</code> to see all available options.</li>
-<li>Call <code>match_builtin_hierarchy(description)</code> for the single best-matching built-in, or <code>suggest_builtin_hierarchies(description)</code> for a ranked DataFrame of candidates.</li>
+<li>Call <code>match_builtin_hierarchy(...)</code> for the single best-matching built-in, or <code>suggest_builtin_hierarchies(...)</code> for a ranked DataFrame of candidates.</li>
 <li>If the tissue type is ambiguous, run several candidates and compare fit diagnostics on your own cluster means profiles.</li>
 </ol>
 <div class="cell">
