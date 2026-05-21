@@ -1831,13 +1831,12 @@ Figure&nbsp;10: Visual comparison of hierarchy-fit metrics across candidate buil
 <p>For datasets with small RNA panels, ensure:</p>
 <ul>
 <li><em>Marker Gene Separation</em>: Check that the remaining marker genes are still sufficiently distinct after intersecting the hierarchy with your input gene list. Refer to <a href="#sec-compile-hierarchy-panel" class="quarto-xref">Section&nbsp;6.1</a> on how to inspect the markers that remain after panel filtering.</li>
-<li><em>Shallower Hierarchies</em>: If too little specific marker separation remains, remove or simplify fragile branches so the hierarchy stays broad enough for the panel.</li>
+<li><em>Shallower Hierarchies</em>: If too little specific marker separation remains, remove or simplify fragile branches so the hierarchy stays broad enough for the panel. For example, if you see a <code>CD8 T cell</code> cluster but no separate <code>CD4 T cell</code> or <code>Treg</code> cluster in the exported label summary, it may be safer to call that cluster <code>T cell</code>, especially when only 1~2 markers differ among the relevant nodes in the dataset-filtered hierarchy.</li>
 </ul>
 <p><strong>General Tips</strong></p>
 <ul>
 <li>Review the hierarchy structure and marker gene lists to ensure they are appropriate for your dataset.</li>
 <li>For rare cell types, consider providing custom marker lists to improve detection.</li>
-<li>Consider rolling up an annotation if no sibling cluster exists. For example, if you see a <code>CD8 T cell</code> cluster but no separate <code>CD4 T cell</code> cluster, it may be safer to call it <code>T cell</code>.</li>
 <li>For advanced users, the default <code>HierAnnot</code> settings are a robust starting point, especially for spatial datasets. If you want to explore tunable parameters, see the docstring of <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/HierAnnot/hierannot/pipeline.py#L58" target="_blank"><code>HierAnnotPipeline.__init__()</code></a> and <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/HierAnnot/hierannot/workflows.py#L1137" target="_blank"><code>make_cluster_annotation_export_summary()</code></a> functions for descriptions of all available knobs at both scoring/routing and exporting steps.</li>
 </ul>
 </section>
