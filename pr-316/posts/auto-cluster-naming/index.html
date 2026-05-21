@@ -1824,7 +1824,7 @@ Figure&nbsp;10: Visual comparison of hierarchy-fit metrics across candidate buil
 <p><strong>Mixed Labels</strong></p>
 <p>If clusters are annotated with <code>mixed_*</code> or unexpected labels, it may indicate:</p>
 <ul>
-<li><em>Low Resolution Clustering</em>: Try increasing the resolution of your clustering algorithm to create smaller, more distinct clusters.</li>
+<li><em>Low Resolution Clustering</em>: <code>mixed_*</code> labels indicate strong support from different L1 nodes (cell lineages) within same cluster. Try increasing the resolution of your clustering algorithm to create smaller, more distinct clusters.</li>
 <li><em>Signal Bleedthrough</em>: In spatial datasets, abundant cell types may influence rare cell types due to segmentation ambiguity. Try <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/HieraType" target="_blank"><code>HierType</code></a> algorithm introduced in <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/immune-cell-typing-smooth/" target="_blank">earlier post</a> for robust marker-based fine-clustering on minority cell types.</li>
 </ul>
 <p><strong>Targeted RNA Panels</strong></p>
@@ -1837,6 +1837,7 @@ Figure&nbsp;10: Visual comparison of hierarchy-fit metrics across candidate buil
 <ul>
 <li>Review the hierarchy structure and marker gene lists to ensure they are appropriate for your dataset.</li>
 <li>For rare cell types, consider providing custom marker lists to improve detection.</li>
+<li>Consider rolling up an annotation if no sibling cluster exists. For example, if you see a <code>CD8 T cell</code> cluster but no separate <code>CD4 T cell</code> cluster, it may be safer to call it <code>T cell</code>.</li>
 <li>For advanced users, the default <code>HierAnnot</code> settings are a robust starting point, especially for spatial datasets. If you want to explore tunable parameters, see the docstring of <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/HierAnnot/hierannot/pipeline.py#L58" target="_blank"><code>HierAnnotPipeline.__init__()</code></a> and <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/HierAnnot/hierannot/workflows.py#L1137" target="_blank"><code>make_cluster_annotation_export_summary()</code></a> functions for descriptions of all available knobs at both scoring/routing and exporting steps.</li>
 </ul>
 </section>
