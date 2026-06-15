@@ -98,7 +98,7 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-a4a11d514c7d463668e07712114998e6.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-fc1ccc45d6820f09b13ef546ea2afc43.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-2fdaebff472179f4033b32cdfc9043ef.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
 <link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
@@ -299,7 +299,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">June 11, 2026</p>
+        <p class="date-modified">June 15, 2026</p>
       </div>
     </div>
       
@@ -1720,12 +1720,12 @@ Table&nbsp;2: All built-in hierarchies returned by <code>list_builtin_hierarchie
 <div aria-describedby="tbl-hierarchy-list-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="cell caption-top table table-sm table-striped small">
 <colgroup>
-<col style="width: 11%">
+<col style="width: 10%">
 <col style="width: 8%">
-<col style="width: 10%">
-<col style="width: 49%">
-<col style="width: 9%">
-<col style="width: 10%">
+<col style="width: 8%">
+<col style="width: 55%">
+<col style="width: 8%">
+<col style="width: 8%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -1763,6 +1763,14 @@ Table&nbsp;2: All built-in hierarchies returned by <code>list_builtin_hierarchie
 <td style="text-align: right;">8</td>
 </tr>
 <tr class="even">
+<td style="text-align: left;">tissue_origin_screen</td>
+<td style="text-align: left;">tissue_detection</td>
+<td style="text-align: left;">pan-tissue</td>
+<td style="text-align: left;">Shallow tissue-origin screening hierarchy for detect_tissue_type; not intended as a final cell-type hierarchy.</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">17</td>
+</tr>
+<tr class="odd">
 <td style="text-align: left;">breast_tme</td>
 <td style="text-align: left;">tme</td>
 <td style="text-align: left;">breast</td>
@@ -1770,7 +1778,7 @@ Table&nbsp;2: All built-in hierarchies returned by <code>list_builtin_hierarchie
 <td style="text-align: right;">5</td>
 <td style="text-align: right;">23</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">colon_tme</td>
 <td style="text-align: left;">tme</td>
 <td style="text-align: left;">colon</td>
@@ -1778,7 +1786,7 @@ Table&nbsp;2: All built-in hierarchies returned by <code>list_builtin_hierarchie
 <td style="text-align: right;">5</td>
 <td style="text-align: right;">23</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">kidney_tme</td>
 <td style="text-align: left;">tme</td>
 <td style="text-align: left;">kidney</td>
@@ -1786,7 +1794,7 @@ Table&nbsp;2: All built-in hierarchies returned by <code>list_builtin_hierarchie
 <td style="text-align: right;">5</td>
 <td style="text-align: right;">25</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">liver_tme</td>
 <td style="text-align: left;">tme</td>
 <td style="text-align: left;">liver</td>
@@ -1794,7 +1802,7 @@ Table&nbsp;2: All built-in hierarchies returned by <code>list_builtin_hierarchie
 <td style="text-align: right;">5</td>
 <td style="text-align: right;">23</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">lung_tme</td>
 <td style="text-align: left;">tme</td>
 <td style="text-align: left;">lung</td>
@@ -1802,7 +1810,7 @@ Table&nbsp;2: All built-in hierarchies returned by <code>list_builtin_hierarchie
 <td style="text-align: right;">5</td>
 <td style="text-align: right;">23</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">pancreas_tme</td>
 <td style="text-align: left;">tme</td>
 <td style="text-align: left;">pancreas</td>
@@ -1810,15 +1818,15 @@ Table&nbsp;2: All built-in hierarchies returned by <code>list_builtin_hierarchie
 <td style="text-align: right;">5</td>
 <td style="text-align: right;">24</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">skin_tme</td>
 <td style="text-align: left;">tme</td>
 <td style="text-align: left;">skin</td>
 <td style="text-align: left;">Skin-flavored tissue microenvironment hierarchy.</td>
 <td style="text-align: right;">6</td>
-<td style="text-align: right;">27</td>
+<td style="text-align: right;">24</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">tme_core</td>
 <td style="text-align: left;">tme</td>
 <td style="text-align: left;">pan-solid-tissue</td>
@@ -1826,13 +1834,13 @@ Table&nbsp;2: All built-in hierarchies returned by <code>list_builtin_hierarchie
 <td style="text-align: right;">5</td>
 <td style="text-align: right;">22</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">tonsil_tme</td>
 <td style="text-align: left;">tme</td>
 <td style="text-align: left;">tonsil</td>
 <td style="text-align: left;">Tonsil-flavored tissue microenvironment hierarchy.</td>
 <td style="text-align: right;">5</td>
-<td style="text-align: right;">24</td>
+<td style="text-align: right;">23</td>
 </tr>
 </tbody>
 </table>
