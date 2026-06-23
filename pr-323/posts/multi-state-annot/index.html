@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Lidan Wu">
-<meta name="dcterms.date" content="2026-06-16">
+<meta name="dcterms.date" content="2026-06-22">
 <meta name="description" content="Using flat marker-program tracks to annotate tumor-like status, malignant state, and other auxiliary biological programs alongside normal hierarchy labels.">
 
 <title>Multi-state Annotation with HierAnnot: Tumor Status and Auxiliary Program Tracks – Blog</title>
@@ -272,14 +272,14 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">June 16, 2026</p>
+        <p class="date">June 22, 2026</p>
       </div>
     </div>
     
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">June 16, 2026</p>
+        <p class="date-modified">June 23, 2026</p>
       </div>
     </div>
       
@@ -296,10 +296,10 @@ window.Quarto = {
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
   <li><a href="#the-mental-model-identity-first-programs-second" id="toc-the-mental-model-identity-first-programs-second" class="nav-link" data-scroll-target="#the-mental-model-identity-first-programs-second"><span class="header-section-number">2</span> The mental model: identity first, programs second</a></li>
   <li><a href="#working-principles-at-a-glance" id="toc-working-principles-at-a-glance" class="nav-link" data-scroll-target="#working-principles-at-a-glance"><span class="header-section-number">3</span> Working principles at a glance</a></li>
-  <li><a href="#running-pipeline-with-auxillary-track" id="toc-running-pipeline-with-auxillary-track" class="nav-link" data-scroll-target="#running-pipeline-with-auxillary-track"><span class="header-section-number">4</span> Running pipeline with auxillary track</a>
+  <li><a href="#running-pipeline-with-auxiliary-track" id="toc-running-pipeline-with-auxiliary-track" class="nav-link" data-scroll-target="#running-pipeline-with-auxiliary-track"><span class="header-section-number">4</span> Running pipeline with auxiliary track</a>
   <ul class="collapse">
   <li><a href="#illustration-dataset" id="toc-illustration-dataset" class="nav-link" data-scroll-target="#illustration-dataset"><span class="header-section-number">4.1</span> Illustration dataset</a></li>
-  <li><a href="#setup-hierarhcy-and-auxiliary-marker-program-set" id="toc-setup-hierarhcy-and-auxiliary-marker-program-set" class="nav-link" data-scroll-target="#setup-hierarhcy-and-auxiliary-marker-program-set"><span class="header-section-number">4.2</span> Setup hierarhcy and auxiliary marker program set</a></li>
+  <li><a href="#setup-hierarchy-and-auxiliary-marker-program-set" id="toc-setup-hierarchy-and-auxiliary-marker-program-set" class="nav-link" data-scroll-target="#setup-hierarchy-and-auxiliary-marker-program-set"><span class="header-section-number">4.2</span> Setup hierarchy and auxiliary marker program set</a></li>
   <li><a href="#choose-how-auxiliary-track-labels-interact-with-final-labels" id="toc-choose-how-auxiliary-track-labels-interact-with-final-labels" class="nav-link" data-scroll-target="#choose-how-auxiliary-track-labels-interact-with-final-labels"><span class="header-section-number">4.3</span> Choose how auxiliary-track labels interact with final labels</a></li>
   <li><a href="#workflow-a-flag-only-multi-state-annotation" id="toc-workflow-a-flag-only-multi-state-annotation" class="nav-link" data-scroll-target="#workflow-a-flag-only-multi-state-annotation"><span class="header-section-number">4.4</span> Workflow A: flag-only multi-state annotation</a></li>
   <li><a href="#workflow-b-integrated-tumor-annotation" id="toc-workflow-b-integrated-tumor-annotation" class="nav-link" data-scroll-target="#workflow-b-integrated-tumor-annotation"><span class="header-section-number">4.5</span> Workflow B: integrated tumor annotation</a>
@@ -335,32 +335,101 @@ window.Quarto = {
 .table-scroll .table {
   margin-bottom: 0;
 }
+
+/* Compact layout for wide metadata tables with one long description column. */
+.table-scroll .table.compact-table th,
+.table-scroll .table.compact-table td {
+  padding: 0.25rem 0.45rem;
+  font-size: 0.88rem;
+  line-height: 1.25;
+  vertical-align: top;
+}
+
+.table-scroll .table.program-sets-table,
+.table-scroll .table.tumor-summary-table {
+  table-layout: fixed;
+}
+
+.table-scroll .table.program-sets-table th:not(:nth-child(7)),
+.table-scroll .table.program-sets-table td:not(:nth-child(7)) {
+  width: 8.5em;
+  max-width: 8.5em;
+  overflow-wrap: anywhere;
+}
+
+.table-scroll .table.program-sets-table th:nth-child(7),
+.table-scroll .table.program-sets-table td:nth-child(7) {
+  min-width: 28em;
+  width: 28em;
+  max-width: 36em;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.table-scroll .table.tumor-summary-table th:not(:nth-child(5)),
+.table-scroll .table.tumor-summary-table td:not(:nth-child(5)) {
+  width: 10em;
+  max-width: 10em;
+  overflow-wrap: anywhere;
+}
+
+.table-scroll .table.tumor-summary-table th:nth-child(5),
+.table-scroll .table.tumor-summary-table td:nth-child(5) {
+  min-width: 30em;
+  width: 30em;
+  max-width: 42em;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* Freeze first column on horizontal scroll */
+.table-scroll table.compact-table th:first-child,
+.table-scroll table.compact-table td:first-child {
+  position: sticky;
+  left: 0;
+  background-color: white;
+  z-index: 10;
+}
+
+/* Freeze header row on vertical scroll */
+.table-scroll table.compact-table thead th {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 11;
+}
+
+/* Top-left corner cell (frozen row + frozen column) gets highest z-index */
+.table-scroll table.compact-table thead th:first-child {
+  z-index: 12;
+}
 </style>
 <section id="introduction" class="level1" data-number="1">
 <h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
 <p>The first <code>HierAnnot</code> <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/auto-cluster-naming/" target="_blank">post</a> introduced a structured way to assign normal lineage or cell-type labels to clusters. That workflow starts from a tissue-appropriate marker hierarchy and asks a lineage-routing question:</p>
 <blockquote class="blockquote">
-<p>Which normal hierarchy node best explains this cluster?</p>
+<p>Which node in our hierarchy of normal cell types best fits this cluster?</p>
 </blockquote>
 <p>That question is essential, but it is not always enough. In tumor and disease datasets, a cluster may have a clear normal lineage identity and also show several biological programs at the same time. For example, a colon epithelial cluster can be tumor-like, stem-like, mesenchymal-shifted, cycling, and interferon-high. A fibroblast cluster can show fibrosis or wound-response programs. An immune cluster can be cytotoxic, exhausted, or IFN-high.</p>
 <p>Those are <strong>multi-state annotation</strong> problems. They are related to cell identity, but they are not the same as lineage identity. A cluster does not need to choose between “tumor-like” and “cycling” or between “epithelial” and “IFN-high.” Multiple programs can be active together.</p>
 <p><code>HierAnnot</code> therefore separates two tasks:</p>
-<pre class="text"><code>Normal hierarchy track
-    Assign a conservative lineage or cell-type identity.
-
-Tumor / auxiliary program track
-    Detect and report biological state programs that can coexist with the normal identity.</code></pre>
-<p>The tumor/auxiliary track was designed primarily for tumor-status annotation and tumor-like label integration. The same machinery can also be used in <code>flag_only</code> mode for non-tumor auxiliary programs such as cell cycle, stress, inflammation, or fibrosis.</p>
-<p>This post focuses on the tumor/auxiliary program track. I use malignant status annotation as the primary example, but the same design supports broader multi-state annotation.</p>
+<ul>
+<li><strong>Normal hierarchy track</strong>: Assign a conservative lineage or cell-type identity.</li>
+<li><strong>Tumor / auxiliary program track</strong>: Detect and report biological state programs that can coexist with the normal identity.</li>
+</ul>
+<p>The tumor/auxiliary track was designed primarily for tumor-status annotation and tumor-like label integration (which integrates both lineage-based cell type annotation and descriptive tumor status annotation to final export label of a tumor-positive cluster, example shown in <a href="#tbl-intgr-annot" class="quarto-xref">Table&nbsp;6</a>). The same machinery can also be used in <code>flag_only</code> mode for non-tumor auxiliary programs such as cell cycle, stress, inflammation, or fibrosis.</p>
+<p>This post focuses on the tumor/auxiliary program track. I use malignant status annotation as the primary example, but the same design supports broader multi-state annotation. At the end of this workflow, <code>HierAnnot</code> would annotate clusters with labels that carry the auxiliary status description (<a href="#tbl-cluster-malig" class="quarto-xref">Table&nbsp;4</a>) in addition to the lineage-based cell type labels (<a href="#tbl-cluster-annot" class="quarto-xref">Table&nbsp;3</a>).</p>
 </section>
 <section id="the-mental-model-identity-first-programs-second" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> The mental model: identity first, programs second</h1>
 <p>The normal hierarchy track and tumor/auxiliary track solve different problems.</p>
-<p>The <strong>normal hierarchy track</strong> is a tree-routing problem. It uses marker enrichment, sibling competition, marker support, and branch support to decide how far to descend through a normal lineage hierarchy. The output is a normal identity label, with safeguards such as <code>mixed_*</code>, <code>candidate_*</code>, and <code>unknown</code> when the evidence is uncertain.</p>
-<p>The <strong>tumor/auxiliary program track</strong> is a flat program-reporting problem. It scores marker programs in parallel, then reports them through a tiered interpretation layer.</p>
+<p>The <strong>normal hierarchy track</strong> is a tree-routing problem. As illustrated in earlier <a href="https://nanostring-biostats.github.io/CosMx-Analysis-Scratch-Space/posts/auto-cluster-naming/" target="_blank">post</a>, it aggregates evidences from multiple aspects (i.e.&nbsp;marker enrichment, sibling competition, marker support, and branch support) to decide how far to descend through a normal lineage hierarchy. The output is a normal identity label, with safeguards such as <code>mixed_*</code>, <code>candidate_*</code>, and <code>unknown</code> when the evidence is uncertain.</p>
+<p>The <strong>tumor/auxiliary program track</strong> is a flat program-reporting problem. It scores marker programs in parallel, then reports them through a tiered interpretation layer which decides whether the cluster has sufficient evidences for tumor identity and what descriptive annotation should be assigned to an identified tumor-positive cluster.</p>
 <p>The main intuition is:</p>
-<pre class="text"><code>Normal hierarchy = "What is this cluster?"
-Tumor/auxiliary track = "What programs are active in this cluster?"</code></pre>
+<ul>
+<li>Normal hierarchy = “What is this cluster?”</li>
+<li>Tumor/auxiliary track = “What programs are active in this cluster?”</li>
+</ul>
 <p>For tumor annotation, the program track uses three reporting roles:</p>
 <table class="caption-top table">
 <colgroup>
@@ -485,13 +554,13 @@ Figure&nbsp;1: Conceptual overview of HierAnnot’s two-track annotation design.
 </div>
 </div>
 <p>The most important rule is that tumor-like integration is driven by <strong>combined tumor-status evidence</strong>. State programs can support or decorate tumor-status calls, but modifier programs remain diagnostic by default.</p>
-<div class="callout callout-style-default callout-note callout-titled" title="Under the hood: combined malignant-status scoring">
+<div id="nte-combined-scoring" class="callout callout-style-default callout-note callout-titled" title="Under the hood: combined malignant-status scoring">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Under the hood: combined malignant-status scoring
+Note&nbsp;1: Under the hood: combined malignant-status scoring
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
@@ -552,8 +621,27 @@ S_{\mathrm{combined},c} \ge T_{\mathrm{status}}
 </div>
 </div>
 </section>
-<section id="running-pipeline-with-auxillary-track" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Running pipeline with auxillary track</h1>
+<section id="running-pipeline-with-auxiliary-track" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Running pipeline with auxiliary track</h1>
+<div class="callout callout-style-default callout-tip callout-titled" title="Just the code">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Just the code
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For a quick start with just the code, refer to the <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/HierAnnot/examples" target="_blank">examples scripts</a> under <code>HierAnnot/examples</code> subfolder of source code repository.</p>
+<ul>
+<li><code>examples/basic_usage.py</code>: normal hierarchy annotation along with optional malignant integration.</li>
+<li><code>examples/end_to_end_anndata.py</code>: end-to-end workflow with <code>AnnData</code> and custom embeddings.</li>
+<li><code>examples/plot_diagnostics_from_bundle.py</code>: all individual diagnostic plots</li>
+<li><code>examples/tissue_type_detection.py</code>: automatic pipeline with tissue type detection and auto-pick of normal hierarhcy and tumor program set.</li>
+</ul>
+</div>
+</div>
 <section id="illustration-dataset" class="level2" data-number="4.1">
 <h2 data-number="4.1" class="anchored" data-anchor-id="illustration-dataset"><span class="header-section-number">4.1</span> Illustration dataset</h2>
 <div class="callout callout-style-simple callout-note">
@@ -568,44 +656,45 @@ S_{\mathrm{combined},c} \ge T_{\mathrm{status}}
 </div>
 <p>For the code examples, assume we already have an <code>AnnData</code> object named <code>adata</code>. The object should contain expression data and a cluster assignment column:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> anndata <span class="im">as</span> ad </span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># read in anndata object and get the `obs` column with clusters</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>adata <span class="op">=</span> ad.read_h5ad(<span class="st">"path/to/data.h5ad"</span>)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>cluster_key <span class="op">=</span> <span class="st">"cluster"</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Minimal assumed inputs:</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># - adata.layers["counts"]   (raw integer counts, required)</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># - adata.obs["cluster"]     (cluster labels)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> anndata <span class="im">as</span> ad </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># read in anndata object and get the `obs` column with clusters</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>adata <span class="op">=</span> ad.read_h5ad(<span class="st">"path/to/data.h5ad"</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>cluster_key <span class="op">=</span> <span class="st">"cluster"</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Minimal assumed inputs:</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># - adata.layers["counts"]   (raw integer counts, required)</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># - adata.obs["cluster"]     (cluster labels)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><code>HierAnnot</code> scores cluster-level expression profiles. We can aggregate the <code>AnnData</code> object to cluster means:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> hierannot <span class="im">import</span> (</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    aggregate_anndata_to_cluster_means, </span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    HierAnnotPipeline, </span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    make_cluster_annotation_export_summary,</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>cluster_means <span class="op">=</span> aggregate_anndata_to_cluster_means(</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    adata,</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    cluster_key<span class="op">=</span>cluster_key,</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    source<span class="op">=</span><span class="st">"layer"</span>,</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    source_key<span class="op">=</span><span class="st">"counts"</span>,</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    method<span class="op">=</span><span class="st">"mean"</span>,</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    uppercase_genes<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>cluster_means.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> hierannot <span class="im">import</span> (</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    aggregate_anndata_to_cluster_means, </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    HierAnnotPipeline, </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    make_cluster_annotation_export_summary,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>cluster_means <span class="op">=</span> aggregate_anndata_to_cluster_means(</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    adata,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    cluster_key<span class="op">=</span>cluster_key,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    source<span class="op">=</span><span class="st">"layer"</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    source_key<span class="op">=</span><span class="st">"counts"</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    method<span class="op">=</span><span class="st">"mean"</span>,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    uppercase_genes<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co"># pandas.DataFrame with gene names as row index for feature x cluster average expression profiles </span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>cluster_means.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="setup-hierarhcy-and-auxiliary-marker-program-set" class="level2" data-number="4.2">
-<h2 data-number="4.2" class="anchored" data-anchor-id="setup-hierarhcy-and-auxiliary-marker-program-set"><span class="header-section-number">4.2</span> Setup hierarhcy and auxiliary marker program set</h2>
+<section id="setup-hierarchy-and-auxiliary-marker-program-set" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="setup-hierarchy-and-auxiliary-marker-program-set"><span class="header-section-number">4.2</span> Setup hierarchy and auxiliary marker program set</h2>
 <p><code>HierAnnot</code> provides several built-in marker-program sets for tumor-status annotation and auxiliary program scoring. These include broad solid-tumor programs, tissue-context tumor programs, and non-tumor auxiliary program sets for <code>flag_only</code> workflows. You can inspect the available sets and their recommended usage metadata with <code>list_builtin_marker_program_sets()</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> hierannot <span class="im">import</span> list_builtin_marker_program_sets</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>program_sets <span class="op">=</span> list_builtin_marker_program_sets()</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(program_sets)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> hierannot <span class="im">import</span> list_builtin_marker_program_sets</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>program_sets <span class="op">=</span> list_builtin_marker_program_sets()</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(program_sets)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="tbl-marker-sets" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -614,7 +703,7 @@ Table&nbsp;1: All built-in markger program sets returned by <code>list_builtin_m
 </figcaption>
 <div aria-describedby="tbl-marker-sets-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="table-scroll">
-<table class="table table-striped table-hover">
+<table class="table table-striped table-hover compact-table program-sets-table">
 <thead>
 <tr>
 <th style="text-align:left;">
@@ -1039,40 +1128,40 @@ Stress, hypoxia, interferon, and UPR auxiliary programs for flag-only scoring.
 </div>
 </figure>
 </div>
-<p>For the colon cancer example dataset, we will use a colon tissue microenvironment hierarchy <code>colon_tme</code> and a colon-specific tumor program set <code>tumor_colon</code>.</p>
+<p>Each built-in marker program set is designed for different annotation purpose and <code>HierAnnot</code> allows you to pick one marker program set at a time. For the colon cancer example dataset here, we will use a colon tissue microenvironment hierarchy <code>colon_tme</code> and a colon-specific tumor program set <code>tumor_colon</code>. Please refer to package <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/HierAnnot#built-in-and-custom-malignant-programs" target="_blank">README</a> on how to customize the marker program set (i.e.&nbsp;a custom list of <code>MalignantProgram</code> objects) for auxiliary track annotation.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> hierannot <span class="im">import</span> get_builtin_hierarchy, get_builtin_marker_program_set</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># normal hierarchy </span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>root_programs <span class="op">=</span> get_builtin_hierarchy(<span class="st">"colon_tme"</span>)</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co"># tumor program set, use `tumor_general` for generic solid-tumor programs shared across tissue types</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>tumor_programs <span class="op">=</span> get_builtin_marker_program_set(<span class="st">"tumor_colon"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> hierannot <span class="im">import</span> get_builtin_hierarchy, get_builtin_marker_program_set</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># normal hierarchy </span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>root_programs <span class="op">=</span> get_builtin_hierarchy(<span class="st">"colon_tme"</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># tumor program set, use `tumor_general` for generic solid-tumor programs shared across tissue types</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>tumor_programs <span class="op">=</span> get_builtin_marker_program_set(<span class="st">"tumor_colon"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>You can visualize the structure and content of those programs using helper functions:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> hierannot <span class="im">import</span> (</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  format_hierarchy_tree, format_marker_program_set, </span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  summarize_marker_program_set</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>) </span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co"># visualize the chosen hierarchy as a tree</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(format_hierarchy_tree(root_programs))</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co"># visualize the tumor program set</span></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(format_marker_program_set(tumor_programs, title<span class="op">=</span><span class="st">"tumor_colon"</span>))</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co"># get summary info for tumor program set </span></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>program_summary <span class="op">=</span> summarize_marker_program_set(tumor_programs)</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(program_summary[[</span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"name"</span>,</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"reporting_role"</span>,</span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"competition_group"</span>,</span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"n_positive_markers"</span>,</span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"description"</span>,</span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> hierannot <span class="im">import</span> (</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  format_hierarchy_tree, format_marker_program_set, </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  summarize_marker_program_set</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>) </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co"># visualize the chosen hierarchy as a tree</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(format_hierarchy_tree(root_programs))</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co"># visualize the tumor program set</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(format_marker_program_set(tumor_programs, title<span class="op">=</span><span class="st">"tumor_colon"</span>))</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="co"># get summary info for tumor program set </span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>program_summary <span class="op">=</span> summarize_marker_program_set(tumor_programs)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(program_summary[[</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"name"</span>,</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"reporting_role"</span>,</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"competition_group"</span>,</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"n_positive_markers"</span>,</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"description"</span>,</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
@@ -1086,7 +1175,7 @@ Table&nbsp;2: Program summary for built-in <code>tumor_colon</code> marker progr
 </figcaption>
 <div aria-describedby="tbl-tumor-summary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="table-scroll">
-<table class="table table-striped table-hover">
+<table class="table table-striped table-hover compact-table tumor-summary-table">
 <thead>
 <tr>
 <th style="text-align:left;">
@@ -1337,6 +1426,7 @@ Listing&nbsp;2: Example built-in hierarchy
 </div>
 </div>
 </div>
+<p>Within the built-in <code>tumor_*</code> program sets, <code>core_transformation</code> is the main generic tumor-status module, which captures compact expression evidence for a <strong>transformed</strong>, tumor-like <strong>epithelial</strong> state that can be evaluated across solid-tumor data sets. <code>HierAnnot</code> treats this as <strong>tumor-status</strong> evidence: <em>if the program is sufficiently enriched and supported by detected markers, it can contribute to a tumor-like call</em>. More specific programs, such as EMT, cycling, stress, or tissue-specific melanocytic programs, are then used as <strong>state</strong> or <strong>modifier</strong> evidence <em>which do not establish tumor-like identity by themselves but add a small support bonus only when core tumor-status evidence is already borderline</em>. See details on program roles and tumor-status scoring in <a href="#nte-combined-scoring" class="quarto-xref">Note&nbsp;1</a> above.</p>
 </section>
 <section id="choose-how-auxiliary-track-labels-interact-with-final-labels" class="level2" data-number="4.3">
 <h2 data-number="4.3" class="anchored" data-anchor-id="choose-how-auxiliary-track-labels-interact-with-final-labels"><span class="header-section-number">4.3</span> Choose how auxiliary-track labels interact with final labels</h2>
@@ -1374,79 +1464,80 @@ Listing&nbsp;2: Example built-in hierarchy
 </tbody>
 </table>
 <p>A second control is <code>program_report_block_preset</code>, which controls where tumor-like labels are allowed to be reported after normal hierarchy routing. In this post, we use the recommended solid-tumor default:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>program_report_block_preset<span class="op">=</span><span class="st">"tumor_reportable"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>This preset allows reporting in curated tumor-reportable built-in lineages while guarding against common false positives in immune, stromal, endothelial, and mural compartments. For custom hierarchies or specialized workflows, use an exact block list or <code>"lineage_aware"</code> program metadata. For the complete option reference for integration modes, report-block presets, lineage-aware metadata, and export behavior, refer to the package <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/HierAnnot#auxillary-track-annotations" target="_blank">README</a>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>program_report_block_preset<span class="op">=</span><span class="st">"tumor_reportable"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This preset allows reporting in curated tumor-reportable built-in lineages while guarding against common false positives in immune, stromal, endothelial, and mural compartments. For custom hierarchies or specialized workflows, use an exact block list or <code>"lineage_aware"</code> program metadata. For the complete option reference for integration modes, report-block presets, lineage-aware metadata, and export behavior, refer to the package <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/HierAnnot#auxiliary-track-annotations" target="_blank">README</a>.</p>
 <p>The two sections below demonstrate the two most common workflows.</p>
 </section>
 <section id="workflow-a-flag-only-multi-state-annotation" class="level2" data-number="4.4">
 <h2 data-number="4.4" class="anchored" data-anchor-id="workflow-a-flag-only-multi-state-annotation"><span class="header-section-number">4.4</span> Workflow A: flag-only multi-state annotation</h2>
 <p>In <code>flag_only</code> mode, the normal hierarchy still produces the export label. The tumor/auxiliary program track is scored and reported separately in <code>result.malignant_annotations</code>.</p>
 <p>This mode is useful when the program track is a secondary layer of interpretation:</p>
-<pre class="text"><code>Which clusters show tumor-status, state, or modifier evidence?</code></pre>
+<p><strong>Which clusters show tumor-status, state, or modifier evidence?</strong></p>
 <p>without changing the final cell-type labels.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>pipeline_flag <span class="op">=</span> HierAnnotPipeline(</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    root_programs<span class="op">=</span>root_programs,</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    malignant_programs<span class="op">=</span>tumor_programs,</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    malignant_integration_mode<span class="op">=</span><span class="st">"flag_only"</span>,</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    program_report_block_preset<span class="op">=</span><span class="st">"tumor_reportable"</span>,</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>result_flag <span class="op">=</span> pipeline_flag.fit_score(cluster_means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>pipeline_flag <span class="op">=</span> HierAnnotPipeline(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    root_programs<span class="op">=</span>root_programs,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    malignant_programs<span class="op">=</span>tumor_programs,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    malignant_integration_mode<span class="op">=</span><span class="st">"flag_only"</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    program_report_block_preset<span class="op">=</span><span class="st">"tumor_reportable"</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>result_flag <span class="op">=</span> pipeline_flag.fit_score(cluster_means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The normal hierarchy annotations are stored in <code>result.cluster_annotations</code>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>hiera_cols <span class="op">=</span> [</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"cluster_id"</span>,</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_label"</span>,</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_path"</span>,</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_level"</span>,</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_status"</span>,</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_confidence"</span>,</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_branch_supported_raw_score"</span>,</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_final_call_margin"</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>result_flag.cluster_annotations[hiera_cols]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>hiera_cols <span class="op">=</span> [</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"cluster_id"</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_label"</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_path"</span>,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_level"</span>,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_status"</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_confidence"</span>,</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_branch_supported_raw_score"</span>,</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_final_call_margin"</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>result_flag.cluster_annotations[hiera_cols]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>The tumor/auxiliary program summary is stored in <code>result.malignant_annotations</code>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>malig_cols <span class="op">=</span> [</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"cluster_id"</span>,</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_status"</span>,</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_label_concise"</span>,</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_status_label"</span>,</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_state_label"</span>,</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_modifier_labels"</span>,</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_tumor_status_pass"</span>,</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_raw_score"</span>,</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_status_score"</span>,</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_status_decision_source"</span>,</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>result_flag.malignant_annotations[malig_cols]</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="co">## To inspect all strong programs for a given cluster in one field </span></span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>result_flag.malignant_annotations[[<span class="st">"cluster_id"</span>, <span class="st">"annot_malignant_strong_programs"</span>]]</span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="co">## To inspect tumor-like clusters only </span></span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>result_flag.malignant_annotations.loc[</span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>    result_flag.malignant_annotations[<span class="st">"annot_malignant_tumor_status_pass"</span>],</span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>    malig_cols,</span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a><span class="co">## To inspect clusters where state support helped a borderline tumor-status call pass</span></span>
-<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>result_flag.malignant_annotations.loc[</span>
-<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>    result_flag.malignant_annotations[<span class="st">"annot_malignant_status_decision_source"</span>]</span>
-<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    <span class="op">==</span> <span class="st">"status_core_plus_state_support"</span>,</span>
-<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>    malig_cols,</span>
-<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>malig_cols <span class="op">=</span> [</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"cluster_id"</span>,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_status"</span>,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_label_concise"</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_status_label"</span>,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_state_label"</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_modifier_labels"</span>,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_tumor_status_pass"</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_raw_score"</span>,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_status_score"</span>,</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_status_decision_source"</span>,</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>result_flag.malignant_annotations[malig_cols]</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co">## To inspect all strong programs for a given cluster in one field </span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>result_flag.malignant_annotations[[<span class="st">"cluster_id"</span>, <span class="st">"annot_malignant_strong_programs"</span>]]</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="co">## To inspect tumor-like clusters only </span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>result_flag.malignant_annotations.loc[</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>    result_flag.malignant_annotations[<span class="st">"annot_malignant_tumor_status_pass"</span>],</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    malig_cols,</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="co">## To inspect clusters where state support helped a borderline tumor-status call pass</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>result_flag.malignant_annotations.loc[</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>    result_flag.malignant_annotations[<span class="st">"annot_malignant_status_decision_source"</span>]</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>    <span class="op">==</span> <span class="st">"status_core_plus_state_support"</span>,</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>    malig_cols,</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Although the current result table uses <code>malignant_*</code> column names, it is best to think of this table as the summary of the flat tumor/auxiliary program track.</p>
@@ -1504,29 +1595,29 @@ Listing&nbsp;2: Example built-in hierarchy
 <p>This table is intentionally richer than a single label. Multi-state annotation should preserve the distinction between status, state, and modifier programs.</p>
 <p>In <code>flag_only</code> mode, tumor/auxiliary programs do not change the final export label.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>export_flag <span class="op">=</span> make_cluster_annotation_export_summary(result_flag)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>export_flag <span class="op">=</span> make_cluster_annotation_export_summary(result_flag)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>expr_cols <span class="op">=</span> [</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"cluster_id"</span>,</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># final export label</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_export_label"</span>,</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_export_status"</span>,</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># normal hierarchy outcomes </span></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_label"</span>,</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_confidence"</span>,</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># malignant flagging outcomes</span></span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_status"</span>,</span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_label_concise"</span>,</span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_export_malignant_flag"</span></span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>export_flag[expr_cols]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>expr_cols <span class="op">=</span> [</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"cluster_id"</span>,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># final export label</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_export_label"</span>,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_export_status"</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># normal hierarchy outcomes </span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_label"</span>,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_confidence"</span>,</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># malignant flagging outcomes</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_status"</span>,</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_label_concise"</span>,</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_export_malignant_flag"</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>export_flag[expr_cols]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>The export label remains normal-hierarchy based. The tumor/auxiliary status can be used as an additional metadata field.</p>
@@ -3581,40 +3672,40 @@ False
 <h2 data-number="4.5" class="anchored" data-anchor-id="workflow-b-integrated-tumor-annotation"><span class="header-section-number">4.5</span> Workflow B: integrated tumor annotation</h2>
 <p>Integrated mode combines annotations from both tracks into integrated labels. Use it when the desired final label should explicitly include strong reportable tumor-like status.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>pipeline_integrated <span class="op">=</span> HierAnnotPipeline(</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    root_programs<span class="op">=</span>root_programs,</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    malignant_programs<span class="op">=</span>tumor_programs,</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    malignant_integration_mode<span class="op">=</span><span class="st">"integrate"</span>,</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    program_report_block_preset<span class="op">=</span><span class="st">"tumor_reportable"</span>,</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>result_integrated <span class="op">=</span> pipeline_integrated.fit_score(cluster_means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>pipeline_integrated <span class="op">=</span> HierAnnotPipeline(</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    root_programs<span class="op">=</span>root_programs,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    malignant_programs<span class="op">=</span>tumor_programs,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    malignant_integration_mode<span class="op">=</span><span class="st">"integrate"</span>,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    program_report_block_preset<span class="op">=</span><span class="st">"tumor_reportable"</span>,</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>result_integrated <span class="op">=</span> pipeline_integrated.fit_score(cluster_means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The integrated annotation table, <code>result.integrated_annotations</code>, combines normal identity with tumor-status interpretation.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>integrated_cols <span class="op">=</span> [</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"cluster_id"</span>,</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_integrated_label"</span>,</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_integrated_status"</span>,</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_integrated_reason"</span>,</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_label"</span>,</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_status"</span>,</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_label_concise"</span>,</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_tumor_status_pass"</span>,</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_reporting_blocked"</span>,</span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_status_score"</span>,</span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_raw_score"</span>,</span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>result_integrated.integrated_annotations[integrated_cols]</span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a><span class="co">## To inspect clusters whose reporting was blocked by lineage/reporting rules</span></span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>result_integrated.integrated_annotations.loc[</span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>    result_integrated.integrated_annotations[<span class="st">"annot_malignant_reporting_blocked"</span>],</span>
-<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>    integrated_cols,</span>
-<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>integrated_cols <span class="op">=</span> [</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"cluster_id"</span>,</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_integrated_label"</span>,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_integrated_status"</span>,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_integrated_reason"</span>,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_label"</span>,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_status"</span>,</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_label_concise"</span>,</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_tumor_status_pass"</span>,</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_reporting_blocked"</span>,</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_status_score"</span>,</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_raw_score"</span>,</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>result_integrated.integrated_annotations[integrated_cols]</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="co">## To inspect clusters whose reporting was blocked by lineage/reporting rules</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>result_integrated.integrated_annotations.loc[</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>    result_integrated.integrated_annotations[<span class="st">"annot_malignant_reporting_blocked"</span>],</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>    integrated_cols,</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Resolved normal labels with strong reportable tumor-status evidence can become integrated labels such as:</p>
@@ -3623,58 +3714,58 @@ tumor_like_transformed_emt_mesenchymal.Absorptive-like</code></pre>
 <p>Normal-track safeguards are still respected in the export stage. For example, <code>mixed_*</code> or <code>candidate_*</code> labels can remain primary when they carry important normal-hierarchy uncertainty.</p>
 <p>The export summary gives a concise table that can be joined back to <code>adata.obs</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>export_integrated <span class="op">=</span> make_cluster_annotation_export_summary(result_integrated)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>export_integrated <span class="op">=</span> make_cluster_annotation_export_summary(result_integrated)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>expr_cols2 <span class="op">=</span> [</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"cluster_id"</span>,</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># final export label</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_export_label"</span>,</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_export_status"</span>,</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># normal hierarchy outcomes </span></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_label"</span>,</span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_confidence"</span>,</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># malignant flagging outcomes</span></span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_status"</span>,</span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_label_concise"</span>,</span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_export_malignant_flag"</span>,</span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># integrated label before applying other export rules </span></span>
-<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_integrated_label"</span>,</span>
-<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_integrated_status"</span>,</span>
-<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>export_integrated[expr_cols2]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>expr_cols2 <span class="op">=</span> [</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"cluster_id"</span>,</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># final export label</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_export_label"</span>,</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_export_status"</span>,</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># normal hierarchy outcomes </span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_label"</span>,</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_confidence"</span>,</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># malignant flagging outcomes</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_status"</span>,</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_malignant_label_concise"</span>,</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_export_malignant_flag"</span>,</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># integrated label before applying other export rules </span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_integrated_label"</span>,</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"annot_integrated_status"</span>,</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>export_integrated[expr_cols2]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Attach the final export label back to the original <code>AnnData</code> object:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>final_col <span class="op">=</span> <span class="st">"annot_export_label"</span> <span class="co"># or "annot_export_label_with_cluster" </span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>label_map <span class="op">=</span> export_integrated.set_index(<span class="st">"cluster_id"</span>)[final_col]</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>adata.obs[<span class="st">"hierannot_label"</span>] <span class="op">=</span> (</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    adata.obs[cluster_key]</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    .astype(label_map.index.dtype)</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    .<span class="bu">map</span>(label_map)</span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    .fillna(<span class="st">"unassigned"</span>)</span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="co"># attach the tumor-like flag separately</span></span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>tumor_flag_map <span class="op">=</span> export_integrated.set_index(<span class="st">"cluster_id"</span>)[<span class="st">"annot_export_malignant_flag"</span>]</span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>adata.obs[<span class="st">"hierannot_tumor_like"</span>] <span class="op">=</span> (</span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>    adata.obs[cluster_key]</span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>    .astype(tumor_flag_map.index.dtype)</span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>    .<span class="bu">map</span>(tumor_flag_map)</span>
-<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>    .fillna(<span class="va">False</span>)</span>
-<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>final_col <span class="op">=</span> <span class="st">"annot_export_label"</span> <span class="co"># or "annot_export_label_with_cluster" </span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>label_map <span class="op">=</span> export_integrated.set_index(<span class="st">"cluster_id"</span>)[final_col]</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>adata.obs[<span class="st">"hierannot_label"</span>] <span class="op">=</span> (</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    adata.obs[cluster_key]</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    .astype(label_map.index.dtype)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    .<span class="bu">map</span>(label_map)</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    .fillna(<span class="st">"unassigned"</span>)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="co"># attach the tumor-like flag separately</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>tumor_flag_map <span class="op">=</span> export_integrated.set_index(<span class="st">"cluster_id"</span>)[<span class="st">"annot_export_malignant_flag"</span>]</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>adata.obs[<span class="st">"hierannot_tumor_like"</span>] <span class="op">=</span> (</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>    adata.obs[cluster_key]</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>    .astype(tumor_flag_map.index.dtype)</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    .<span class="bu">map</span>(tumor_flag_map)</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>    .fillna(<span class="va">False</span>)</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled" title="Export precedence with mixed, candidate, and unknown normal labels">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -3683,7 +3774,7 @@ Export precedence with mixed, candidate, and unknown normal labels
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>In integration mode, the tumor/auxiliary track does not simply overwrite every normal hierarchy label.</p>
 <p>The default export behavior is:</p>
@@ -5359,19 +5450,19 @@ resolved
 <h3 data-number="4.5.1" class="anchored" data-anchor-id="diagnostic-plots"><span class="header-section-number">4.5.1</span> Diagnostic plots</h3>
 <p><code>HierAnnot</code> includes plotting helpers for various diagnostic checks. See <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/HierAnnot#examples-and-diagnostic-plots" target="_blank">README</a> and <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/blob/Main/_code/HierAnnot/examples/plot_diagnostics_from_bundle.py" target="_blank">examples</a> subfolder of the package for a complete list of all available diagnostic plots.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> hierannot <span class="im">import</span> (</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    plot_malignant_score_heatmap,</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    plot_malignant_status_scatter,</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="co"># same plot functions for `result_flag` and `result_integrated`</span></span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Heatmap of malignant score shows which programs are active across clusters</span></span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>plot_malignant_score_heatmap(result_flag)</span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Scatter plot summarizes raw tumor-status evidence against combined status evidence </span></span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="co"># and helps identify strong, weak, and borderline calls.</span></span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>plot_malignant_status_scatter(result_flag)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> hierannot <span class="im">import</span> (</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    plot_malignant_score_heatmap,</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    plot_malignant_status_scatter,</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="co"># same plot functions for `result_flag` and `result_integrated`</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Heatmap of malignant score shows which programs are active across clusters</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>plot_malignant_score_heatmap(result_flag)</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Scatter plot summarizes raw tumor-status evidence against combined status evidence </span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="co"># and helps identify strong, weak, and borderline calls.</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>plot_malignant_status_scatter(result_flag)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">Malignant score heatmap</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">Scatter plot of malignant status evidence</a></li></ul>
@@ -5404,16 +5495,16 @@ Figure&nbsp;3: Scatter plot of malignant raw score vs combined status score, col
 </div>
 <p>In integrated mode, the most useful diagnostic plots focus on how the tumor/auxiliary track interacts with the normal hierarchy track.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> hierannot <span class="im">import</span> (</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    plot_integration_summary,</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    plot_integration_raw_evidence,</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Summary bar plot for integrated annotation results</span></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>plot_integration_summary(result_integrated)</span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Scatter plot of normal raw evidence against malignant raw evidence</span></span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>plot_integration_raw_evidence(result_integrated)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> hierannot <span class="im">import</span> (</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    plot_integration_summary,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    plot_integration_raw_evidence,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Summary bar plot for integrated annotation results</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>plot_integration_summary(result_integrated)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Scatter plot of normal raw evidence against malignant raw evidence</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>plot_integration_raw_evidence(result_integrated)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true">Integration summary bar plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false">Normal vs.&nbsp;maligant raw evidence</a></li></ul>
@@ -5450,40 +5541,40 @@ Figure&nbsp;5: Raw-evidence scatter plot showing normal hierarchy evidence versu
 <h3 data-number="4.5.2" class="anchored" data-anchor-id="canonical-marker-sanity-checks"><span class="header-section-number">4.5.2</span> Canonical marker sanity checks</h3>
 <p><code>HierAnnot</code> provides a helper to collect positive marker genes from built-in hierarchies and marker program sets.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> hierannot <span class="im">import</span> collect_positive_marker_genes</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co"># get all marker genes as a list </span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>pos_mrk_genes <span class="op">=</span> collect_positive_marker_genes(</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    hierarchy<span class="op">=</span><span class="st">"colon_tme"</span>, </span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># built-in hierarchy name or actual hierarchy `root_programs` </span></span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    program_sets<span class="op">=</span>[<span class="st">"tumor_colon"</span>, <span class="st">"stress"</span>],</span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># built-in program set names </span></span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">## or pass in the actual list of flat marker programs </span></span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># programs = tumor_programs</span></span>
-<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>heatmap_genes <span class="op">=</span> [g <span class="cf">for</span> g <span class="kw">in</span> pos_mrk_genes <span class="cf">if</span> g <span class="kw">in</span> adata.var_names]</span>
-<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a><span class="co"># you can use these markers to make a heatmap across clusters</span></span>
-<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scanpy <span class="im">as</span> sc</span>
-<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>sc.pl.matrixplot(adata, heatmap_genes, groupby<span class="op">=</span>cluster_key)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> hierannot <span class="im">import</span> collect_positive_marker_genes</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co"># get all marker genes as a list </span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>pos_mrk_genes <span class="op">=</span> collect_positive_marker_genes(</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    hierarchy<span class="op">=</span><span class="st">"colon_tme"</span>, </span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># built-in hierarchy name or actual hierarchy `root_programs` </span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    program_sets<span class="op">=</span>[<span class="st">"tumor_colon"</span>, <span class="st">"stress"</span>],</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># built-in program set names </span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">## or pass in the actual list of flat marker programs </span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># programs = tumor_programs</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>heatmap_genes <span class="op">=</span> [g <span class="cf">for</span> g <span class="kw">in</span> pos_mrk_genes <span class="cf">if</span> g <span class="kw">in</span> adata.var_names]</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a><span class="co"># you can use these markers to make a heatmap across clusters</span></span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scanpy <span class="im">as</span> sc</span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>sc.pl.matrixplot(adata, heatmap_genes, groupby<span class="op">=</span>cluster_key)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>To keep track of where each gene came from what sources:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>marker_table <span class="op">=</span> collect_positive_marker_genes(</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    hierarchy<span class="op">=</span><span class="st">"colon_tme"</span>,</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    program_sets<span class="op">=</span>[<span class="st">"tumor_colon"</span>, <span class="st">"stress"</span>],</span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    return_format<span class="op">=</span><span class="st">"dataframe"</span>, <span class="co"># default: "list"</span></span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>marker_table.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>marker_table <span class="op">=</span> collect_positive_marker_genes(</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    hierarchy<span class="op">=</span><span class="st">"colon_tme"</span>,</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    program_sets<span class="op">=</span>[<span class="st">"tumor_colon"</span>, <span class="st">"stress"</span>],</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    return_format<span class="op">=</span><span class="st">"dataframe"</span>, <span class="co"># default: "list"</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>marker_table.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="tbl-mrk-all" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-mrk-all-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;8: Marker table for <code>colon_tme</code> hierarhcy and built-in marker program sets for <code>tumor_colon</code> and <code>stress</code>.
+Table&nbsp;8: Marker table for <code>colon_tme</code> hierarchy and built-in marker program sets for <code>tumor_colon</code> and <code>stress</code>.
 </figcaption>
 <div aria-describedby="tbl-mrk-all-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="table-scroll">
@@ -7492,30 +7583,30 @@ ATF4
 <p>The same flat program track can be used for non-tumor programs. In that case, use <code>flag_only</code> mode so that auxiliary program status does not change the final export label.</p>
 <p>For example, to score <code>stress</code> programs:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>stress_programs <span class="op">=</span> get_builtin_marker_program_set(<span class="st">"stress"</span>)</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>pipeline_stress <span class="op">=</span> HierAnnotPipeline(</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    root_programs<span class="op">=</span>root_programs,</span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    malignant_programs<span class="op">=</span>stress_programs,</span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    malignant_integration_mode<span class="op">=</span><span class="st">"flag_only"</span>,</span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    program_report_block_preset<span class="op">=</span><span class="st">"off"</span>,</span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>result_stress <span class="op">=</span> pipeline_stress.fit_score(cluster_means)</span>
-<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a><span class="co"># To inspect auxiliary annotation </span></span>
-<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>result_stress.malignant_annotations[</span>
-<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>    [</span>
-<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"cluster_id"</span>,</span>
-<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"annot_malignant_status"</span>,</span>
-<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"annot_malignant_label_concise"</span>,</span>
-<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"annot_malignant_modifier_labels"</span>,</span>
-<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"annot_malignant_strong_programs"</span>,</span>
-<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>    ]</span>
-<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a><span class="co"># score heatmap </span></span>
-<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a>plot_malignant_score_heatmap(result_stress)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>stress_programs <span class="op">=</span> get_builtin_marker_program_set(<span class="st">"stress"</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>pipeline_stress <span class="op">=</span> HierAnnotPipeline(</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    root_programs<span class="op">=</span>root_programs,</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    malignant_programs<span class="op">=</span>stress_programs,</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    malignant_integration_mode<span class="op">=</span><span class="st">"flag_only"</span>,</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    program_report_block_preset<span class="op">=</span><span class="st">"off"</span>,</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>result_stress <span class="op">=</span> pipeline_stress.fit_score(cluster_means)</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a><span class="co"># To inspect auxiliary annotation </span></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>result_stress.malignant_annotations[</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>    [</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"cluster_id"</span>,</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"annot_malignant_status"</span>,</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"annot_malignant_label_concise"</span>,</span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"annot_malignant_modifier_labels"</span>,</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"annot_malignant_strong_programs"</span>,</span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a><span class="co"># score heatmap </span></span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>plot_malignant_score_heatmap(result_stress)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Here, <code>annot_malignant_label_concise</code> should be interpreted as the selected auxiliary program label, such as <code>hypoxia</code>, not necessarily a malignant tumor label.</p>
 <div id="fig-stress-score-heatmap" class="quarto-float quarto-figure quarto-figure-center anchored" alt="heatmap of tumor-program status scores across clusters.">
@@ -7534,9 +7625,9 @@ Figure&nbsp;6: Heatmap of <code>stress</code> auxiliary program status across cl
 <h1 data-number="5"><span class="header-section-number">5</span> Conclusion</h1>
 <p>The tumor/auxiliary program track extends <code>HierAnnot</code> from lineage annotation to multi-state annotation.</p>
 <p>The normal hierarchy track answers:</p>
-<pre class="text"><code>What is this cluster's best-supported normal identity?</code></pre>
+<p><strong>What is this cluster’s best-supported normal identity?</strong></p>
 <p>The tumor/auxiliary program track answers:</p>
-<pre class="text"><code>Which tumor-like, state, modifier, or auxiliary marker programs are active?</code></pre>
+<p><strong>Which tumor-like, state, modifier, or auxiliary marker programs are active?</strong></p>
 <p>For malignant annotation, the combined tumor-status score aggregates evidence across status programs, allows gated support from state programs, and keeps modifiers as diagnostic context. This lets <code>HierAnnot</code> report tumor-like labels when appropriate without treating every active biological program as a new cell identity. For non-tumor auxiliary programs, <code>flag_only</code> mode provides the same program-status summary while keeping final export labels anchored to the normal hierarchy.</p>
 <p>Together, this two-track design provides a compact final annotation while preserving the evidence needed to understand, audit, and extend the result.</p>
 

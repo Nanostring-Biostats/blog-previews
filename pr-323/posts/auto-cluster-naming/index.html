@@ -299,7 +299,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">June 16, 2026</p>
+        <p class="date-modified">June 23, 2026</p>
       </div>
     </div>
       
@@ -329,7 +329,7 @@ window.Quarto = {
   <li><a href="#step-4-marker-validation-for-naming" id="toc-step-4-marker-validation-for-naming" class="nav-link" data-scroll-target="#step-4-marker-validation-for-naming"><span class="header-section-number">4.4</span> Step 4: Marker Validation For Naming</a></li>
   </ul></li>
   <li><a href="#advanced-usage-foundation-model-embeddings---hierannot" id="toc-advanced-usage-foundation-model-embeddings---hierannot" class="nav-link" data-scroll-target="#advanced-usage-foundation-model-embeddings---hierannot"><span class="header-section-number">5</span> Advanced Usage: Foundation-Model Embeddings -&gt; HierAnnot</a></li>
-  <li><a href="#sec-choose-hierarhcy" id="toc-sec-choose-hierarhcy" class="nav-link" data-scroll-target="#sec-choose-hierarhcy"><span class="header-section-number">6</span> Choosing A Hierarchy</a>
+  <li><a href="#sec-choose-hierarchy" id="toc-sec-choose-hierarchy" class="nav-link" data-scroll-target="#sec-choose-hierarchy"><span class="header-section-number">6</span> Choosing A Hierarchy</a>
   <ul class="collapse">
   <li><a href="#sec-compile-hierarchy-panel" id="toc-sec-compile-hierarchy-panel" class="nav-link" data-scroll-target="#sec-compile-hierarchy-panel"><span class="header-section-number">6.1</span> Compile A Built-in Hierarchy Against Your Panel</a></li>
   <li><a href="#sec-building-your-own-hierarchy" id="toc-sec-building-your-own-hierarchy" class="nav-link" data-scroll-target="#sec-building-your-own-hierarchy"><span class="header-section-number">6.2</span> Building Your Own Hierarchy</a></li>
@@ -392,7 +392,7 @@ Figure&nbsp;1: A modern spatial analysis pattern: data-driven clustering plus hi
 <section id="working-principles" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> Working Principles</h1>
 <p><code>HierAnnot</code> starts from a tissue-appropriate marker hierarchy, which acts as the main biological prior for annotation. The marker hierarchy is a tree-shaped catalogue of cell types organized from broad categories (e.g., “immune cell”) down to specific subtypes (e.g., “CD8 T cell”). Each node in this tree carries a <em>marker program</em>: a curated list of genes that are expected to be switched <em>ON</em> (or <em>OFF</em>) in that particular cell type. Think of a marker program as a genetic fingerprint for a cell identity: if the right genes are highly expressed, the evidence points toward that label.</p>
-<p>In practice, the package provides several ways to facilitate this step, including built-in hierarchy catalogues, direct matching helpers, and ranked suggestions. The detailed code workflow for choosing and comparing hierarchies appears in latter <a href="#sec-choose-hierarhcy" class="quarto-xref">Section&nbsp;6</a>. For a concrete example of a built-in hierarchy used by <code>HierAnnot</code>, see the example <code>colon_tme</code> hierarchy in <a href="#lst-colon-tme-example" class="quarto-xref">Listing&nbsp;1</a>.</p>
+<p>In practice, the package provides several ways to facilitate this step, including built-in hierarchy catalogues, direct matching helpers, and ranked suggestions. The detailed code workflow for choosing and comparing hierarchies appears in latter <a href="#sec-choose-hierarchy" class="quarto-xref">Section&nbsp;6</a>. For a concrete example of a built-in hierarchy used by <code>HierAnnot</code>, see the example <code>colon_tme</code> hierarchy in <a href="#lst-colon-tme-example" class="quarto-xref">Listing&nbsp;1</a>.</p>
 <p>Once a reasonable hierarchy is selected, <code>HierAnnot</code> combines multiple evidence sources to decide how far to descend and when to stop conservatively.</p>
 <section id="a-concise-view-of-the-scoring-and-routing-logic" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="a-concise-view-of-the-scoring-and-routing-logic"><span class="header-section-number">2.1</span> A Concise View Of The Scoring And Routing Logic</h2>
@@ -634,7 +634,7 @@ Illustration Dataset
 </section>
 <section id="step-2-hierannot-scoring-and-export-summary" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="step-2-hierannot-scoring-and-export-summary"><span class="header-section-number">4.2</span> Step 2: HierAnnot scoring and export summary</h2>
-<p>See the later <a href="#sec-choose-hierarhcy" class="quarto-xref">Section&nbsp;6</a> for the full exploration and comparison workflow around hierarchies. For a quick start, <code>match_builtin_hierarchy("tissue description")</code> is usually a strong first-pass choice before deeper hierarchy comparison. Here, the <code>"tissue description"</code> is a free-form text string describing the tissue type or biological context of your dataset (e.g., “breast tumor”, “colorectal cancer”, “pancreatic cancer”). You can use natural language, and the function will try to match your input to the most appropriate built-in hierarchy. This makes it easy to get started even if you are not sure of the exact hierarchy name.</p>
+<p>See the later <a href="#sec-choose-hierarchy" class="quarto-xref">Section&nbsp;6</a> for the full exploration and comparison workflow around hierarchies. For a quick start, <code>match_builtin_hierarchy("tissue description")</code> is usually a strong first-pass choice before deeper hierarchy comparison. Here, the <code>"tissue description"</code> is a free-form text string describing the tissue type or biological context of your dataset (e.g., “breast tumor”, “colorectal cancer”, “pancreatic cancer”). You can use natural language, and the function will try to match your input to the most appropriate built-in hierarchy. This makes it easy to get started even if you are not sure of the exact hierarchy name.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -653,7 +653,7 @@ Illustration Dataset
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>hierarchy_name <span class="op">=</span> match_builtin_hierarchy(<span class="st">"colon cancer"</span>)</span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>root_programs <span class="op">=</span> get_builtin_hierarchy(hierarchy_name)</span>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Aggregate raw counts across all genes by cluster for HierAnnot.</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Aggregate raw counts across all genes by cluster into feature x cluster pandas.DataFrame for HierAnnot.</span></span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>cluster_means <span class="op">=</span> aggregate_anndata_to_cluster_means(</span>
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    adata,</span>
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    cluster_key<span class="op">=</span>cluster_key,</span>
@@ -1667,7 +1667,7 @@ Figure&nbsp;9: Spatial projection of HierAnnot labels from embedding-derived clu
 </div>
 </div>
 </section>
-<section id="sec-choose-hierarhcy" class="level1" data-number="6">
+<section id="sec-choose-hierarchy" class="level1" data-number="6">
 <h1 data-number="6"><span class="header-section-number">6</span> Choosing A Hierarchy</h1>
 <p>The annotation result depends on hierarchy choice, so selecting a tissue-appropriate hierarchy is a key practical step.</p>
 <p><code>HierAnnot</code> ships with rich tissue-flavored built-in hierarchies. These built-ins are intentionally designed to work across RNA panels of different sizes, so they tend to focus on critical broad cell types rather than pushing too deeply into very fine-grained subtypes. Users can discover options with <code>list_builtin_hierarchies()</code>, get a direct automatic suggestion with <code>match_builtin_hierarchy("description")</code>, or inspect ranked candidates with <code>suggest_builtin_hierarchies("description")</code>. Note that the <code>"description"</code> here is a free-form text string describing the tissue type (e.g., “brain cortex”). For a complete and maintained catalog of built-ins, plus additional usage guidance, refer to the package <a href="https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/HierAnnot" target="_blank">README</a>.</p>
